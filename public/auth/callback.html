@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verificando tu identidad… · Placeta Joven</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/png" href="../img/jovenlogo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --deep:#3A0A6B; --dark:#2A0750; --darker:#1F053C; --accent:#C9B8FF; --accent2:#A78BFA; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      font-family:'Plus Jakarta Sans',sans-serif; color:#fff;
+      background:linear-gradient(160deg,#4E1B94 0%,#2A0750 55%,#1F053C 100%); padding:24px; }
+    .box { background:#fff; color:#25113A; border-radius:22px; padding:2.4rem 2rem; max-width:430px;
+      width:100%; text-align:center; box-shadow:0 24px 60px rgba(10,0,25,.45); }
+    .logo { width:96px; height:96px; margin:0 auto 1.1rem; }
+    .spinner { width:44px; height:44px; border:4px solid #eee; border-top-color:var(--accent2);
+      border-radius:50%; margin:0 auto 1rem; animation:spin .9s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    h1 { font-family:'Bebas Neue',sans-serif; font-weight:400; letter-spacing:.6px; font-size:1.6rem; margin:0 0 .4rem; }
+    p { font-size:.95rem; color:#6B5A86; margin:0 0 1rem; line-height:1.5; }
+    .ok { color:#1f8a4c; font-weight:700; }
+    .err { color:#c62828; font-weight:700; }
+    a.btn { display:inline-block; margin-top:.4rem; background:linear-gradient(120deg,#6D28D9,#7C3AED);
+      color:#fff; text-decoration:none; font-weight:800; padding:.7rem 1.4rem; border-radius:999px; font-size:.95rem; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <img class="logo" src="../img/jovenlogo.png" alt="Placeta Joven" />
+    <div class="spinner" id="spinner"></div>
+    <h1>Verificando tu identidad</h1>
+    <p id="status">Conectando con PlacetaID…</p>
+    <div id="actions" style="display:none">
+      <a class="btn" href="../index.html">Volver a Placeta Joven</a>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var token = params.get('token') || params.get('placetaid_token');
+      var userStr = params.get('user');
+      var statusEl = document.getElementById('status');
+      var actionsEl = document.getElementById('actions');
+      var spinner = document.getElementById('spinner');
+
+      function finish(msg, ok) {
+        spinner.style.display = 'none';
+        statusEl.textContent = msg;
+        statusEl.className = ok ? 'ok' : 'err';
+        actionsEl.style.display = 'block';
+      }
+
+      if (!token || !userStr) {
+        finish('No se recibieron datos de autenticación de PlacetaID.', false);
+        return;
+      }
+
+      try {
+        var user = JSON.parse(decodeURIComponent(userStr));
+        var store = window.PlacetaJovenAuth || { storeSession: function () { return true; } };
+        if (store.storeSession(token, user)) {
+          finish('Identidad verificada. Cargando tu Placeta Joven…', true);
+          setTimeout(function () { window.location.href = '../index.html'; }, 600);
+        } else {
+          finish('No se pudo guardar la sesión en este navegador.', false);
+        }
+      } catch (e) {
+        finish('Error al procesar los datos de PlacetaID.', false);
+      }
+    })();
+  </script>
+  <script src="../js/placetaid.js?v=20260906c"></script>
+</body>
+</html>

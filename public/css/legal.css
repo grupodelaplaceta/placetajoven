@@ -1,0 +1,44 @@
+/* Placeta Joven — páginas legales (contenido servido desde el BOLP vía API) */
+:root{
+  --deep:#3A0A6B; --dark:#2A0750; --darker:#1F053C;
+  --violet:#7C3AED; --violet2:#6D28D9;
+  --accent:#C9B8FF; --accent2:#A78BFA;
+  --soft:#F6F3FF; --soft2:#EDE7FF;
+  --ink:#25113A; --muted:#5F4E7C; --line:#E2D8F3;
+  --font-display:'Bebas Neue','Arial Narrow',sans-serif;
+  --font-body:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--font-body);font-size:16px;line-height:1.7;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+a{color:var(--violet2)}
+img{max-width:100%}
+
+.legal-top{
+  position:sticky;top:0;z-index:50;background:var(--dark);
+  border-bottom:1px solid rgba(255,255,255,.14);
+}
+.legal-top-in{width:min(960px,94%);margin-inline:auto;height:66px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.legal-top img{height:46px;width:auto}
+.legal-top a.back{color:#fff;text-decoration:none;font-weight:700;font-size:.95rem;padding:.5rem .9rem;border:1px solid rgba(255,255,255,.3);border-radius:999px;transition:background .15s ease}
+.legal-top a.back:hover{background:rgba(255,255,255,.12)}
+
+.legal-main{width:min(860px,92%);margin:2.4rem auto 3.4rem}
+.legal-meta{font-size:.92rem;color:var(--muted);margin-bottom:1.6rem;border-left:4px solid var(--accent2);padding:.2rem .9rem;background:var(--soft)}
+.legal-main h1{font-family:var(--font-display);font-weight:400;letter-spacing:.6px;text-transform:uppercase;font-size:clamp(1.9rem,4vw,2.6rem);line-height:1.05;color:var(--deep);margin:0 0 1.4rem}
+.legal-main h2{font-family:var(--font-display);font-weight:400;letter-spacing:.4px;text-transform:uppercase;font-size:1.35rem;color:var(--deep);margin:2rem 0 .7rem;border-bottom:2px solid var(--soft2);padding-bottom:.3rem}
+.legal-main h3{font-size:1.05rem;color:var(--violet2);margin:1.4rem 0 .4rem}
+.legal-main h4{font-size:.98rem;margin:1.1rem 0 .3rem;color:var(--deep)}
+.legal-main p{margin:0 0 .9rem}
+.legal-main ul,.legal-main ol{margin:0 0 .9rem;padding-left:1.4rem}
+.legal-main li{margin-bottom:.35rem}
+.legal-main code{background:var(--soft2);border-radius:6px;padding:.1rem .4rem;font-size:.9em}
+.legal-main hr{border:none;border-top:1px solid var(--line);margin:1.6rem 0}
+.legal-main table{width:100%;border-collapse:collapse;margin:.8rem 0 1.2rem;font-size:.93rem}
+.legal-main th,.legal-main td{border:1px solid var(--line);padding:.5rem .7rem;text-align:left;vertical-align:top}
+.legal-main th{background:var(--soft)}
+
+.legal-foot{background:var(--soft);border-top:1px solid var(--line);padding:1.4rem 0;text-align:center;color:var(--muted);font-size:.9rem}
+.legal-foot p{margin:0}
+.legal-note{display:none;background:var(--soft2);border:1px solid var(--accent2);border-radius:14px;padding:1rem 1.2rem;margin-bottom:1.4rem;color:var(--ink)}
+.legal-note a{font-weight:700}
