@@ -88,8 +88,9 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
 - Panel de usuario: `mi.html` («Mi Placeta Joven»).
 - Lógica pura testeada: `npm test` (`tests/core.test.js`).
 - Config necesaria en producción: variables de `.env.example`
-  (LS_API_KEY, LS_STORE_ID, LS_WEBHOOK_SECRET, LS_VARIANT_MENSUAL/ANUAL,
-  PLACETAID_BASE_URL, MONGODB_URI opcional).
+  (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY, LS_API_KEY, LS_STORE_ID,
+  LS_WEBHOOK_SECRET, LS_VARIANT_MENSUAL/ANUAL, PLACETAID_BASE_URL).
+  Tabla Supabase: ejecuta `sql/placeta_joven.sql`.
 
 ## Pendiente para fases siguientes
 - Gestión de ventajas (`joven_benefits`) y panel de administración (RSP).
