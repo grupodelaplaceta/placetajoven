@@ -3,6 +3,7 @@
   "moneda": "EUR",
   "soporteEmail": "joven@laplaceta.org",
   "ofertaAnual": "Drop Joven '26",
+  "notaOferta": "«Drop Joven '26» es la oferta anual de BENEFICIOS del programa y está incluida en ambos planes (mensual y anual). NO es el nombre de la suscripción anual; el plan anual destaca porque a fin de cuenta es más barato (10 €/año vs 23,40 € mes a mes).",
   "planes": {
     "mensual": {
       "productoId": 1342686,

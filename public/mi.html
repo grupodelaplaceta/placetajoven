@@ -70,7 +70,8 @@
       <span class="mi-ico ok">✨</span>
       <h2>Elige tu plan</h2>
       <p>Contrata Placeta Joven y desbloquea tu espacio joven: formación Cisco,
-      descuentos, cashback y keys de juegos indie. Pago seguro con Lemon Squeezy.</p>
+      descuentos, cashback y keys de juegos indie. Pago seguro con Lemon Squeezy.
+      Ambos planes incluyen la oferta anual de beneficios «Drop Joven '26».</p>
       <div class="mi-plans">
         <article class="mi-plan">
           <h3>Plan mensual</h3>
@@ -79,11 +80,11 @@
           <button type="button" class="mi-btn outline" data-plan="mensual" onclick="estado.alta('mensual', this)">Contratar mensual</button>
         </article>
         <article class="mi-plan feat">
-          <span class="tag">Drop Joven '26</span>
+          <span class="tag">La más rentable</span>
           <h3>Plan anual</h3>
           <p class="price"><b>10&nbsp;€</b><span>/año</span></p>
           <p class="equiv">Ahorras un <b>57&nbsp;%</b> (−13,40&nbsp;€)</p>
-          <button type="button" class="mi-btn primary" data-plan="anual" onclick="estado.alta('anual', this)">Quiero el Drop Joven '26</button>
+          <button type="button" class="mi-btn primary" data-plan="anual" onclick="estado.alta('anual', this)">Quiero el plan anual</button>
         </article>
       </div>
       <p class="fine">Puedes cancelar cuando quieras; las ventajas se mantienen hasta el final del período pagado.</p>
@@ -99,7 +100,7 @@
               <span class="mi-badge" id="mi-sub-badge">✓ Activa</span>
               <h2 id="mi-sub-title">Tienes Placeta Joven</h2>
             </div>
-            <span class="mi-sub-tag" id="mi-sub-plan-tag">Drop Joven '26</span>
+            <span class="mi-sub-tag" id="mi-sub-plan-tag">Plan anual</span>
           </div>
           <div class="mi-sub-rows">
             <div class="mi-sub-row"><span>Estado</span><b id="mi-sub-estado">Activa</b></div>
@@ -113,8 +114,8 @@
 
         <!-- Ventajas -->
         <article class="mi-card mi-vents">
-          <h3 class="mi-card-title">Tus ventajas</h3>
-          <p class="mi-card-sub">Incluidas mientras tu Placeta Joven esté activa.</p>
+          <h3 class="mi-card-title">Drop Joven '26 · tus beneficios</h3>
+          <p class="mi-card-sub">La oferta anual de beneficios del programa, incluida con tu suscripción (mensual o anual).</p>
           <ul class="mi-vents-list">
             <li>
               <span class="mi-v-ico">🎓</span>
@@ -273,7 +274,7 @@
         $id('mi-sub-title').textContent = activa ? 'Tienes Placeta Joven' : 'Placeta Joven cancelada';
 
         var pi = st.planInfo || {};
-        $id('mi-sub-plan-tag').textContent = pi.etiqueta || (st.plan === 'anual' ? "Drop Joven '26" : 'Plan mensual');
+        $id('mi-sub-plan-tag').textContent = pi.etiqueta || (st.plan === 'anual' ? 'Plan anual' : 'Plan mensual');
         $id('mi-sub-estado').textContent = activa ? 'Activa' : 'Cancelada (hasta fin de período)';
         $id('mi-sub-plan').textContent = st.plan === 'anual' ? 'Anual' : 'Mensual';
         $id('mi-sub-precio').innerHTML = pi.precioLabel || (st.plan === 'anual' ? '10&nbsp;€/año' : '1,95&nbsp;€/mes');

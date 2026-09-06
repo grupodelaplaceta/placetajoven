@@ -11,7 +11,7 @@ const EURO = (n) => n.toLocaleString('es-ES', { style: 'currency', currency: 'EU
 function planInfo(plan) {
   if (plan === 'anual') {
     const p = cfg.planes.anual;
-    return { id: 'anual', etiqueta: "Drop Joven '26", precio: p.precio, precioLabel: EURO(p.precio) + '/año', periodoLabel: 'al año', oferta: true };
+    return { id: 'anual', etiqueta: 'Plan anual', precio: p.precio, precioLabel: EURO(p.precio) + '/año', periodoLabel: 'al año', oferta: true };
   }
   if (plan === 'mensual') {
     const p = cfg.planes.mensual;

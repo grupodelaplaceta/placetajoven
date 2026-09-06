@@ -41,8 +41,11 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
 - Soporte: **joven@laplaceta.org**.
 
 ## Oferta anual
-- La oferta anual de beneficios se llama **«Drop Joven '26»**: el plan anual
-  (10 €/año) da acceso a las ventajas del programa durante la edición '26.
+- La oferta anual de beneficios se llama **«Drop Joven '26»** y está **incluida en ambos
+  planes** (mensual 1,95 €/mes y anual 10 €/año): formación Cisco, descuentos, keys
+  indie y cashback.
+- El plan anual destaca porque sale **más rentable a fin de cuenta**: 10 €/año frente a
+  23,40 € pagando mes a mes (ahorras un 57 %).
 
 ## Acceso
 - El acceso/contratación se hace a través de la **pasarela PlacetaID (plid26)**
