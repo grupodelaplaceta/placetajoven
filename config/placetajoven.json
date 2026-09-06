@@ -1,0 +1,21 @@
+{
+  "proveedorPago": "Lemon Squeezy",
+  "moneda": "EUR",
+  "soporteEmail": "joven@laplaceta.org",
+  "ofertaAnual": "Drop Joven '26",
+  "planes": {
+    "mensual": {
+      "productoId": 1342686,
+      "precio": 1.95,
+      "periodo": "mensual"
+    },
+    "anual": {
+      "productoId": 1343043,
+      "precio": 10,
+      "periodo": "anual"
+    }
+  },
+  "edadPermitida": { "min": 16, "max": 30 },
+  "estados": ["PENDIENTE", "ACTIVO", "SUSPENDIDO", "CANCELADO", "EXPIRADO"],
+  "nota": "Los product IDs pertenecen a Lemon Squeezy (store de La Placeta). Usarlos al crear checkouts/links y en la documentación de integración."
+}
