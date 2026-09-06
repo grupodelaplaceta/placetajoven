@@ -14,16 +14,19 @@
   const navBtn = document.getElementById('pjv-nav-btn');
   const nav = document.getElementById('pjv-nav');
   const navClose = document.getElementById('pjv-nav-close');
+  const backdrop = document.getElementById('pjv-backdrop');
   if (navBtn && nav) {
     const isOpen = () => nav.classList.contains('is-open');
     const setOpen = (open) => {
       nav.classList.toggle('is-open', open);
+      if (backdrop) backdrop.classList.toggle('is-open', open);
       navBtn.setAttribute('aria-expanded', String(open));
       navBtn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
       document.body.classList.toggle('pjv-lock', open);
     };
     navBtn.addEventListener('click', () => setOpen(!isOpen()));
     if (navClose) navClose.addEventListener('click', () => setOpen(false));
+    if (backdrop) backdrop.addEventListener('click', () => setOpen(false));
 
     // Cerrar al navegar a una sección
     nav.addEventListener('click', (e) => {
