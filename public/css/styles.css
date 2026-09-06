@@ -459,6 +459,7 @@ ul{margin:0;padding:0;list-style:none}
   padding:.55rem .8rem;font-size:.9rem;
 }
 .pjv-ses-t{font-weight:700;flex:1}
+.pjv-ses-mi{background:linear-gradient(120deg,var(--pjv-violet2),var(--pjv-violet));color:#fff;font-weight:800;border-radius:999px;padding:.35rem .85rem;font-size:.8rem;text-decoration:none;white-space:nowrap}
 .pjv-ses-out{background:var(--pjv-soft2);border:1px solid var(--pjv-accent2);color:var(--pjv-violet2);font-weight:800;border-radius:999px;padding:.35rem .85rem;font-size:.8rem;cursor:pointer;white-space:nowrap}
 .pjv-ses-out:hover{background:var(--pjv-accent)}
 .pjv-ses-x{background:transparent;border:none;color:var(--pjv-muted);cursor:pointer;font-size:.95rem;padding:.15rem .3rem}

@@ -79,8 +79,18 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
 - Importar el repo / carpeta; Framework `Other` / `Static`; Output `/`.
 - `vercel.json` ya enruta `/` → `public/index.html`.
 
+## API (funciones Vercel) — ya implementada
+- `GET  /api/status`     → estado del usuario (control de edad 16–30 vía PlacetaID).
+- `POST /api/alta`       → checkout de Lemon Squeezy para darse de alta.
+- `POST /api/renovar`    → checkout para renovar.
+- `POST /api/cancelar`   → cancelar (mantiene las ventajas hasta fin de período).
+- `POST /api/webhook`    → webhook de Lemon Squeezy (verifica firma `X-Signature`).
+- Panel de usuario: `mi.html` («Mi Placeta Joven»).
+- Lógica pura testeada: `npm test` (`tests/core.test.js`).
+- Config necesaria en producción: variables de `.env.example`
+  (LS_API_KEY, LS_STORE_ID, LS_WEBHOOK_SECRET, LS_VARIANT_MENSUAL/ANUAL,
+  PLACETAID_BASE_URL, MONGODB_URI opcional).
+
 ## Pendiente para fases siguientes
-- Implementar backend del flujo (ver `docs/flujo-placetajoven.md`): estado +
-  edad, alta/renovar/cancelar y webhook de Lemon Squeezy.
-- Panel «Mi Placeta Joven» tras el login de PlacetaID.
 - Gestión de ventajas (`joven_benefits`) y panel de administración (RSP).
+- Desplegar plid26 con el solicitante de Placeta Joven para validar el login.

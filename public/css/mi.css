@@ -1,0 +1,63 @@
+/* Mi Placeta Joven — panel de estado (mi.html) */
+:root{
+  --deep:#3A0A6B; --dark:#2A0750; --darker:#1F053C; --violet:#7C3AED; --violet2:#6D28D9;
+  --accent:#C9B8FF; --accent2:#A78BFA; --soft:#F6F3FF; --soft2:#EDE7FF;
+  --ink:#25113A; --muted:#5F4E7C; --line:#E2D8F3;
+  --font-display:'Bebas Neue','Arial Narrow',sans-serif; --font-body:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-body);font-size:16px;line-height:1.6;color:var(--ink);background:var(--soft)}
+img{max-width:100%}
+a{color:var(--violet2)}
+
+.mi-top{position:sticky;top:0;z-index:20;background:var(--dark);border-bottom:1px solid rgba(255,255,255,.14)}
+.mi-top-in{width:min(900px,94%);margin-inline:auto;height:66px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.mi-top img{height:46px;width:auto}
+.mi-top .back{color:#fff;text-decoration:none;font-weight:700;font-size:.95rem;padding:.5rem .9rem;border:1px solid rgba(255,255,255,.3);border-radius:999px}
+.mi-top .back:hover{background:rgba(255,255,255,.12)}
+
+.mi-main{width:min(720px,94%);margin:2.4rem auto 3rem}
+.mi-main>h1{font-family:var(--font-display);font-weight:400;letter-spacing:.6px;text-transform:uppercase;font-size:clamp(2rem,5vw,3rem);color:var(--deep);text-align:center;margin:0 0 1.6rem}
+
+.mi-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:1.8rem;box-shadow:0 10px 30px rgba(42,7,80,.08);text-align:left}
+.mi-card.center{text-align:center}
+.mi-card h2{font-family:var(--font-display);font-weight:400;letter-spacing:.4px;color:var(--deep);font-size:1.6rem;margin:0 0 .5rem}
+.mi-card p{color:var(--muted);margin:0 0 1rem}
+.mi-card .spinner{width:40px;height:40px;border:4px solid var(--soft2);border-top-color:var(--accent2);border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mi-card.ok .badge{background:#22a05c}
+.badge{display:inline-block;background:var(--accent2);color:#fff;font-weight:800;letter-spacing:1px;padding:.3rem .9rem;border-radius:999px;margin-bottom:1rem}
+.badge.neutral{background:var(--muted)}
+
+.mi-note{background:var(--soft2);border:1px dashed var(--accent2);color:var(--ink);border-radius:12px;padding:.7rem 1rem;margin:0 0 1rem;text-align:center}
+
+.mi-plans{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0}
+.mi-plan{background:#fff;border:1px solid var(--line);border-radius:16px;padding:1.2rem;position:relative;display:flex;flex-direction:column;gap:.7rem;text-align:center}
+.mi-plan h3{font-family:var(--font-display);font-weight:400;letter-spacing:.4px;color:var(--deep);font-size:1.3rem;margin:0}
+.mi-plan .price{margin:0;color:var(--muted)}
+.mi-plan .price b{font-family:var(--font-display);font-size:2.2rem;color:var(--deep);font-weight:400}
+.mi-plan .save{display:block;font-weight:700;color:#1f8a4c;font-size:.85rem;margin-top:.2rem}
+.mi-plan.feat{background:linear-gradient(160deg,#4E1B94 0%,#2A0750 60%,#1F053C 100%);color:#fff;border:none;transform:translateY(-3px)}
+.mi-plan.feat h3{color:var(--accent)}
+.mi-plan.feat .price{color:#D9CDF4}
+.mi-plan.feat .price b{color:#fff}
+.mi-plan.feat .tag{position:absolute;top:-11px;right:14px;background:var(--accent);color:var(--dark);font-weight:800;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;padding:.3rem .7rem;border-radius:999px}
+.mi-actions{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.6rem}
+.fine{font-size:.85rem;color:var(--muted)}
+
+.mi-btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-body);font-weight:800;font-size:.98rem;text-decoration:none;border:2px solid transparent;border-radius:999px;padding:.7rem 1.3rem;cursor:pointer;line-height:1;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
+.mi-btn.primary{background:linear-gradient(120deg,var(--violet2),var(--violet));color:#fff;box-shadow:0 8px 20px rgba(109,40,217,.3)}
+.mi-btn.primary:hover{transform:translateY(-2px)}
+.mi-btn.outline{background:#fff;color:var(--violet2);border-color:var(--accent2)}
+.mi-btn.ghost{background:var(--soft2);color:var(--violet2);border-color:var(--accent2)}
+.mi-btn.danger{background:#fff;color:#c62828;border-color:#e4b4b4}
+.mi-btn:disabled{opacity:.6;cursor:wait}
+
+.mi-foot{background:var(--darker);color:#C7BDDF;text-align:center;padding:1.4rem 1rem;font-size:.9rem}
+.mi-foot a{color:var(--accent);text-decoration:none}
+.mi-foot p{margin:.5rem 0 0;color:#9487B5;font-size:.85rem}
+
+@media (max-width:640px){
+  .mi-plans{grid-template-columns:1fr}
+  .mi-plan.feat{transform:none}
+}

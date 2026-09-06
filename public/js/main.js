@@ -25,6 +25,12 @@
     txt.className = 'pjv-ses-t';
     txt.textContent = 'Conectado con PlacetaID' + (name ? ' · ' + name : '');
 
+    var mi = document.createElement('a');
+    mi.className = 'pjv-ses-mi';
+    mi.href = 'mi.html';
+    mi.textContent = 'Mi Placeta Joven';
+    mi.addEventListener('click', function () { bar.remove(); });
+
     var out = document.createElement('button');
     out.type = 'button';
     out.className = 'pjv-ses-out';
@@ -42,6 +48,7 @@
     close.addEventListener('click', function () { bar.remove(); });
 
     bar.appendChild(txt);
+    bar.appendChild(mi);
     bar.appendChild(out);
     bar.appendChild(close);
     document.body.appendChild(bar);
