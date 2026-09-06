@@ -3,7 +3,7 @@
 
 const { GatewayError, sesion } = require('../lib/gateway');
 
-const ORIGENES_OK = [/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/, /^https:\/\/joven\.laplaceta\.org$/];
+const ORIGENES_OK = [/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/, /^https:\/\/joven\.laplaceta\.org$/, /^https:\/\/placetajoven\.vercel\.app$/];
 
 function corsOk(origin) {
   if (!origin) return false;
