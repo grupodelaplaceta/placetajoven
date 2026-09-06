@@ -1,63 +1,99 @@
-/* Mi Placeta Joven — panel de estado (mi.html) */
+/* Mi Placeta Joven — panel de estado (coherente con la identidad de la web) */
 :root{
   --deep:#3A0A6B; --dark:#2A0750; --darker:#1F053C; --violet:#7C3AED; --violet2:#6D28D9;
-  --accent:#C9B8FF; --accent2:#A78BFA; --soft:#F6F3FF; --soft2:#EDE7FF;
-  --ink:#25113A; --muted:#5F4E7C; --line:#E2D8F3;
+  --accent:#C9B8FF; --accent2:#A78BFA; --soft:#F6F3FF; --soft2:#EDE7FF; --line:#E2D8F3;
+  --ink:#25113A; --muted:#5F4E7C;
+  --green:#1f8a4c; --green-bg:#e7f6ed; --red:#c62828; --red-bg:#fdecec;
   --font-display:'Bebas Neue','Arial Narrow',sans-serif; --font-body:'Plus Jakarta Sans',system-ui,sans-serif;
+  --shadow:0 14px 40px rgba(42,7,80,.10);
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:var(--font-body);font-size:16px;line-height:1.6;color:var(--ink);background:var(--soft)}
+body{margin:0;font-family:var(--font-body);font-size:16px;line-height:1.6;color:var(--ink);background:var(--soft);-webkit-font-smoothing:antialiased}
 img{max-width:100%}
 a{color:var(--violet2)}
 
-.mi-top{position:sticky;top:0;z-index:20;background:var(--dark);border-bottom:1px solid rgba(255,255,255,.14)}
-.mi-top-in{width:min(900px,94%);margin-inline:auto;height:66px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.mi-top img{height:46px;width:auto}
-.mi-top .back{color:#fff;text-decoration:none;font-weight:700;font-size:.95rem;padding:.5rem .9rem;border:1px solid rgba(255,255,255,.3);border-radius:999px}
-.mi-top .back:hover{background:rgba(255,255,255,.12)}
+/* ── Cabecera ── */
+.mi-top{position:sticky;top:0;z-index:20;background:linear-gradient(150deg,#4E1B94 0%,#2A0750 60%,#1F053C 100%);box-shadow:0 6px 22px rgba(15,0,30,.25)}
+.mi-top-in{width:min(980px,94%);margin-inline:auto;height:72px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.mi-top img{height:52px;width:auto}
+.mi-top .back{color:#fff;text-decoration:none;font-weight:700;font-size:.95rem;padding:.55rem 1rem;border:1px solid rgba(255,255,255,.35);border-radius:999px;transition:background .15s ease}
+.mi-top .back:hover{background:rgba(255,255,255,.14)}
 
-.mi-main{width:min(720px,94%);margin:2.4rem auto 3rem}
-.mi-main>h1{font-family:var(--font-display);font-weight:400;letter-spacing:.6px;text-transform:uppercase;font-size:clamp(2rem,5vw,3rem);color:var(--deep);text-align:center;margin:0 0 1.6rem}
+/* ── Contenido ── */
+.mi-main{width:min(760px,94%);margin:2.6rem auto 3.4rem}
+.mi-intro{text-align:center;margin-bottom:1.8rem}
+.mi-kicker{display:inline-block;font-weight:800;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--violet2);background:var(--soft2);padding:.3rem 1rem;border-radius:999px;margin:0 0 .6rem}
+.mi-intro h1{font-family:var(--font-display);font-weight:400;letter-spacing:.6px;text-transform:uppercase;font-size:clamp(2.3rem,6vw,3.4rem);line-height:1;color:var(--deep);margin:0 0 .4rem}
+.mi-intro p{color:var(--muted);margin:0;font-size:1.05rem}
 
-.mi-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:1.8rem;box-shadow:0 10px 30px rgba(42,7,80,.08);text-align:left}
+/* ── Tarjetas ── */
+.mi-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:2rem 1.8rem;box-shadow:var(--shadow)}
 .mi-card.center{text-align:center}
-.mi-card h2{font-family:var(--font-display);font-weight:400;letter-spacing:.4px;color:var(--deep);font-size:1.6rem;margin:0 0 .5rem}
+.mi-card h2{font-family:var(--font-display);font-weight:400;letter-spacing:.5px;text-transform:uppercase;color:var(--deep);font-size:clamp(1.4rem,3.4vw,1.9rem);margin:0 0 .5rem}
 .mi-card p{color:var(--muted);margin:0 0 1rem}
-.mi-card .spinner{width:40px;height:40px;border:4px solid var(--soft2);border-top-color:var(--accent2);border-radius:50%;margin:0 auto 1rem;animation:spin .9s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.mi-card.ok .badge{background:#22a05c}
-.badge{display:inline-block;background:var(--accent2);color:#fff;font-weight:800;letter-spacing:1px;padding:.3rem .9rem;border-radius:999px;margin-bottom:1rem}
-.badge.neutral{background:var(--muted)}
+.mi-ico{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:20px;background:var(--soft2);font-size:1.8rem;margin-bottom:1rem}
+.mi-ico.ok{background:var(--green-bg)}
+.mi-ico.err{background:var(--red-bg)}
+.mi-err-txt{max-width:54ch;margin-inline:auto}
+.mi-det{font-size:1.05rem}
+.mi-det b{color:var(--deep)}
+.mi-badge{display:inline-block;background:var(--violet2);color:#fff;font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:.85rem;padding:.35rem 1rem;border-radius:999px;margin-bottom:1rem}
+.mi-badge.neutral{background:var(--muted)}
 
-.mi-note{background:var(--soft2);border:1px dashed var(--accent2);color:var(--ink);border-radius:12px;padding:.7rem 1rem;margin:0 0 1rem;text-align:center}
+.mi-msg{display:block;text-align:center;background:#fff8e1;border:1px solid #ffe082;color:#7a5c00;border-radius:14px;padding:.7rem 1rem;margin-top:1rem;font-size:.95rem}
 
-.mi-plans{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0}
-.mi-plan{background:#fff;border:1px solid var(--line);border-radius:16px;padding:1.2rem;position:relative;display:flex;flex-direction:column;gap:.7rem;text-align:center}
-.mi-plan h3{font-family:var(--font-display);font-weight:400;letter-spacing:.4px;color:var(--deep);font-size:1.3rem;margin:0}
+/* ── Planes ── */
+.mi-plans{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin:1.4rem 0 1.2rem}
+.mi-plan{background:#fff;border:1px solid var(--line);border-radius:20px;padding:1.4rem 1.2rem;position:relative;display:flex;flex-direction:column;gap:.6rem;text-align:center;box-shadow:0 8px 24px rgba(42,7,80,.07)}
+.mi-plan h3{font-family:var(--font-display);font-weight:400;letter-spacing:.4px;text-transform:uppercase;color:var(--deep);font-size:1.35rem;margin:0}
 .mi-plan .price{margin:0;color:var(--muted)}
-.mi-plan .price b{font-family:var(--font-display);font-size:2.2rem;color:var(--deep);font-weight:400}
-.mi-plan .save{display:block;font-weight:700;color:#1f8a4c;font-size:.85rem;margin-top:.2rem}
-.mi-plan.feat{background:linear-gradient(160deg,#4E1B94 0%,#2A0750 60%,#1F053C 100%);color:#fff;border:none;transform:translateY(-3px)}
+.mi-plan .price b{font-family:var(--font-display);font-size:2.6rem;color:var(--deep);font-weight:400;letter-spacing:1px}
+.mi-plan .price span{font-weight:700;color:var(--muted)}
+.mi-plan .equiv{margin:0;color:var(--muted);font-size:.85rem}
+.mi-plan .equiv b{color:var(--green)}
+.mi-plan.feat{background:linear-gradient(160deg,#4E1B94 0%,#2A0750 62%,#1F053C 100%);color:#fff;border:none;transform:translateY(-4px);box-shadow:0 18px 40px rgba(58,10,107,.35)}
 .mi-plan.feat h3{color:var(--accent)}
 .mi-plan.feat .price{color:#D9CDF4}
 .mi-plan.feat .price b{color:#fff}
-.mi-plan.feat .tag{position:absolute;top:-11px;right:14px;background:var(--accent);color:var(--dark);font-weight:800;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;padding:.3rem .7rem;border-radius:999px}
-.mi-actions{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.6rem}
+.mi-plan.feat .price span{color:#D9CDF4}
+.mi-plan.feat .equiv{color:#D9CDF4}
+.mi-plan.feat .equiv b{color:#a7f3c3}
+.mi-plan.feat .tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--dark);font-weight:800;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;padding:.32rem .9rem;border-radius:999px;white-space:nowrap}
+.mi-plan .mi-btn{margin-top:auto}
+
+.mi-actions{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
 .fine{font-size:.85rem;color:var(--muted)}
+.fine a{font-weight:700}
 
-.mi-btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-body);font-weight:800;font-size:.98rem;text-decoration:none;border:2px solid transparent;border-radius:999px;padding:.7rem 1.3rem;cursor:pointer;line-height:1;transition:transform .15s ease,box-shadow .15s ease,background .15s ease}
-.mi-btn.primary{background:linear-gradient(120deg,var(--violet2),var(--violet));color:#fff;box-shadow:0 8px 20px rgba(109,40,217,.3)}
-.mi-btn.primary:hover{transform:translateY(-2px)}
+/* ── Botones ── */
+.mi-btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-body);font-weight:800;font-size:.98rem;text-decoration:none;border:2px solid transparent;border-radius:999px;padding:.72rem 1.4rem;cursor:pointer;line-height:1;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease}
+.mi-btn:hover{transform:translateY(-2px)}
+.mi-btn.primary{background:linear-gradient(120deg,var(--violet2),var(--violet));color:#fff;box-shadow:0 10px 24px rgba(109,40,217,.32)}
 .mi-btn.outline{background:#fff;color:var(--violet2);border-color:var(--accent2)}
-.mi-btn.ghost{background:var(--soft2);color:var(--violet2);border-color:var(--accent2)}
-.mi-btn.danger{background:#fff;color:#c62828;border-color:#e4b4b4}
-.mi-btn:disabled{opacity:.6;cursor:wait}
+.mi-btn.outline:hover{background:var(--soft2)}
+.mi-btn.ghost{background:var(--soft2);color:var(--violet2)}
+.mi-btn.danger{background:#fff;color:var(--red);border-color:#f0c4c4}
+.mi-btn.danger:hover{background:var(--red-bg)}
+.mi-btn:disabled{opacity:.6;cursor:wait;transform:none}
 
-.mi-foot{background:var(--darker);color:#C7BDDF;text-align:center;padding:1.4rem 1rem;font-size:.9rem}
-.mi-foot a{color:var(--accent);text-decoration:none}
-.mi-foot p{margin:.5rem 0 0;color:#9487B5;font-size:.85rem}
+/* ── Spinner ── */
+.mi-load{width:44px;height:44px;display:block;margin:0 auto 1rem;border:4px solid var(--soft2);border-top-color:var(--violet2);border-radius:50%;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
+/* ── Pie ── */
+.mi-foot{background:var(--darker);color:#C7BDDF;text-align:center;padding:1.6rem 1rem}
+.mi-foot nav{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;justify-content:center;font-size:.95rem}
+.mi-foot nav a{color:var(--accent);text-decoration:none}
+.mi-foot nav a:hover{text-decoration:underline}
+.mi-foot p{margin:.8rem 0 0;color:#9487B5;font-size:.85rem}
+.mi-foot p a{color:var(--accent);text-decoration:none}
+
+/* ── Responsive ── */
 @media (max-width:640px){
+  .mi-main{width:94%;margin:1.8rem auto 2.4rem}
+  .mi-card{padding:1.5rem 1.2rem;border-radius:18px}
   .mi-plans{grid-template-columns:1fr}
   .mi-plan.feat{transform:none}
+  .mi-top-in{height:64px}
+  .mi-top img{height:46px}
 }

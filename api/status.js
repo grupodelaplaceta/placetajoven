@@ -1,4 +1,4 @@
-// GET /api/status — estado de Placeta Joven del usuario (con control de edad)
+// GET /api/status — estado de Placeta Joven del usuario autenticado
 'use strict';
 
 const { edadOk, docVigente } = require('../lib/placetajoven');
@@ -10,29 +10,48 @@ module.exports = async (req, res) => {
   if (handleOptions(req, res)) return;
   if (req.method !== 'GET') return json(res, 405, { error: 'method_not_allowed' });
 
-  const u = await requiereUsuario(req, res);
-  if (!u) return;
+  try {
+    const u = await requiereUsuario(req, res);
+    if (!u) return; // ya respondió con el error adecuado
 
-  const registro = u.registro;
-  const permitido = edadOk(registro.edad);
-  const base = { ok: true, dip: registro.dip, edad: registro.edad != null ? Number(registro.edad) : null, permitido };
+    const dip = String(u.registro.dip || '').trim().toUpperCase();
+    const ok = edadOk(u.registro.edad);
 
-  if (!permitido) {
-    return json(res, 200, { ...base, estado: null, bloqueado: true });
+    // Gate de edad
+    if (!ok) {
+      return json(res, 200, {
+        permitido: false,
+        bloqueado: true,
+        motivo: 'edad_no_permitida',
+        estado: null,
+        plan: null,
+        expiresAt: null,
+        requiereAlta: false
+      });
+    }
+
+    const doc = docVigente(await store.get(dip));
+    if (!doc || !doc.status) {
+      return json(res, 200, {
+        permitido: true,
+        bloqueado: false,
+        estado: null,
+        plan: null,
+        expiresAt: null,
+        requiereAlta: true
+      });
+    }
+
+    return json(res, 200, {
+      permitido: true,
+      bloqueado: false,
+      estado: doc.status,
+      plan: doc.plan || null,
+      expiresAt: doc.expires_at || null,
+      requiereAlta: doc.status === 'CANCELADO' || doc.status === 'EXPIRADO'
+    });
+  } catch (e) {
+    // Última red de seguridad: nunca devolver HTML crudo de Vercel
+    return json(res, 500, { error: 'internal' });
   }
-
-  const doc = docVigente(await store.get(registro.dip)) || null;
-  if (doc && doc.status !== 'ACTIVO' && doc.expires_at) {
-    await store.set(doc); // persistir posible paso a EXPIRADO
-  }
-
-  return json(res, 200, {
-    ...base,
-    bloqueado: false,
-    estado: doc ? doc.status : null,
-    plan: doc ? doc.plan : null,
-    startedAt: doc ? doc.started_at : null,
-    expiresAt: doc ? doc.expires_at : null,
-    requiereAlta: !doc || doc.status === 'EXPIRADO' || doc.status === 'CANCELADO'
-  });
 };
