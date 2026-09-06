@@ -40,6 +40,7 @@
     </div>
   </div>
 
+  <script src="../js/placetaid.js?v=20260907b"></script>
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
@@ -63,10 +64,13 @@
 
       try {
         var user = JSON.parse(decodeURIComponent(userStr));
-        var store = window.PlacetaJovenAuth || { storeSession: function () { return true; } };
-        if (store.storeSession(token, user)) {
+        if (!window.PlacetaJovenAuth) {
+          finish('No se pudo cargar el módulo de sesión. Recarga e inténtalo.', false);
+          return;
+        }
+        if (window.PlacetaJovenAuth.storeSession(token, user)) {
           finish('Identidad verificada. Cargando tu Placeta Joven…', true);
-          setTimeout(function () { window.location.href = '../index.html'; }, 600);
+          setTimeout(function () { window.location.href = '../mi.html'; }, 600);
         } else {
           finish('No se pudo guardar la sesión en este navegador.', false);
         }
@@ -75,6 +79,5 @@
       }
     })();
   </script>
-  <script src="../js/placetaid.js?v=20260907a"></script>
 </body>
 </html>
