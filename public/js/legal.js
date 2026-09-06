@@ -61,7 +61,7 @@
       var data = await res.json();
       if (!data || !data.contenido_md) throw new Error('sin contenido');
       var h1 = document.getElementById('legal-h1');
-      if (h1) h1.textContent = data.titulo || h1.textContent;
+      if (h1) { h1.style.display = 'none'; } // el documento ya trae su propio título
       target.innerHTML = render(data.contenido_md);
       var meta = document.getElementById('legal-meta');
       if (meta) meta.textContent = (data.codigo ? data.codigo + ' · ' : '') + (data.titulo || '');
