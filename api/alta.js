@@ -4,7 +4,7 @@
 const { edadOk, planValido } = require('../lib/placetajoven');
 const { crearCheckout } = require('../lib/checkout');
 const store = require('../lib/store');
-const { setCors, json, handleOptions, requiereUsuario, readBody } = require('./_util');
+const { setCors, json, handleOptions, requiereUsuario, readBody, origenPermitido } = require('./_util');
 
 module.exports = async (req, res) => {
   setCors(req, res);
@@ -27,7 +27,8 @@ module.exports = async (req, res) => {
   if (doc && doc.status === 'ACTIVO') return json(res, 409, { error: 'ya_activo' });
 
   try {
-    const url = await crearCheckout(plan, { dip: u.registro.dip, email: u.registro.correo });
+    const redirectUrl = (origenPermitido(req) || process.env.SITE_URL) + '/mi.html?pago=ok';
+    const url = await crearCheckout(plan, { dip: u.registro.dip, email: u.registro.correo, redirectUrl });
     // Marcamos un placeholder PENDIENTE para que el usuario vea el flujo
     if (!doc) {
       await store.set({

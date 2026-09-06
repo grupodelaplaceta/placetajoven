@@ -10,6 +10,13 @@ function corsOk(origin) {
   return ORIGENES_OK.some((re) => re.test(origin));
 }
 
+// Devuelve el origen solo si está en la lista de permitidos (útil para
+// redirigir el checkout al mismo dominio desde el que se paga).
+function origenPermitido(req) {
+  const origin = req.headers.origin || '';
+  return corsOk(origin) ? origin : '';
+}
+
 function setCors(req, res) {
   const origin = req.headers.origin || '';
   if (corsOk(origin)) {
@@ -64,4 +71,4 @@ function readBody(req) {
   });
 }
 
-module.exports = { setCors, json, handleOptions, bearerToken, requiereUsuario, readBody };
+module.exports = { setCors, json, handleOptions, bearerToken, requiereUsuario, readBody, origenPermitido };

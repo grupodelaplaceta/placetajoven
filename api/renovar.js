@@ -4,7 +4,7 @@
 const { edadOk, planValido } = require('../lib/placetajoven');
 const { crearCheckout } = require('../lib/checkout');
 const store = require('../lib/store');
-const { setCors, json, handleOptions, requiereUsuario, readBody } = require('./_util');
+const { setCors, json, handleOptions, requiereUsuario, readBody, origenPermitido } = require('./_util');
 
 module.exports = async (req, res) => {
   setCors(req, res);
@@ -24,7 +24,8 @@ module.exports = async (req, res) => {
   if (!planValido(plan)) return json(res, 400, { error: 'plan_invalido' });
 
   try {
-    const url = await crearCheckout(plan, { dip: u.registro.dip, email: u.registro.correo });
+    const redirectUrl = (origenPermitido(req) || process.env.SITE_URL) + '/mi.html?pago=ok';
+    const url = await crearCheckout(plan, { dip: u.registro.dip, email: u.registro.correo, redirectUrl });
     return json(res, 200, { ok: true, checkoutUrl: url, plan });
   } catch (e) {
     const code = e && e.code ? e.code : 'error';

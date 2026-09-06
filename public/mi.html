@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mi Placeta Joven · Tu estado</title>
-  <meta name="description" content="Consulta el estado de tu Placeta Joven: alta, renovación o cancelación de tu suscripción." />
+  <title>Mi Placeta Joven · Tu espacio joven</title>
+  <meta name="description" content="Tu espacio joven de Placeta Joven: tu suscripción, tus ventajas y tus keys de juegos indie." />
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#2A0750" />
   <link rel="icon" type="image/png" href="img/jovenlogo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/mi.css?v=20260907c" />
+  <link rel="stylesheet" href="css/mi.css?v=20260907d" />
 </head>
 <body>
   <header class="mi-top">
@@ -23,13 +23,13 @@
 
   <main class="mi-main">
     <div class="mi-intro">
-      <p class="mi-kicker">Tu cuenta</p>
+      <p class="mi-kicker">Tu espacio joven</p>
       <h1>Mi Placeta Joven</h1>
-      <p>Aquí ves el estado de tu programa: contratar, renovar o cancelar.</p>
+      <p>Suscripción, ventajas y keys de juegos indie, todo en un solo sitio.</p>
     </div>
 
     <!-- Cargando -->
-    <section id="mi-loading" class="mi-card center">
+    <section id="mi-loading" class="mi-card center" hidden>
       <span class="mi-load"></span>
       <p>Comprobando tu estado…</p>
     </section>
@@ -65,50 +65,92 @@
       <p class="fine">Placeta Joven es para jóvenes de 16 a 30 años. La Placeta sigue siendo para todos.</p>
     </section>
 
-    <!-- Sin suscripción: alta -->
+    <!-- Sin suscripción activa: elegir plan -->
     <section id="mi-sin" class="mi-card center" hidden>
       <span class="mi-ico ok">✨</span>
-      <h2>Disfruta de tus ventajas</h2>
-      <p>Elige un plan. El pago es seguro con Lemon Squeezy y tu Placeta Joven se
-      activa automáticamente al confirmarse.</p>
+      <h2>Elige tu plan</h2>
+      <p>Contrata Placeta Joven y desbloquea tu espacio joven: formación Cisco,
+      descuentos, cashback y keys de juegos indie. Pago seguro con Lemon Squeezy.</p>
       <div class="mi-plans">
         <article class="mi-plan">
           <h3>Plan mensual</h3>
           <p class="price"><b>1,95&nbsp;€</b><span>/mes</span></p>
           <p class="equiv">Mes a mes son 23,40&nbsp;€ al año</p>
-          <button class="mi-btn outline" data-plan="mensual" onclick="estado.alta('mensual', this)">Contratar mensual</button>
+          <button type="button" class="mi-btn outline" data-plan="mensual" onclick="estado.alta('mensual', this)">Contratar mensual</button>
         </article>
         <article class="mi-plan feat">
           <span class="tag">Drop Joven '26</span>
           <h3>Plan anual</h3>
           <p class="price"><b>10&nbsp;€</b><span>/año</span></p>
           <p class="equiv">Ahorras un <b>57&nbsp;%</b> (−13,40&nbsp;€)</p>
-          <button class="mi-btn primary" data-plan="anual" onclick="estado.alta('anual', this)">Quiero el Drop Joven '26</button>
+          <button type="button" class="mi-btn primary" data-plan="anual" onclick="estado.alta('anual', this)">Quiero el Drop Joven '26</button>
         </article>
       </div>
       <p class="fine">Puedes cancelar cuando quieras; las ventajas se mantienen hasta el final del período pagado.</p>
     </section>
 
-    <!-- Activo -->
-    <section id="mi-activo" class="mi-card ok center" hidden>
-      <span class="mi-badge">✓ Activo</span>
-      <h2>Tienes Placeta Joven</h2>
-      <p class="mi-det" id="mi-activo-det"></p>
-      <div class="mi-actions">
-        <button class="mi-btn outline" onclick="estado.renovar(this)">Renovar</button>
-        <button class="mi-btn danger" onclick="estado.cancelar(this)">Cancelar</button>
+    <!-- Espacio joven (activo / cancelado con vigencia) -->
+    <section id="mi-activo" hidden>
+      <div class="mi-dash">
+        <!-- Suscripción -->
+        <article class="mi-card mi-sub">
+          <div class="mi-sub-head">
+            <div>
+              <span class="mi-badge" id="mi-sub-badge">✓ Activa</span>
+              <h2 id="mi-sub-title">Tienes Placeta Joven</h2>
+            </div>
+            <span class="mi-sub-tag" id="mi-sub-plan-tag">Drop Joven '26</span>
+          </div>
+          <div class="mi-sub-rows">
+            <div class="mi-sub-row"><span>Estado</span><b id="mi-sub-estado">Activa</b></div>
+            <div class="mi-sub-row"><span>Plan</span><b id="mi-sub-plan">Anual</b></div>
+            <div class="mi-sub-row"><span>Precio</span><b id="mi-sub-precio">10&nbsp;€/año</b></div>
+            <div class="mi-sub-row"><span>Válido hasta</span><b id="mi-sub-hasta">—</b></div>
+          </div>
+          <p class="mi-sub-note" id="mi-sub-note"></p>
+          <div class="mi-actions" id="mi-sub-btns"></div>
+        </article>
+
+        <!-- Ventajas -->
+        <article class="mi-card mi-vents">
+          <h3 class="mi-card-title">Tus ventajas</h3>
+          <p class="mi-card-sub">Incluidas mientras tu Placeta Joven esté activa.</p>
+          <ul class="mi-vents-list">
+            <li>
+              <span class="mi-v-ico">🎓</span>
+              <div><b>Formación Cisco NetAcad</b><span>Cursos oficiales a través de PlacetaEDU, con tu PlacetaID.</span></div>
+            </li>
+            <li>
+              <span class="mi-v-ico">💠</span>
+              <div><b>Cursos con descuento</b><span>Cursos propios de La Placeta con precio reducido pagando en Placetas (Pz).</span></div>
+            </li>
+            <li>
+              <span class="mi-v-ico">💳</span>
+              <div><b>Cashback · Cuenta Joven</b><span>Convierte tu cuenta de Banco de La Placeta en Cuenta Joven: 12&nbsp;% de cashback (impuestos excluidos).</span></div>
+            </li>
+            <li>
+              <span class="mi-v-ico">🎮</span>
+              <div><b>Keys de juegos indie</b><span>Claves de estudios colaboradores. Las ves y canjeas abajo.</span></div>
+            </li>
+          </ul>
+        </article>
+
+        <!-- Keys -->
+        <article class="mi-card mi-keys">
+          <h3 class="mi-card-title">Keys de juegos indie</h3>
+          <p class="mi-card-sub">Cuando un estudio colaborador cede claves, aparecen aquí para que las canjees.</p>
+          <div id="mi-keys-list"></div>
+        </article>
       </div>
     </section>
 
-    <!-- Otro estado -->
+    <!-- Otros estados -->
     <section id="mi-inactivo" class="mi-card center" hidden>
       <span class="mi-badge neutral" id="mi-inactivo-badge"></span>
       <h2 id="mi-inactivo-title"></h2>
       <p class="mi-det" id="mi-inactivo-det"></p>
-      <div class="mi-actions">
-        <button class="mi-btn primary" onclick="estado.renovar(this)">Renovar</button>
-        <a class="mi-btn ghost" href="index.html">Volver</a>
-      </div>
+      <div class="mi-actions" id="mi-inactivo-btns"></div>
+      <a class="mi-btn ghost" href="index.html">Volver a Placeta Joven</a>
     </section>
 
     <p class="mi-msg" id="mi-msg" hidden></p>
@@ -123,17 +165,19 @@
     <p>© 2026 Grupo de La Placeta · <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a></p>
   </footer>
 
-  <script src="js/placetaid.js?v=20260907c"></script>
+  <script src="js/placetaid.js?v=20260907d"></script>
   <script>
     (function () {
       'use strict';
       var A = window.PlacetaJovenAuth;
 
+      function $id(x) { return document.getElementById(x); }
+
       function api(path, opts) {
         opts = opts || {};
         opts.headers = Object.assign({
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + (A.getSession().token || '')
+          'Authorization': 'Bearer ' + ((A && A.getSession() && A.getSession().token) || '')
         }, opts.headers || {});
         return fetch('/api/' + path, opts).then(function (r) {
           return r.json().catch(function () { return {}; }).then(function (j) {
@@ -150,121 +194,267 @@
 
       function mostrar(id) {
         ['mi-loading', 'mi-nosession', 'mi-error', 'mi-bloqueado', 'mi-sin', 'mi-activo', 'mi-inactivo'].forEach(function (x) {
-          var el = document.getElementById(x);
+          var el = $id(x);
           if (el) el.hidden = (x !== id);
         });
-        var msg = document.getElementById('mi-msg');
+        var msg = $id('mi-msg');
         if (msg) msg.hidden = true;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
       function fmt(iso) {
         if (!iso) return '';
-        try { return new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+        try { return new Date(iso).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }); }
         catch (e) { return iso; }
       }
 
       function mensajeError(e) {
-        var code = e.code || String(e.status || '');
+        var code = (e && (e.code || String(e.status || ''))) || '';
         if (!code) {
-          return ['No se ha podido conectar con la API de Placeta Joven. ¿Está desplegada? Reintenta en un momento.', false];
+          return 'No se ha podido conectar con la API de Placeta Joven. ¿Está desplegada? Reintenta en un momento.';
         }
         if (code === 'SESION_INVALIDA' || code === 'token_requerido' || code === '401') {
-          return ['Tu sesión de PlacetaID ha caducado. Vuelve a identificarte para continuar.', true];
+          return 'Tu sesión de PlacetaID ha caducado. Vuelve a identificarte para continuar.';
         }
         if (code === 'NO_CONFIG') {
-          return ['El pago aún no está configurado en el servidor (falta configurar Lemon Squeezy).', false];
+          return 'El pago aún no está configurado en el servidor (falta configurar Lemon Squeezy).';
         }
-        if (code === 'http_404' || code === '404' || code === 'TYPEERROR' || code === 'FetchError' || code === 'network') {
-          return ['No se ha podido conectar con la API de Placeta Joven. ¿Está desplegada? Reinténtalo en un momento.', false];
+        if (code === 'LS_ERROR' || code === 'ls_502') {
+          return 'Lemon Squeezy ha rechazado el pago. Revisa que el plan esté bien configurado o reintenta en un momento.';
+        }
+        if (code === 'ya_activo') {
+          return 'Ya tienes Placeta Joven activa. Recarga para ver tu estado.';
+        }
+        if (code === 'no_activa') {
+          return 'No hay ninguna suscripción activa que cancelar.';
+        }
+        if (code === 'http_404' || code === '404' || code === 'TypeError' || code === 'FetchError' || code === 'network') {
+          return 'No se ha podido conectar con la API de Placeta Joven. ¿Está desplegada? Reinténtalo en un momento.';
         }
         if (code === 'gateway_no_disponible') {
-          return ['La pasarela PlacetaID no responde ahora mismo. Inténtalo en unos minutos.', false];
+          return 'La pasarela PlacetaID no responde ahora mismo. Inténtalo en unos minutos.';
         }
-        return ['Ha ocurrido un error inesperado. Reintenta o escribe a joven@laplaceta.org.', false];
+        return 'Ha ocurrido un error inesperado. Reintenta o escribe a joven@laplaceta.org.';
       }
 
+      function errorVista(e) {
+        $id('mi-error-txt').textContent = mensajeError(e);
+        mostrar('mi-error');
+      }
+
+      // Ejecuta una acción con manejo de errores y estado del botón.
+      // ¡IMPORTANTE! Ejecuta fn inmediatamente (antes se devolvía la función sin llamarla).
+      function accion(fn, btn, txtOk) {
+        if (btn) { btn.disabled = true; btn._orig = btn.textContent; btn.textContent = txtOk || 'Procesando…'; }
+        return fn()
+          .catch(function (e) { errorVista(e); })
+          .finally(function () {
+            if (btn) { btn.disabled = false; btn.textContent = btn._orig; }
+          });
+      }
+
+      // ── Suscripción ──
+      function boton(label, clase, onclick) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mi-btn ' + clase;
+        b.textContent = label;
+        b.onclick = onclick;
+        return b;
+      }
+
+      function renderSuscripcion(st) {
+        var cancelada = st.estado === 'CANCELADO';
+        var activa = st.estado === 'ACTIVO';
+
+        var badge = $id('mi-sub-badge');
+        badge.textContent = activa ? '✓ Activa' : 'Cancelada';
+        badge.className = 'mi-badge ' + (activa ? 'ok' : 'warn');
+        $id('mi-sub-title').textContent = activa ? 'Tienes Placeta Joven' : 'Placeta Joven cancelada';
+
+        var pi = st.planInfo || {};
+        $id('mi-sub-plan-tag').textContent = pi.etiqueta || (st.plan === 'anual' ? "Drop Joven '26" : 'Plan mensual');
+        $id('mi-sub-estado').textContent = activa ? 'Activa' : 'Cancelada (hasta fin de período)';
+        $id('mi-sub-plan').textContent = st.plan === 'anual' ? 'Anual' : 'Mensual';
+        $id('mi-sub-precio').innerHTML = pi.precioLabel || (st.plan === 'anual' ? '10&nbsp;€/año' : '1,95&nbsp;€/mes');
+        $id('mi-sub-hasta').textContent = fmt(st.expiresAt) || '—';
+
+        $id('mi-sub-note').textContent = activa
+          ? 'Tu suscripción se renueva automáticamente. Puedes cancelarla cuando quieras.'
+          : 'Cancelaste la suscripción. Mantienes todas las ventajas hasta el final del período ya pagado y puedes reactivarla cuando quieras.';
+
+        var btns = $id('mi-sub-btns');
+        btns.innerHTML = '';
+        if (activa) {
+          btns.appendChild(boton('Renovar / pagar ahora', 'outline', function (e) { estado.renovar(e.target); }));
+          btns.appendChild(boton('Cancelar suscripción', 'danger', function (e) { estado.cancelar(e.target); }));
+        } else {
+          btns.appendChild(boton('Reactivar suscripción', 'primary', function (e) { estado.renovar(e.target); }));
+        }
+      }
+
+      // ── Keys ──
+      function renderKeys(keys) {
+        var cont = $id('mi-keys-list');
+        cont.innerHTML = '';
+        if (!keys || !keys.length) {
+          var vacio = document.createElement('p');
+          vacio.className = 'mi-keys-empty';
+          vacio.textContent = 'Aún no tienes keys. Cuando un estudio colaborador ceda claves aparecerán aquí.';
+          cont.appendChild(vacio);
+          return;
+        }
+        keys.forEach(function (k) {
+          var card = document.createElement('div');
+          card.className = 'mi-key' + (k.estado === 'usado' ? ' used' : '');
+
+          var head = document.createElement('div');
+          head.className = 'mi-key-head';
+          var t = document.createElement('div');
+          var b = document.createElement('b');
+          b.textContent = k.juego || 'Juego indie';
+          var pl = document.createElement('span');
+          pl.textContent = k.plataforma ? k.plataforma.toUpperCase() : '';
+          t.appendChild(b); t.appendChild(pl);
+          var st = document.createElement('span');
+          st.className = 'mi-key-estado ' + (k.estado === 'usado' ? 'used' : 'ok');
+          st.textContent = k.estado === 'usado' ? (k.canjeada ? 'Canjeada · ' + fmt(k.canjeada) : 'Canjeada') : 'Disponible';
+          head.appendChild(t); head.appendChild(st);
+
+          var code = document.createElement('div');
+          code.className = 'mi-key-code';
+          var cd = document.createElement('code');
+          cd.textContent = k.codigo || '—';
+          var cop = document.createElement('button');
+          cop.type = 'button';
+          cop.className = 'mi-btn tiny';
+          cop.textContent = 'Copiar';
+          cop.onclick = function () {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(k.codigo || '').then(function () { cop.textContent = '¡Copiada!'; setTimeout(function () { cop.textContent = 'Copiar'; }, 1600); });
+            }
+          };
+          code.appendChild(cd); code.appendChild(cop);
+
+          card.appendChild(head);
+          card.appendChild(code);
+
+          if (k.estado === 'disponible') {
+            var cj = document.createElement('button');
+            cj.type = 'button';
+            cj.className = 'mi-btn ghost sm';
+            cj.textContent = 'Marcar como canjeada';
+            cj.onclick = function () { estado.canjear(k.id, cj); };
+            card.appendChild(cj);
+          }
+          cont.appendChild(card);
+        });
+      }
+
+      // ── Carga de estado ──
       async function cargar() {
-        var s = A.getSession();
+        var s = A ? A.getSession() : null;
         if (!s || !s.token) { mostrar('mi-nosession'); return; }
         mostrar('mi-loading');
         try {
           var st = await api('status');
+
           if (!st.permitido) {
-            document.getElementById('mi-bloqueado-txt').textContent =
+            $id('mi-bloqueado-txt').textContent =
               'Placeta Joven está pensado para jóvenes de 16 a 30 años y tu edad (' + (st.edad || '?') + ') no cumple el requisito.';
             mostrar('mi-bloqueado');
             return;
           }
-          if (!st.estado || st.requiereAlta) {
-            if (st.estado === 'CANCELADO' && st.expiresAt) {
-              var m = document.getElementById('mi-msg');
-              m.textContent = 'Seguirás con tus ventajas hasta el ' + fmt(st.expiresAt) + '. Después puedes renovar.';
+
+          if (st.estado === 'ACTIVO' || (st.estado === 'CANCELADO' && st.sigueVigente)) {
+            renderSuscripcion(st);
+            renderKeys(st.keys || []);
+            mostrar('mi-activo');
+            return;
+          }
+
+          if (st.requiereAlta || !st.estado) {
+            if (st.estado) {
+              var m = $id('mi-msg');
+              m.textContent = st.estado === 'CANCELADO'
+                ? 'Tu suscripción terminó. Puedes darte de alta de nuevo cuando quieras.'
+                : 'Tu suscripción expiró. Vuelve a elegir un plan para reactivar tu espacio joven.';
               m.hidden = false;
             }
             mostrar('mi-sin');
             return;
           }
-          if (st.estado === 'ACTIVO') {
-            document.getElementById('mi-activo-det').innerHTML =
-              'Plan <b>' + (st.plan === 'anual' ? 'anual · Drop Joven \'26' : 'mensual') + '</b><br>Válido hasta <b>' + fmt(st.expiresAt) + '</b>';
-            mostrar('mi-activo');
-            return;
+
+          // PENDIENTE / SUSPENDIDO / otros
+          var badge = $id('mi-inactivo-badge');
+          var title = $id('mi-inactivo-title');
+          var det = $id('mi-inactivo-det');
+          var bts = $id('mi-inactivo-btns');
+          bts.innerHTML = '';
+          badge.textContent = st.estado;
+          if (st.estado === 'PENDIENTE') {
+            badge.className = 'mi-badge warn';
+            title.textContent = 'Pago en proceso';
+            det.textContent = 'Estamos esperando la confirmación del pago. Si acabas de pagar, comprueba en unos segundos.';
+            bts.appendChild(boton('Comprobar de nuevo', 'primary', function () { cargar(); }));
+          } else if (st.estado === 'SUSPENDIDO') {
+            badge.className = 'mi-badge neutral';
+            title.textContent = 'Suscripción suspendida';
+            det.textContent = 'Hubo un problema con un pago reciente. Regularízalo para seguir disfrutando de tus ventajas.';
+            bts.appendChild(boton('Regularizar pago', 'primary', function (e) { estado.renovar(e.target); }));
+          } else {
+            badge.className = 'mi-badge neutral';
+            title.textContent = 'Suscripción ' + st.estado.toLowerCase();
+            det.textContent = 'Estado inesperado. Si crees que es un error, escríbenos a joven@laplaceta.org.';
+            bts.appendChild(boton('Reintentar', 'primary', function () { cargar(); }));
           }
-          document.getElementById('mi-inactivo-badge').textContent = st.estado;
-          document.getElementById('mi-inactivo-title').textContent =
-            st.estado === 'PENDIENTE' ? 'Pago en proceso' : 'Suscripción ' + st.estado.toLowerCase();
-          document.getElementById('mi-inactivo-det').textContent =
-            st.estado === 'PENDIENTE' ? 'Esperando la confirmación del pago. Si acabas de pagar, reintenta en unos segundos.' : '';
           mostrar('mi-inactivo');
         } catch (e) {
-          var par = mensajeError(e);
-          document.getElementById('mi-error-txt').textContent = par[0];
-          mostrar('mi-error');
+          errorVista(e);
         }
       }
 
-      function accion(fn, btn, txtOk) {
-        return async function () {
-          try {
-            if (btn) { btn.disabled = true; btn.textContent = txtOk || 'Procesando…'; }
-            await fn();
-          } catch (e) {
-            var par = mensajeError(e);
-            document.getElementById('mi-error-txt').textContent = par[0];
-            mostrar('mi-error');
-          } finally {
-            if (btn) { btn.disabled = false; }
-          }
-        };
-      }
-
+      // ── Acciones públicas ──
       window.estado = {
-        reintentar: cargar,
+        reintentar: function () { cargar(); },
         alta: function (plan, btn) {
-          return accion(async function () {
-            var r = await api('alta', { method: 'POST', body: JSON.stringify({ plan: plan }) });
-            if (r && r.checkoutUrl) window.location.href = r.checkoutUrl;
+          return accion(function () {
+            return api('alta', { method: 'POST', body: JSON.stringify({ plan: plan }) })
+              .then(function (r) { if (r && r.checkoutUrl) window.location.href = r.checkoutUrl; });
           }, btn, 'Abriendo pago…');
         },
         renovar: function (btn) {
-          return accion(async function () {
-            var r = await api('renovar', { method: 'POST', body: '{}' });
-            if (r && r.checkoutUrl) window.location.href = r.checkoutUrl;
+          return accion(function () {
+            return api('renovar', { method: 'POST', body: '{}' })
+              .then(function (r) { if (r && r.checkoutUrl) window.location.href = r.checkoutUrl; });
           }, btn, 'Abriendo pago…');
         },
         cancelar: function (btn) {
           if (!window.confirm('¿Seguro que quieres cancelar Placeta Joven? Mantendrás las ventajas hasta el final del período pagado.')) return;
-          return accion(async function () {
-            await api('cancelar', { method: 'POST', body: '{}' });
-            cargar();
+          return accion(function () {
+            return api('cancelar', { method: 'POST', body: '{}' }).then(function () { cargar(); });
           }, btn, 'Cancelando…');
+        },
+        canjear: function (keyId, btn) {
+          return accion(function () {
+            return api('keys', { method: 'POST', body: JSON.stringify({ keyId: keyId, accion: 'canjear' }) })
+              .then(function () { return api('status').then(function (st) { renderKeys(st.keys || []); }); });
+          }, btn, 'Guardando…');
         }
       };
 
       document.addEventListener('DOMContentLoaded', function () {
-        var login = document.getElementById('mi-login');
+        var login = $id('mi-login');
         if (login && A) login.setAttribute('href', A.buildLoginUrl());
-        cargar();
+        var pago = new URLSearchParams(window.location.search).get('pago');
+        if (pago === 'ok') {
+          var msg = $id('mi-msg');
+          msg.textContent = '¡Pago recibido! Estamos activando tu Placeta Joven…';
+          msg.hidden = false;
+          setTimeout(cargar, 800);
+        } else {
+          cargar();
+        }
       });
     })();
   </script>

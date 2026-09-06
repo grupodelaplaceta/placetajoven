@@ -2,8 +2,37 @@
 'use strict';
 
 const { edadOk, docVigente } = require('../lib/placetajoven');
+const cfg = require('../config/placetajoven.json');
 const store = require('../lib/store');
 const { setCors, json, handleOptions, requiereUsuario } = require('./_util');
+
+const EURO = (n) => n.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+
+function planInfo(plan) {
+  if (plan === 'anual') {
+    const p = cfg.planes.anual;
+    return { id: 'anual', etiqueta: "Drop Joven '26", precio: p.precio, precioLabel: EURO(p.precio) + '/año', periodoLabel: 'al año', oferta: true };
+  }
+  if (plan === 'mensual') {
+    const p = cfg.planes.mensual;
+    return { id: 'mensual', etiqueta: 'Plan mensual', precio: p.precio, precioLabel: EURO(p.precio) + '/mes', periodoLabel: 'al mes', oferta: false };
+  }
+  return null;
+}
+
+// Devuelve solo las keys del socio.
+function keysPublicas(doc) {
+  if (!doc || !Array.isArray(doc.keys)) return [];
+  return doc.keys.map((k) => ({
+    id: k.id,
+    juego: k.juego,
+    plataforma: k.plataforma || '',
+    codigo: k.codigo || '',
+    estado: k.estado === 'usado' ? 'usado' : 'disponible',
+    otorgada: k.otorgada || null,
+    canjeada: k.canjeada || null
+  }));
+}
 
 module.exports = async (req, res) => {
   setCors(req, res);
@@ -23,32 +52,46 @@ module.exports = async (req, res) => {
         permitido: false,
         bloqueado: true,
         motivo: 'edad_no_permitida',
+        edad: u.registro.edad,
         estado: null,
         plan: null,
+        planInfo: null,
         expiresAt: null,
-        requiereAlta: false
+        requiereAlta: false,
+        keys: []
       });
     }
 
     const doc = docVigente(await store.get(dip));
+
     if (!doc || !doc.status) {
       return json(res, 200, {
         permitido: true,
         bloqueado: false,
+        edad: u.registro.edad,
         estado: null,
         plan: null,
+        planInfo: null,
         expiresAt: null,
-        requiereAlta: true
+        requiereAlta: true,
+        keys: []
       });
     }
+
+    const vigente = !!(doc.expires_at && new Date(doc.expires_at).getTime() > Date.now());
+    const requiereAlta = doc.status === 'EXPIRADO' || (doc.status === 'CANCELADO' && !vigente);
 
     return json(res, 200, {
       permitido: true,
       bloqueado: false,
+      edad: u.registro.edad,
       estado: doc.status,
       plan: doc.plan || null,
+      planInfo: planInfo(doc.plan),
       expiresAt: doc.expires_at || null,
-      requiereAlta: doc.status === 'CANCELADO' || doc.status === 'EXPIRADO'
+      sigueVigente: vigente,
+      requiereAlta: requiereAlta,
+      keys: keysPublicas(doc)
     });
   } catch (e) {
     // Última red de seguridad: nunca devolver HTML crudo de Vercel

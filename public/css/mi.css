@@ -1,9 +1,9 @@
-/* Mi Placeta Joven — panel de estado (coherente con la identidad de la web) */
+/* Mi Placeta Joven — espacio joven (coherente con la identidad de la web) */
 :root{
   --deep:#3A0A6B; --dark:#2A0750; --darker:#1F053C; --violet:#7C3AED; --violet2:#6D28D9;
   --accent:#C9B8FF; --accent2:#A78BFA; --soft:#F6F3FF; --soft2:#EDE7FF; --line:#E2D8F3;
   --ink:#25113A; --muted:#5F4E7C;
-  --green:#1f8a4c; --green-bg:#e7f6ed; --red:#c62828; --red-bg:#fdecec;
+  --green:#1f8a4c; --green-bg:#e7f6ed; --red:#c62828; --red-bg:#fdecec; --amber:#b45309; --amber-bg:#fff4e0;
   --font-display:'Bebas Neue','Arial Narrow',sans-serif; --font-body:'Plus Jakarta Sans',system-ui,sans-serif;
   --shadow:0 14px 40px rgba(42,7,80,.10);
 }
@@ -20,7 +20,7 @@ a{color:var(--violet2)}
 .mi-top .back:hover{background:rgba(255,255,255,.14)}
 
 /* ── Contenido ── */
-.mi-main{width:min(760px,94%);margin:2.6rem auto 3.4rem}
+.mi-main{width:min(820px,94%);margin:2.6rem auto 3.4rem}
 .mi-intro{text-align:center;margin-bottom:1.8rem}
 .mi-kicker{display:inline-block;font-weight:800;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--violet2);background:var(--soft2);padding:.3rem 1rem;border-radius:999px;margin:0 0 .6rem}
 .mi-intro h1{font-family:var(--font-display);font-weight:400;letter-spacing:.6px;text-transform:uppercase;font-size:clamp(2.3rem,6vw,3.4rem);line-height:1;color:var(--deep);margin:0 0 .4rem}
@@ -29,6 +29,7 @@ a{color:var(--violet2)}
 /* ── Tarjetas ── */
 .mi-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:2rem 1.8rem;box-shadow:var(--shadow)}
 .mi-card.center{text-align:center}
+.mi-card.center h2{margin-top:.4rem}
 .mi-card h2{font-family:var(--font-display);font-weight:400;letter-spacing:.5px;text-transform:uppercase;color:var(--deep);font-size:clamp(1.4rem,3.4vw,1.9rem);margin:0 0 .5rem}
 .mi-card p{color:var(--muted);margin:0 0 1rem}
 .mi-ico{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:20px;background:var(--soft2);font-size:1.8rem;margin-bottom:1rem}
@@ -37,12 +38,15 @@ a{color:var(--violet2)}
 .mi-err-txt{max-width:54ch;margin-inline:auto}
 .mi-det{font-size:1.05rem}
 .mi-det b{color:var(--deep)}
-.mi-badge{display:inline-block;background:var(--violet2);color:#fff;font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:.85rem;padding:.35rem 1rem;border-radius:999px;margin-bottom:1rem}
+
+.mi-badge{display:inline-block;background:var(--violet2);color:#fff;font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:.78rem;padding:.35rem 1rem;border-radius:999px}
+.mi-badge.ok{background:var(--green)}
+.mi-badge.warn{background:var(--amber)}
 .mi-badge.neutral{background:var(--muted)}
 
 .mi-msg{display:block;text-align:center;background:#fff8e1;border:1px solid #ffe082;color:#7a5c00;border-radius:14px;padding:.7rem 1rem;margin-top:1rem;font-size:.95rem}
 
-/* ── Planes ── */
+/* ── Planes (alta) ── */
 .mi-plans{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin:1.4rem 0 1.2rem}
 .mi-plan{background:#fff;border:1px solid var(--line);border-radius:20px;padding:1.4rem 1.2rem;position:relative;display:flex;flex-direction:column;gap:.6rem;text-align:center;box-shadow:0 8px 24px rgba(42,7,80,.07)}
 .mi-plan h3{font-family:var(--font-display);font-weight:400;letter-spacing:.4px;text-transform:uppercase;color:var(--deep);font-size:1.35rem;margin:0}
@@ -61,12 +65,9 @@ a{color:var(--violet2)}
 .mi-plan.feat .tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--dark);font-weight:800;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;padding:.32rem .9rem;border-radius:999px;white-space:nowrap}
 .mi-plan .mi-btn{margin-top:auto}
 
-.mi-actions{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
-.fine{font-size:.85rem;color:var(--muted)}
-.fine a{font-weight:700}
-
 /* ── Botones ── */
-.mi-btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-body);font-weight:800;font-size:.98rem;text-decoration:none;border:2px solid transparent;border-radius:999px;padding:.72rem 1.4rem;cursor:pointer;line-height:1;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease}
+.mi-actions{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:.8rem}
+.mi-btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-body);font-weight:800;font-size:.96rem;text-decoration:none;border:2px solid transparent;border-radius:999px;padding:.72rem 1.4rem;cursor:pointer;line-height:1;transition:transform .15s ease,box-shadow .15s ease,background .15s ease,color .15s ease}
 .mi-btn:hover{transform:translateY(-2px)}
 .mi-btn.primary{background:linear-gradient(120deg,var(--violet2),var(--violet));color:#fff;box-shadow:0 10px 24px rgba(109,40,217,.32)}
 .mi-btn.outline{background:#fff;color:var(--violet2);border-color:var(--accent2)}
@@ -74,14 +75,56 @@ a{color:var(--violet2)}
 .mi-btn.ghost{background:var(--soft2);color:var(--violet2)}
 .mi-btn.danger{background:#fff;color:var(--red);border-color:#f0c4c4}
 .mi-btn.danger:hover{background:var(--red-bg)}
+.mi-btn.sm{padding:.5rem 1rem;font-size:.88rem}
+.mi-btn.tiny{padding:.42rem .9rem;font-size:.82rem}
 .mi-btn:disabled{opacity:.6;cursor:wait;transform:none}
+.fine{font-size:.85rem;color:var(--muted)}
+.fine a{font-weight:700}
+
+/* ── Espacio joven (dashboard) ── */
+.mi-dash{display:grid;grid-template-columns:1fr;gap:1.2rem}
+.mi-card-title{font-family:var(--font-display);font-weight:400;letter-spacing:.5px;text-transform:uppercase;color:var(--deep);font-size:1.5rem;margin:0 0 .2rem}
+.mi-card-sub{font-size:.92rem;color:var(--muted);margin:0 0 1rem}
+
+/* Suscripción */
+.mi-sub-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:.8rem;margin-bottom:.6rem}
+.mi-sub-head .mi-badge{margin-bottom:.5rem}
+.mi-sub-tag{font-family:var(--font-display);letter-spacing:.4px;text-transform:uppercase;color:var(--violet2);background:var(--soft2);border:1px solid var(--line);border-radius:999px;padding:.35rem 1rem;font-size:1.05rem;white-space:nowrap}
+.mi-sub-rows{display:grid;grid-template-columns:1fr 1fr;gap:.7rem 1.4rem;margin:1rem 0 .2rem}
+.mi-sub-row{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;border-bottom:1px dashed var(--line);padding:.35rem 0}
+.mi-sub-row span{color:var(--muted);font-size:.92rem;white-space:nowrap}
+.mi-sub-row b{color:var(--deep);text-align:right;word-break:break-word}
+.mi-sub-note{margin:.8rem 0 0;font-size:.9rem}
+
+/* Ventajas */
+.mi-vents-list{list-style:none;margin:0;padding:0;display:grid;gap:.7rem}
+.mi-vents-list li{display:flex;gap:.9rem;align-items:flex-start;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:.85rem 1rem}
+.mi-v-ico{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:13px;background:#fff;border:1px solid var(--line);font-size:1.3rem}
+.mi-vents-list b{display:block;color:var(--deep);font-size:1rem}
+.mi-vents-list div span{color:var(--muted);font-size:.88rem}
+
+/* Keys */
+.mi-keys-empty{background:var(--soft);border:1px dashed var(--line);border-radius:16px;color:var(--muted);font-size:.95rem;padding:1.4rem;text-align:center}
+.mi-key{border:1px solid var(--line);border-radius:18px;padding:1rem 1.1rem;margin-bottom:.8rem;background:linear-gradient(180deg,#fff,var(--soft))}
+.mi-key.used{opacity:.75}
+.mi-key-head{display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+.mi-key-head b{color:var(--deep);font-size:1.05rem}
+.mi-key-head div span{display:block;color:var(--muted);font-size:.75rem;letter-spacing:.6px;text-transform:uppercase;font-weight:700}
+.mi-key-estado{font-size:.74rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;border-radius:999px;padding:.28rem .75rem}
+.mi-key-estado.ok{background:var(--green-bg);color:var(--green)}
+.mi-key-estado.used{background:var(--soft2);color:var(--muted)}
+.mi-key-code{display:flex;align-items:center;gap:.7rem;margin:.8rem 0;background:#25113A;border-radius:12px;padding:.55rem .9rem}
+.mi-key-code code{color:#D9CDF4;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.95rem;letter-spacing:.5px;flex:1;word-break:break-all;user-select:all}
+.mi-key-code .mi-btn{background:var(--violet2);color:#fff}
+.mi-key > .mi-btn{margin-left:auto}
+.mi-key > .mi-btn:disabled{cursor:wait}
 
 /* ── Spinner ── */
 .mi-load{width:44px;height:44px;display:block;margin:0 auto 1rem;border:4px solid var(--soft2);border-top-color:var(--violet2);border-radius:50%;animation:spin .9s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── Pie ── */
-.mi-foot{background:var(--darker);color:#C7BDDF;text-align:center;padding:1.6rem 1rem}
+.mi-foot{background:var(--darker);color:#C7BDDF;text-align:center;padding:1.6rem 1rem;margin-top:1rem}
 .mi-foot nav{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;justify-content:center;font-size:.95rem}
 .mi-foot nav a{color:var(--accent);text-decoration:none}
 .mi-foot nav a:hover{text-decoration:underline}
@@ -91,9 +134,12 @@ a{color:var(--violet2)}
 /* ── Responsive ── */
 @media (max-width:640px){
   .mi-main{width:94%;margin:1.8rem auto 2.4rem}
-  .mi-card{padding:1.5rem 1.2rem;border-radius:18px}
+  .mi-card{padding:1.5rem 1.1rem;border-radius:18px}
   .mi-plans{grid-template-columns:1fr}
   .mi-plan.feat{transform:none}
+  .mi-sub-rows{grid-template-columns:1fr}
   .mi-top-in{height:64px}
   .mi-top img{height:46px}
+  .mi-key-code{flex-wrap:wrap}
+  .mi-key-code .mi-btn{margin-left:0}
 }
