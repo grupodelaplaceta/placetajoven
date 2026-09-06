@@ -10,6 +10,43 @@
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
+  /* ── Sesión PlacetaID: aviso persistente (cookie 7 días) ── */
+  (function sessionUI() {
+    var A = window.PlacetaJovenAuth;
+    if (!A) return;
+    var s = A.getSession();
+    if (!s || !s.token) return;
+
+    var bar = document.createElement('div');
+    bar.className = 'pjv-ses';
+
+    var name = String(s.nombre || (s.user && (s.user.nombreCompleto || s.user.nombre)) || '').trim();
+    var txt = document.createElement('span');
+    txt.className = 'pjv-ses-t';
+    txt.textContent = 'Conectado con PlacetaID' + (name ? ' · ' + name : '');
+
+    var out = document.createElement('button');
+    out.type = 'button';
+    out.className = 'pjv-ses-out';
+    out.textContent = 'Cerrar sesión';
+    out.addEventListener('click', function () {
+      A.clearSession();
+      bar.remove();
+    });
+
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'pjv-ses-x';
+    close.setAttribute('aria-label', 'Ocultar aviso');
+    close.textContent = '✕';
+    close.addEventListener('click', function () { bar.remove(); });
+
+    bar.appendChild(txt);
+    bar.appendChild(out);
+    bar.appendChild(close);
+    document.body.appendChild(bar);
+  })();
+
   /* ── Menú móvil ─────────────────────────────────────────── */
   const navBtn = document.getElementById('pjv-nav-btn');
   const nav = document.getElementById('pjv-nav');

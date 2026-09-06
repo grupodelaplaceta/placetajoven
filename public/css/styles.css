@@ -93,7 +93,7 @@ ul{margin:0;padding:0;list-style:none}
 
 /* ── Barra superior: morado oscuro, logo transparente ───── */
 .pjv-top{
-  position:fixed;inset:0 0 auto;z-index:1000;
+  position:fixed;inset:0 0 auto;z-index:1500;
   background:rgba(24,3,50,.6);
   transition:background .25s ease,box-shadow .25s ease;
 }
@@ -449,3 +449,17 @@ ul{margin:0;padding:0;list-style:none}
 .pjv-plan-meta b{color:var(--pjv-deep)}
 .pjv-plan-save{margin:.55rem 0 0;font-size:.9rem;line-height:1.45;color:#D9CDF4}
 .pjv-plan-save b{color:#fff}
+
+/* Aviso de sesión PlacetaID (cookie 7 días) */
+.pjv-ses{
+  position:fixed;top:calc(var(--topbar-h) + 10px);right:12px;z-index:1200;
+  display:flex;align-items:center;gap:.6rem;max-width:min(92vw,540px);
+  background:#fff;color:var(--pjv-ink);border:1px solid var(--pjv-line);
+  border-left:4px solid #22a05c;border-radius:12px;box-shadow:var(--shadow-md);
+  padding:.55rem .8rem;font-size:.9rem;
+}
+.pjv-ses-t{font-weight:700;flex:1}
+.pjv-ses-out{background:var(--pjv-soft2);border:1px solid var(--pjv-accent2);color:var(--pjv-violet2);font-weight:800;border-radius:999px;padding:.35rem .85rem;font-size:.8rem;cursor:pointer;white-space:nowrap}
+.pjv-ses-out:hover{background:var(--pjv-accent)}
+.pjv-ses-x{background:transparent;border:none;color:var(--pjv-muted);cursor:pointer;font-size:.95rem;padding:.15rem .3rem}
+.pjv-ses-x:hover{color:var(--pjv-deep)}
