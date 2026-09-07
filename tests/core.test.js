@@ -93,6 +93,32 @@ test('pendienteCaducada: pago PENDIENTE abandonado caduca; con sub no; otros no'
   assert.strictEqual(pendienteCaducada(null), false);
 });
 
+test('activarDoc: activa desde suscripción activa de LS (mismo plan/vigencia)', () => {
+  const { activarDoc } = require('../lib/placetajoven');
+  process.env.LS_VARIANT_MENSUAL = 'vm';
+  process.env.LS_VARIANT_ANUAL = 'va';
+  const out = activarDoc(
+    { status: 'PENDIENTE', plan: 'mensual', created_at: '2026-01-01T00:00:00Z' },
+    { subscriptionId: 'sub-ls-9', variantId: 'va', renewsAt: '2027-09-06T00:00:00Z' }
+  );
+  assert.strictEqual(out.status, 'ACTIVO');
+  assert.strictEqual(out.plan, 'anual', 'variante LS anual manda');
+  assert.strictEqual(out.subscription_id, 'sub-ls-9');
+  assert.strictEqual(out.expires_at, '2027-09-06T00:00:00Z');
+  assert.ok(out.updated_at);
+  assert.strictEqual(out.created_at, '2026-01-01T00:00:00Z', 'no pierde created_at');
+});
+
+test('activarDoc: variante desconocida conserva el plan del documento', () => {
+  const { activarDoc } = require('../lib/placetajoven');
+  delete process.env.LS_VARIANT_MENSUAL;
+  delete process.env.LS_VARIANT_ANUAL;
+  const out = activarDoc({ status: 'PENDIENTE', plan: 'mensual' }, { subscriptionId: 'x', variantId: 'zz' });
+  assert.strictEqual(out.status, 'ACTIVO');
+  assert.strictEqual(out.plan, 'mensual');
+  assert.ok(out.expires_at);
+});
+
 // ── Recompensas disponibles (catálogo) ────────────────────────────────
 const { CATEGORIAS, DEMO, publica, categoriaValida } = require('../lib/recompensas');
 

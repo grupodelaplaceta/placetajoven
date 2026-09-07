@@ -138,8 +138,9 @@
     var botones = '<button type="button" class="mi-btn primary" data-accion="reintentar">Reintentar</button>';
     if (st.estado === 'PENDIENTE') {
       badgeCls = 'warn'; titulo = 'Pago en proceso';
-      det = 'Estamos esperando la confirmación del pago. Si acabas de pagar, comprueba en unos segundos.';
+      det = 'Estamos esperando la confirmación del pago. Si ya pagaste, verifícalo abajo y activaremos tu Placeta Joven (no se te cobra dos veces).';
       botones = '<button type="button" class="mi-btn primary" data-accion="reintentar">Comprobar de nuevo</button>' +
+        '<button type="button" class="mi-btn ghost" data-accion="verificar">Ya he pagado · Verificar pago</button>' +
         '<button type="button" class="mi-btn outline" data-accion="pagar">Pagar de nuevo</button>';
     } else if (st.estado === 'SUSPENDIDO') {
       badgeCls = 'neutral'; titulo = 'Suscripción suspendida';
@@ -153,6 +154,8 @@
       '<a class="mi-btn ghost" href="../index.html">Volver a Placeta Joven</a>'));
     var rt = APP.querySelector('[data-accion="reintentar"]');
     if (rt) rt.addEventListener('click', boot);
+    var vf = APP.querySelector('[data-accion="verificar"]');
+    if (vf) vf.addEventListener('click', function () { verificarPago(vf); });
     var pg = APP.querySelector('[data-accion="pagar"]');
     if (pg) pg.addEventListener('click', function () { renovar(pg); });
   }
@@ -175,6 +178,28 @@
       return api('renovar', { method: 'POST', body: '{}' })
         .then(function (r) { if (r && r.checkoutUrl) window.location.href = r.checkoutUrl; });
     }, b, 'Abriendo pago…');
+  }
+  // Verifica si el pago ya se hizo en Lemon Squeezy y activa la suscripción.
+  function verificarPago(b) {
+    if (b) { b.disabled = true; b.textContent = 'Comprobando pago…'; }
+    api('verificar', { method: 'POST', body: '{}' })
+      .then(function (r) { if (r && r.ok && r.estado === 'ACTIVO') { boot(); return; } throw Object.assign(new Error('sin_suscripcion'), { code: 'sin_suscripcion' }); })
+      .catch(function (e) {
+        var card = APP && APP.querySelector('.mi-card');
+        if (card) {
+          var av = card.querySelector('.mi-aviso');
+          if (!av) { av = document.createElement('p'); av.className = 'mi-aviso'; card.appendChild(av); }
+          av.textContent = (e && e.code === 'sin_suscripcion')
+            ? 'Todavía no vemos tu pago. A veces tarda unos minutos: si acabas de pagar, espera un momento y vuelve a verificar (no te cobramos dos veces).'
+            : mensajeError(e);
+        }
+        if (b) { b.disabled = false; b.textContent = 'Ya he pagado · Verificar pago'; }
+      });
+  }
+  function maybeAutoVerificar() {
+    if (new URLSearchParams(window.location.search).get('pago') === 'ok') {
+      setTimeout(function () { verificarPago(null); }, 1500);
+    }
   }
   function cancelar(b) {
     if (!window.confirm('¿Seguro que quieres cancelar Placeta Joven? Mantendrás las ventajas hasta el final del período pagado.')) return;
@@ -684,8 +709,8 @@
       var st = await api('status');
       if (!st.permitido) { pintarBloqueado(st); return; }
       if (st.estado === 'ACTIVO' || (st.estado === 'CANCELADO' && st.sigueVigente)) { pintarEspacio(st); return; }
-      if (st.requiereAlta || !st.estado) { pintarSin(st); return; }
-      pintarInactivo(st);
+      if (st.requiereAlta || !st.estado) { pintarSin(st); maybeAutoVerificar(); return; }
+      pintarInactivo(st); maybeAutoVerificar();
     } catch (e) {
       pintarError(e);
     }

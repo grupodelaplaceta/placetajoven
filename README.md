@@ -88,6 +88,9 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
 - `POST /api/renovar`    → checkout para renovar.
 - `POST /api/cancelar`   → cancelar (mantiene las ventajas hasta fin de período).
 - `POST /api/webhook`    → webhook de Lemon Squeezy (verifica firma `X-Signature`).
+- `POST /api/verificar`  → reconcilia el pago: busca en Lemon Squeezy una
+  suscripción activa por email y activa la cuenta si el usuario ya pagó (caso
+  «sigue en PENDIENTE aunque pagué»). Nunca hace pagar dos veces.
 - `GET  /api/recompensas`→ catálogo de recompensas disponibles (ver abajo).
 - `POST /api/recompensas`→ canjear una recompensa (entrega la key al socio).
 - Panel de usuario: espacio multipágina en `public/espacio/`:
@@ -132,6 +135,11 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
 - **Pendiente abandonado**: un `PENDIENTE` sin confirmar caduca a las **2 horas**
   (`pendienteCaducada` en `lib/placetajoven.js`) y deja al usuario elegir plan de
   nuevo; mientras está reciente puede «Comprobar» o «Pagar de nuevo».
+- **Si ya pagó pero sigue PENDIENTE**: en «Pago en proceso» hay un botón
+  **«Ya he pagado · Verificar pago»** (y se intenta automáticamente al volver con
+  `?pago=ok`) que llama a `POST /api/verificar`, busca la suscripción activa en
+  Lemon Squeezy por email (`lib/checkout.js` → `buscarActivaPorEmail`) y activa la
+  cuenta con `activarDoc` (nunca cobra dos veces).
 - **Canje** (`POST /api/recompensas`): comprueba edad 16–30, suscripción activa o
   cancelada con vigencia, recompensa canjeable y **una key por usuario y título**
   (ledger `doc.recompensas`). Al canjear: toma una key del pool, la guarda en
