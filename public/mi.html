@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/mi.css?v=20260907f" />
+  <link rel="stylesheet" href="css/mi.css?v=20260907g" />
 </head>
 <body>
   <header class="mi-top">
@@ -493,7 +493,10 @@
         var tagRow = rwEl('div', 'mi-rw-tags');
         tagRow.appendChild(rwEl('span', 'mi-rw-cat', rwCatLabel(r.categoria)));
         if (conseguida) tagRow.appendChild(rwEl('span', 'mi-rw-est ok', 'Conseguida'));
-        else if (!rwDisponible(r)) tagRow.appendChild(rwEl('span', 'mi-rw-est', r.disponibilidad || 'Próximamente'));
+        else if (!rwDisponible(r)) {
+          var estTxt = r.disponibilidad || 'Próximamente';
+          tagRow.appendChild(rwEl('span', 'mi-rw-est' + (estTxt === 'Agotado' ? ' agot' : ''), estTxt));
+        }
         body.appendChild(tagRow);
 
         var h = rwEl('h4', 'mi-rw-nombre', r.nombre);
@@ -503,6 +506,7 @@
         var meta = rwEl('div', 'mi-rw-meta');
         if (r.plataforma) meta.appendChild(rwEl('span', 'mi-rw-plat', r.plataforma));
         if (r.edadRecomendada) meta.appendChild(rwEl('span', 'mi-rw-edad', r.edadRecomendada));
+        if (!conseguida && r.canjeable && r.stock != null) meta.appendChild(rwEl('span', 'mi-rw-stock', 'Quedan ' + r.stock));
         body.appendChild(meta);
 
         var foot = rwEl('div', 'mi-rw-foot');
@@ -567,10 +571,11 @@
         var info = rwEl('div', 'mi-rw-det-info');
 
         var conseguida = !!rwConseguidas[r.id];
+        var estDisp = r.disponibilidad || 'Próximamente';
         var tagRow = rwEl('div', 'mi-rw-tags');
         tagRow.appendChild(rwEl('span', 'mi-rw-cat', rwCatLabel(r.categoria)));
         if (conseguida) tagRow.appendChild(rwEl('span', 'mi-rw-est ok', 'Conseguida'));
-        else tagRow.appendChild(rwEl('span', 'mi-rw-est ' + (rwDisponible(r) ? 'ok' : 'soon'), r.disponibilidad || 'Próximamente'));
+        else tagRow.appendChild(rwEl('span', 'mi-rw-est ' + (estDisp === 'Agotado' ? 'agot' : (rwDisponible(r) ? 'ok' : 'soon')), estDisp));
         info.appendChild(tagRow);
 
         info.appendChild(rwEl('h3', 'mi-rw-det-nombre', r.nombre));
@@ -581,7 +586,9 @@
         var spec = rwEl('dl', 'mi-rw-spec');
         if (r.plataforma) spec.appendChild(rwRow('Plataforma', r.plataforma));
         if (r.edadRecomendada) spec.appendChild(rwRow('Edad recomendada', r.edadRecomendada));
-        if (r.disponibilidad) spec.appendChild(rwRow('Disponibilidad', r.disponibilidad));
+        var dispTxt = estDisp;
+        if (rwDisponible(r) && r.stock != null) dispTxt = 'Disponible · Quedan ' + r.stock + ' keys';
+        spec.appendChild(rwRow('Disponibilidad', dispTxt));
         info.appendChild(spec);
 
         var price = rwEl('div', 'mi-rw-det-price', 'Necesitas ');
@@ -601,7 +608,8 @@
         if (conseguida) {
           acc.appendChild(rwEl('p', 'mi-rw-ya', 'Ya conseguiste esta recompensa. Tu key está en «Keys de juegos indie» (límite: una por usuario y título).'));
         } else {
-          var got = rwEl('button', 'mi-btn primary' + (puede ? '' : ' off'), r.canjeable ? 'Conseguir recompensa' : 'No disponible todavía');
+          var botonTxt = r.canjeable ? 'Conseguir recompensa' : (estDisp === 'Agotado' ? 'Agotado' : 'No disponible todavía');
+          var got = rwEl('button', 'mi-btn primary' + (puede ? '' : ' off'), botonTxt);
           got.type = 'button';
           if (puede) {
             got.addEventListener('click', function () { conseguirRw(r, got); });
@@ -615,7 +623,9 @@
         var nota = rwEl('p', 'fine mi-rw-nota',
           r.canjeable && !conseguida
             ? 'Al conseguirla, la key se guarda en tu espacio (aparece en «Keys de juegos indie») y solo podrás conseguirla una vez.'
-            : 'Todavía no se puede conseguir esta recompensa. Cuando esté disponible podrás hacerlo desde aquí.');
+            : (estDisp === 'Agotado'
+                ? 'Se han agotado las keys de esta recompensa. Vuelve pronto: repondremos cuando el estudio colabore de nuevo.'
+                : 'Todavía no se puede conseguir esta recompensa. Cuando esté disponible podrás hacerlo desde aquí.'));
         info.appendChild(nota);
 
         layout.appendChild(info);
@@ -674,6 +684,16 @@
             });
           })
           .then(function () {
+            // ajusta el stock local: este canje acaba de consumir 1 key
+            rw.lista.forEach(function (x) {
+              if (x.id === r.id && x.stock != null) {
+                x.stock = Math.max(0, Number(x.stock) - 1);
+                if (x.stock === 0 && /^disponible$/i.test(String(x.disponibilidad || ''))) {
+                  x.disponibilidad = 'Agotado';
+                  x.canjeable = false;
+                }
+              }
+            });
             cerrarRw();
             rwEstado('¡Recompensa conseguida! Tu key ya está en «Keys de juegos indie». Solo puedes conseguirla una vez.', 'ok');
           })

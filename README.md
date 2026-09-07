@@ -115,6 +115,11 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
   recompensa). Solo la API la lee con la service role key: los códigos nunca llegan al
   navegador salvo al socio que la consigue (ver `lib/keypool.js`). `estado` =
   `disponible` | `asignada`; al asignar se marca con el `placeta_id` y no se reasigna.
+- **Cientos de keys por título (500 de un solo uso)**: cada key es una fila del pool y se
+  entrega a un único socio (una key por usuario y título). Para cargarlas en bloque:
+  `node scripts/load-keys.js <recompensaId> keys.txt [plataforma]` (una key por línea;
+  idempotente: reimportar no duplica). El catálogo muestra el stock real (vista
+  `placeta_joven_keypool_stock`) y pasa a **Agotado** cuando no quedan keys.
 - **Canje** (`POST /api/recompensas`): comprueba edad 16–30, suscripción activa o
   cancelada con vigencia, recompensa canjeable y **una key por usuario y título**
   (ledger `doc.recompensas`). Al canjear: toma una key del pool, la guarda en

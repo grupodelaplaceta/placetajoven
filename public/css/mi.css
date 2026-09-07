@@ -178,6 +178,8 @@ a{color:var(--violet2)}
 .mi-rw-cat{background:var(--soft2);color:var(--violet2);font-weight:800;font-size:.68rem;letter-spacing:.8px;text-transform:uppercase;border-radius:999px;padding:.28rem .7rem}
 .mi-rw-est{background:#fff4e0;color:var(--amber);font-weight:800;font-size:.68rem;letter-spacing:.8px;text-transform:uppercase;border-radius:999px;padding:.28rem .7rem}
 .mi-rw-est.ok{background:var(--green-bg);color:var(--green)}
+.mi-rw-est.agot{background:var(--red-bg);color:var(--red)}
+.mi-rw-stock{background:var(--green-bg);border:1px solid #bfe6d0;color:var(--green);font-weight:800;font-size:.74rem;border-radius:999px;padding:.25rem .7rem}
 .mi-rw-nombre{font-family:var(--font-display);font-weight:400;letter-spacing:.4px;text-transform:uppercase;color:var(--deep);font-size:1.18rem;line-height:1.05;margin:0}
 .mi-rw-dev{margin:0;color:var(--muted);font-size:.88rem}
 .mi-rw-meta{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.1rem}

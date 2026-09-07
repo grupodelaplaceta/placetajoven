@@ -193,3 +193,33 @@ test('canje: recompensa sin stock (Próximamente) no entrega key', async () => {
   const x = await keypool.tomarUna('vj-ejemplo-3', 'DIP-A');
   assert.strictEqual(x, null);
 });
+
+test('keypool: stockPara cuenta solo las keys disponibles', async () => {
+  sinSupabase();
+  keypool.resetDemo();
+  const s = await keypool.stockPara(['vj-ejemplo-1', 'vj-ejemplo-2', 'vj-ejemplo-3']);
+  assert.deepStrictEqual(s, { 'vj-ejemplo-1': 2, 'vj-ejemplo-2': 2, 'vj-ejemplo-3': 0 });
+  await keypool.tomarUna('vj-ejemplo-1', 'DIP-X'); // una asignada → baja el stock
+  const s2 = await keypool.stockPara(['vj-ejemplo-1']);
+  assert.strictEqual(s2['vj-ejemplo-1'], 1);
+});
+
+test('keypool: importar en bloque es idempotente y no duplica códigos', async () => {
+  sinSupabase();
+  keypool.resetDemo();
+  // incluye duplicado, línea vacía y comentario → solo 3 únicos
+  const r1 = await keypool.importar('recompensa-x', ['AAA-1', 'AAA-2', 'AAA-2', '', '# nota', 'AAA-3'], 'steam');
+  assert.strictEqual(r1.insertadas, 3);
+  let stock = await keypool.stockPara(['recompensa-x']);
+  assert.strictEqual(stock['recompensa-x'], 3);
+
+  // reimportar lo mismo no añade nada
+  const r2 = await keypool.importar('recompensa-x', ['AAA-1', 'AAA-2', 'AAA-3'], 'steam');
+  assert.strictEqual(r2.insertadas, 0);
+  stock = await keypool.stockPara(['recompensa-x']);
+  assert.strictEqual(stock['recompensa-x'], 3);
+
+  // esas keys se pueden entregar (una a cada usuario)
+  const t = await keypool.tomarUna('recompensa-x', 'DIP-Y');
+  assert.ok(t);
+});

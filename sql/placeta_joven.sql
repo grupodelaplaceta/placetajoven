@@ -123,3 +123,15 @@ insert into public.placeta_joven_keypool (id, recompensa_id, codigo, plataforma,
   ('kp-demo-3', 'vj-ejemplo-2', 'VJ2-EJEMPLO-1111-CCCC', 'steam', 'disponible'),
   ('kp-demo-4', 'vj-ejemplo-2', 'VJ2-EJEMPLO-1111-DDDD', 'steam', 'disponible')
 on conflict (id) do nothing;
+
+-- Vista de stock disponible por recompensa (para mostrar «Quedan N» / «Agotado»
+-- sin exponer los códigos). La API la lee con la service role key.
+-- Nota: para cargar cientos de keys de un solo uso por título usa
+-- `node scripts/load-keys.js <recompensaId> keys.txt` (una key por línea).
+create or replace view public.placeta_joven_keypool_stock as
+select
+  recompensa_id,
+  count(*) filter (where estado = 'disponible') as disponibles,
+  count(*) as total
+from public.placeta_joven_keypool
+group by recompensa_id;
