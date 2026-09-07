@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/mi.css?v=20260907e" />
+  <link rel="stylesheet" href="css/mi.css?v=20260907f" />
 </head>
 <body>
   <header class="mi-top">
@@ -339,6 +339,12 @@
           var pl = document.createElement('span');
           pl.textContent = k.plataforma ? k.plataforma.toUpperCase() : '';
           t.appendChild(b); t.appendChild(pl);
+          if (k.recompensaId && k.pz) {
+            var rwOr = document.createElement('span');
+            rwOr.className = 'mi-key-origen';
+            rwOr.textContent = 'Recompensa · ' + k.pz + ' Pz';
+            t.appendChild(rwOr);
+          }
           var st = document.createElement('span');
           st.className = 'mi-key-estado ' + (k.estado === 'usado' ? 'used' : 'ok');
           st.textContent = k.estado === 'usado' ? (k.canjeada ? 'Canjeada · ' + fmt(k.canjeada) : 'Canjeada') : 'Disponible';
@@ -389,6 +395,15 @@
         otros: { etiqueta: 'Otros', icono: '🎁' }
       };
       var rw = { lista: [], filtro: 'todos', demo: false, activa: false };
+      // recompensas que este socio ya ha conseguido (una por usuario y título)
+      var rwConseguidas = {};
+
+      function rwMarcarConseguidas(keys) {
+        rwConseguidas = {};
+        (keys || []).forEach(function (k) {
+          if (k && k.recompensaId) rwConseguidas[String(k.recompensaId)] = true;
+        });
+      }
 
       function rwEl(tag, cls, txt) {
         var n = document.createElement(tag);
@@ -460,7 +475,11 @@
       }
 
       function rwCard(r) {
-        var card = rwEl('article', 'mi-rw-card' + (rwDisponible(r) ? '' : ' soon'));
+        var conseguida = !!rwConseguidas[r.id];
+        var puede = r.canjeable && !conseguida;
+        var card = rwEl('article', 'mi-rw-card'
+          + (rwDisponible(r) ? '' : ' soon')
+          + (conseguida ? ' got' : ''));
         card.setAttribute('data-cat', r.categoria);
 
         var coverBtn = rwEl('button', 'mi-rw-coverbtn');
@@ -473,7 +492,8 @@
         var body = rwEl('div', 'mi-rw-body');
         var tagRow = rwEl('div', 'mi-rw-tags');
         tagRow.appendChild(rwEl('span', 'mi-rw-cat', rwCatLabel(r.categoria)));
-        if (!rwDisponible(r)) tagRow.appendChild(rwEl('span', 'mi-rw-est', r.disponibilidad || 'Próximamente'));
+        if (conseguida) tagRow.appendChild(rwEl('span', 'mi-rw-est ok', 'Conseguida'));
+        else if (!rwDisponible(r)) tagRow.appendChild(rwEl('span', 'mi-rw-est', r.disponibilidad || 'Próximamente'));
         body.appendChild(tagRow);
 
         var h = rwEl('h4', 'mi-rw-nombre', r.nombre);
@@ -487,9 +507,14 @@
 
         var foot = rwEl('div', 'mi-rw-foot');
         foot.appendChild(rwPrecio(r));
-        var got = rwEl('button', 'mi-btn primary sm', 'Conseguir');
+        var got = rwEl('button', 'mi-btn primary sm' + (puede ? '' : ' off'),
+          conseguida ? 'Conseguida ✓' : (r.canjeable ? 'Conseguir' : (r.disponibilidad || 'Próximamente')));
         got.type = 'button';
-        got.addEventListener('click', function () { abrirRw(r.id); });
+        if (puede) {
+          got.addEventListener('click', function () { abrirRw(r.id); });
+        } else {
+          got.disabled = true;
+        }
         foot.appendChild(got);
         body.appendChild(foot);
 
@@ -541,9 +566,11 @@
 
         var info = rwEl('div', 'mi-rw-det-info');
 
+        var conseguida = !!rwConseguidas[r.id];
         var tagRow = rwEl('div', 'mi-rw-tags');
         tagRow.appendChild(rwEl('span', 'mi-rw-cat', rwCatLabel(r.categoria)));
-        tagRow.appendChild(rwEl('span', 'mi-rw-est ' + (rwDisponible(r) ? 'ok' : 'soon'), r.disponibilidad || 'Próximamente'));
+        if (conseguida) tagRow.appendChild(rwEl('span', 'mi-rw-est ok', 'Conseguida'));
+        else tagRow.appendChild(rwEl('span', 'mi-rw-est ' + (rwDisponible(r) ? 'ok' : 'soon'), r.disponibilidad || 'Próximamente'));
         info.appendChild(tagRow);
 
         info.appendChild(rwEl('h3', 'mi-rw-det-nombre', r.nombre));
@@ -570,16 +597,25 @@
         }
 
         var acc = rwEl('div', 'mi-rw-det-acc');
-        var got = rwEl('button', 'mi-btn primary', 'Conseguir recompensa');
-        got.type = 'button';
-        got.addEventListener('click', function () { conseguirRw(r, got); });
-        acc.appendChild(got);
+        var puede = r.canjeable && !conseguida;
+        if (conseguida) {
+          acc.appendChild(rwEl('p', 'mi-rw-ya', 'Ya conseguiste esta recompensa. Tu key está en «Keys de juegos indie» (límite: una por usuario y título).'));
+        } else {
+          var got = rwEl('button', 'mi-btn primary' + (puede ? '' : ' off'), r.canjeable ? 'Conseguir recompensa' : 'No disponible todavía');
+          got.type = 'button';
+          if (puede) {
+            got.addEventListener('click', function () { conseguirRw(r, got); });
+          } else {
+            got.disabled = true;
+          }
+          acc.appendChild(got);
+        }
         info.appendChild(acc);
 
         var nota = rwEl('p', 'fine mi-rw-nota',
-          rw.demo
-            ? 'Ejemplo para la maqueta: todavía no hay colaboraciones confirmadas. Cuando las haya, el canje se hará con tus Placetas (Pz).'
-            : 'El canje con Placetas (Pz) se está preparando. Podrás conseguirla desde aquí cuando esté disponible.');
+          r.canjeable && !conseguida
+            ? 'Al conseguirla, la key se guarda en tu espacio (aparece en «Keys de juegos indie») y solo podrás conseguirla una vez.'
+            : 'Todavía no se puede conseguir esta recompensa. Cuando esté disponible podrás hacerlo desde aquí.');
         info.appendChild(nota);
 
         layout.appendChild(info);
@@ -611,27 +647,46 @@
         renderRwGrilla();
       }
 
+      function rwMsgCanje(code) {
+        switch (code) {
+          case 'canjeo_desactivado': return 'El canje con Placetas (Pz) se activará cuando haya recompensas confirmadas. De momento no se puede conseguir.';
+          case 'ya_conseguida': return 'Ya conseguiste esta recompensa. Solo se puede conseguir una vez por usuario y título.';
+          case 'no_disponible': return 'Esta recompensa todavía no está disponible para conseguir.';
+          case 'sin_stock': return 'Acabamos de quedarnos sin keys de esta recompensa. Vuelve pronto.';
+          case 'no_activa': return 'Necesitas tener Placeta Joven activa para conseguir recompensas.';
+          case 'recompensa_no_encontrada': return 'No hemos encontrado esa recompensa. Recarga la página.';
+          case 'edad_no_permitida': return 'Este programa es para jóvenes de 16 a 30 años.';
+          default: return null;
+        }
+      }
+
       function conseguirRw(r, btn) {
-        // Sin backend de Pz todavía: aviso claro, sin prometer nada.
         if (btn.disabled) return;
         btn.disabled = true;
+        var orig = btn.textContent;
         btn.textContent = 'Procesando…';
-        setTimeout(function () {
-          btn.disabled = false;
-          btn.textContent = 'Conseguir recompensa';
-          rwEstado(
-            rw.demo
-              ? 'Aún no se puede conseguir: es una recompensa de ejemplo. Cuando haya colaboraciones reales y saldo en Placetas (Pz), podrás canjearla desde aquí.'
-              : 'El canje con Placetas (Pz) se activará próximamente. Te avisaremos desde tu espacio joven.',
-            'aviso'
-          );
-          var e = $id('mi-rw-estado');
-          if (e) e.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 500);
+        api('recompensas', { method: 'POST', body: JSON.stringify({ recompensaId: r.id }) })
+          .then(function () {
+            // refresca las keys: la nueva key aparece en «Keys de juegos indie»
+            return api('status').then(function (st) {
+              renderKeys(st.keys || []);
+              rwMarcarConseguidas(st.keys || []);
+            });
+          })
+          .then(function () {
+            cerrarRw();
+            rwEstado('¡Recompensa conseguida! Tu key ya está en «Keys de juegos indie». Solo puedes conseguirla una vez.', 'ok');
+          })
+          .catch(function (e) {
+            rwEstado(rwMsgCanje(e && e.code) || 'No se ha podido conseguir la recompensa. Reintenta en un momento.', 'error');
+            btn.disabled = false;
+            btn.textContent = orig;
+          });
       }
 
       // ── Carga de recompensas ──
-      async function cargarRecompensas() {
+      async function cargarRecompensas(keys) {
+        rwMarcarConseguidas(keys);
         rwEstado('Cargando recompensas…');
         $id('mi-rw-grid').hidden = true;
         try {
@@ -666,7 +721,7 @@
           if (st.estado === 'ACTIVO' || (st.estado === 'CANCELADO' && st.sigueVigente)) {
             renderSuscripcion(st);
             renderKeys(st.keys || []);
-            cargarRecompensas();
+            cargarRecompensas(st.keys || []);
             mostrar('mi-activo');
             return;
           }

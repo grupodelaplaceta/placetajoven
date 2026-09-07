@@ -141,6 +141,7 @@ a{color:var(--violet2)}
 .mi-rw-estado.empty{background:var(--soft);border-style:dashed}
 .mi-rw-estado.error{background:var(--red-bg);border-color:#f0c4c4;color:var(--red)}
 .mi-rw-estado.aviso{background:#fff8e1;border-color:#ffe082;color:#7a5c00}
+.mi-rw-estado.ok{background:var(--green-bg);border-color:#bfe6d0;color:var(--green);font-weight:700}
 
 /* Grilla de tarjetas */
 .mi-rw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
@@ -152,6 +153,11 @@ a{color:var(--violet2)}
 }
 .mi-rw-card:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(42,7,80,.14);border-color:var(--accent2)}
 .mi-rw-card.soon{filter:saturate(.75)}
+.mi-rw-card.got{filter:none;border-color:#bfe6d0;background:linear-gradient(180deg,#fff,#f2fbf6)}
+.mi-rw-card.got .mi-rw-nombre{color:var(--green)}
+.mi-btn.off{opacity:.55;pointer-events:none}
+.mi-rw-ya{margin:0;background:var(--green-bg);border:1px solid #bfe6d0;color:var(--green);font-weight:700;font-size:.92rem;border-radius:12px;padding:.7rem 1rem}
+.mi-key-origen{display:block;color:var(--green);font-size:.75rem;letter-spacing:.3px;text-transform:none;font-weight:700}
 .mi-rw-coverbtn{display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;text-align:left}
 .mi-rw-coverbtn:focus-visible{outline-offset:-3px}
 .mi-rw-cover{position:relative;aspect-ratio:16/9;overflow:hidden}
@@ -181,6 +187,7 @@ a{color:var(--violet2)}
 .mi-rw-pz-txt{color:var(--muted);font-size:.78rem}
 .mi-rw-foot .mi-btn{padding:.5rem .95rem;font-size:.85rem}
 .mi-rw-card.soon .mi-rw-foot .mi-btn{opacity:.55;pointer-events:none}
+.mi-rw-card.got .mi-rw-foot .mi-btn{opacity:1;pointer-events:none;background:var(--green);box-shadow:none}
 
 /* Ficha detalle (dentro de la página) */
 .mi-rw-back{margin-bottom:1rem}

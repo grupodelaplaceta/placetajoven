@@ -30,7 +30,9 @@ function keysPublicas(doc) {
     codigo: k.codigo || '',
     estado: k.estado === 'usado' ? 'usado' : 'disponible',
     otorgada: k.otorgada || null,
-    canjeada: k.canjeada || null
+    canjeada: k.canjeada || null,
+    recompensaId: k.recompensaId || null,
+    pz: k.pz || null
   }));
 }
 

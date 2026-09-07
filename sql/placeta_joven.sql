@@ -81,3 +81,45 @@ insert into public.placeta_joven_recompensas (id, categoria, orden, activa, data
     "condiciones": "Una key por usuario y título. Se informará de la fecha de disponibilidad."
   }'::jsonb)
 on conflict (id) do nothing;
+
+-- Solo las recompensas «Disponibles» de las que hay stock real se pueden canjear.
+update public.placeta_joven_recompensas
+  set data = data || '{"canjeable": true}'::jsonb
+  where id in ('vj-ejemplo-1', 'vj-ejemplo-2');
+update public.placeta_joven_recompensas
+  set data = data || '{"canjeable": false}'::jsonb
+  where id = 'vj-ejemplo-3';
+
+-- ══════════════════════════════════════════════════════════════════════════
+-- Pool de keys por recompensa (códigos reales, SOLO en el servidor)
+-- --------------------------------------------------------------------------
+-- Cada fila = una key en stock de una recompensa. El cliente NUNCA ve esta
+-- tabla: la API entrega el código únicamente al socio que la consigue (la
+-- guarda en su doc.keys). `estado` = disponible | asignada. Cuando una key
+-- se asigna se marca con el placeta_id y se impide reasignarla (1 por título).
+-- ══════════════════════════════════════════════════════════════════════════
+
+create table if not exists public.placeta_joven_keypool (
+  id text primary key,
+  recompensa_id text not null,
+  codigo text not null,
+  plataforma text not null default '',
+  estado text not null default 'disponible',
+  placeta_id text,
+  asignada_en timestamptz,
+  creada_en timestamptz not null default now()
+);
+
+-- Sin políticas de lectura: ni anónimo ni authenticated leen los códigos.
+-- Solo la service role key (usada por la API) puede leer/asignar.
+alter table public.placeta_joven_keypool enable row level security;
+
+-- Seed de ejemplo (códigos INVENTADOS, no reales) para poder probar el canje
+-- de extremo a extremo. Cuando haya colaboraciones reales se sustituyen por
+-- los códigos reales del estudio.
+insert into public.placeta_joven_keypool (id, recompensa_id, codigo, plataforma, estado) values
+  ('kp-demo-1', 'vj-ejemplo-1', 'VJ1-EJEMPLO-0000-AAAA', 'steam', 'disponible'),
+  ('kp-demo-2', 'vj-ejemplo-1', 'VJ1-EJEMPLO-0000-BBBB', 'steam', 'disponible'),
+  ('kp-demo-3', 'vj-ejemplo-2', 'VJ2-EJEMPLO-1111-CCCC', 'steam', 'disponible'),
+  ('kp-demo-4', 'vj-ejemplo-2', 'VJ2-EJEMPLO-1111-DDDD', 'steam', 'disponible')
+on conflict (id) do nothing;

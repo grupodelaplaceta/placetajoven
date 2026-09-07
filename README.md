@@ -89,6 +89,7 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
 - `POST /api/cancelar`   → cancelar (mantiene las ventajas hasta fin de período).
 - `POST /api/webhook`    → webhook de Lemon Squeezy (verifica firma `X-Signature`).
 - `GET  /api/recompensas`→ catálogo de recompensas disponibles (ver abajo).
+- `POST /api/recompensas`→ canjear una recompensa (entrega la key al socio).
 - Panel de usuario: `mi.html` («Mi Placeta Joven»).
 - Lógica pura testeada: `npm test` (`tests/core.test.js`).
 - Config necesaria en producción: variables de `.env.example`
@@ -109,7 +110,25 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
   está configurado, la API devuelve el mismo catálogo de ejemplo con `demo: true`
   para que la maqueta funcione sin base de datos.
 
+## Canje de recompensas (cómo se almacenan y entregan las keys)
+- **Pool de keys**: tabla `placeta_joven_keypool` (una fila = una key en stock de una
+  recompensa). Solo la API la lee con la service role key: los códigos nunca llegan al
+  navegador salvo al socio que la consigue (ver `lib/keypool.js`). `estado` =
+  `disponible` | `asignada`; al asignar se marca con el `placeta_id` y no se reasigna.
+- **Canje** (`POST /api/recompensas`): comprueba edad 16–30, suscripción activa o
+  cancelada con vigencia, recompensa canjeable y **una key por usuario y título**
+  (ledger `doc.recompensas`). Al canjear: toma una key del pool, la guarda en
+  `doc.keys` del socio (aparece en «Keys de juegos indie» con origen «Recompensa · N Pz»)
+  y registra el coste en Pz en el ledger. Ver `lib/recompensas.js` (`yaConseguida`,
+  `anadirKey`) y `api/recompensas.js`.
+- **Placetas (Pz)**: el coste se registra pero **no se descuenta saldo** todavía (no
+  existe wallet Pz en el ecosistema). Cuando exista el saldo real se añadirá la
+  comprobación y el débito en el punto de canje.
+- **Activación**: el canje está **desactivado por defecto** (`RECOMPENSAS_CANJEO=0`).
+  Al tener colaboraciones reales y cargar códigos reales en el keypool, pon
+  `RECOMPENSAS_CANJEO=1` en Vercel.
+
 ## Pendiente para fases siguientes
 - Gestión de ventajas (`joven_benefits`) y panel de administración (RSP).
 - Desplegar plid26 con el solicitante de Placeta Joven para validar el login.
-- Canje real con Placetas (Pz) y entrega de keys cuando haya colaboraciones confirmadas.
+- Verificación/débito real del saldo de Placetas (Pz) al canjear (ecosistema Banco/PlacetaID).

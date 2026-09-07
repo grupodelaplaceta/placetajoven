@@ -115,7 +115,7 @@ test('recompensas: publica expone solo campos públicos', () => {
   assert.deepStrictEqual(p, {
     id: 'x-1', categoria: 'videojuegos', nombre: 'Demo', desarrolladora: 'Estudio',
     descripcion: 'D', plataforma: 'Steam', edadRecomendada: '16+', pz: 500,
-    imagen: null, disponibilidad: 'Disponible', condiciones: 'C'
+    imagen: null, disponibilidad: 'Disponible', canjeable: false, condiciones: 'C'
   });
   // No filtra columnas internas: nunca expone `data` cruda ni `orden`.
   assert.ok(!('orden' in p));
@@ -134,4 +134,62 @@ test('recompensas: categoriaValida cae a otros si no es conocida', () => {
   assert.strictEqual(categoriaValida('videojuegos'), 'videojuegos');
   assert.strictEqual(categoriaValida('formacion'), 'formacion');
   assert.strictEqual(categoriaValida('raro'), 'otros');
+});
+
+// ── Canje de recompensas (keypool + entrega al socio) ────────────────
+const { yaConseguida, anadirKey } = require('../lib/recompensas');
+const keypool = require('../lib/keypool');
+
+function sinSupabase() {
+  delete process.env.SUPABASE_URL;
+  delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+}
+
+test('canje: publica marca canjeable solo si disponible', () => {
+  const r1 = DEMO.find((x) => x.id === 'vj-ejemplo-1');
+  const p1 = publica({ data: r1 });
+  assert.strictEqual(p1.canjeable, true);
+  const r3 = DEMO.find((x) => x.id === 'vj-ejemplo-3');
+  const p3 = publica({ data: r3 });
+  assert.strictEqual(p3.canjeable, false); // «Próximamente»
+});
+
+test('canje: yaConseguida se detecta por ledger o por key existente', () => {
+  const docLedger = { recompensas: { 'vj-ejemplo-1': { obtenida: 'x', pz: 500 } } };
+  assert.strictEqual(yaConseguida(docLedger, 'vj-ejemplo-1'), true);
+  const docKey = { keys: [{ recompensaId: 'vj-ejemplo-2' }] };
+  assert.strictEqual(yaConseguida(docKey, 'vj-ejemplo-2'), true);
+  assert.strictEqual(yaConseguida({}, 'vj-ejemplo-3'), false);
+  assert.strictEqual(yaConseguida(null, 'vj-ejemplo-1'), false);
+});
+
+test('canje: anadirKey guarda la key en doc.keys y registra el coste en Pz', () => {
+  const r = DEMO.find((x) => x.id === 'vj-ejemplo-1');
+  const { doc, key } = anadirKey({ placeta_id: '12345678A' }, r, { id: 'kp-1', codigo: 'VJ1-TEST', plataforma: 'steam' });
+  assert.strictEqual(doc.keys.length, 1);
+  assert.strictEqual(doc.keys[0].juego, 'Videojuego Ejemplo 1');
+  assert.strictEqual(doc.keys[0].codigo, 'VJ1-TEST');
+  assert.strictEqual(doc.keys[0].estado, 'disponible');
+  assert.strictEqual(doc.keys[0].recompensaId, 'vj-ejemplo-1');
+  assert.strictEqual(doc.recompensas['vj-ejemplo-1'].pz, 500);
+  assert.strictEqual(key.recompensaId, 'vj-ejemplo-1');
+  assert.strictEqual(yaConseguida(doc, 'vj-ejemplo-1'), true);
+});
+
+test('canje: keypool demo asigna sin repetir y agota el stock', async () => {
+  sinSupabase();
+  keypool.resetDemo();
+  const a = await keypool.tomarUna('vj-ejemplo-1', 'DIP-A');
+  const b = await keypool.tomarUna('vj-ejemplo-1', 'DIP-B');
+  assert.ok(a && b, 'debería haber 2 keys demo');
+  assert.notStrictEqual(a.codigo, b.codigo, 'nunca entrega dos veces la misma key');
+  const c = await keypool.tomarUna('vj-ejemplo-1', 'DIP-C');
+  assert.strictEqual(c, null, 'stock agotado');
+});
+
+test('canje: recompensa sin stock (Próximamente) no entrega key', async () => {
+  sinSupabase();
+  keypool.resetDemo();
+  const x = await keypool.tomarUna('vj-ejemplo-3', 'DIP-A');
+  assert.strictEqual(x, null);
 });
