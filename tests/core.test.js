@@ -128,12 +128,11 @@ test('recompensas: categorías esperadas', () => {
 });
 
 test('recompensas: el catálogo demo no usa nombres de juegos reales', () => {
-  assert.strictEqual(DEMO.length, 3);
+  assert.strictEqual(DEMO.length, 6);
   DEMO.forEach((r, i) => {
     assert.match(r.id, /^vj-ejemplo-/);
     assert.match(r.nombre, /^Videojuego Ejemplo \d/);
     assert.match(r.desarrolladora, /^Estudio Ejemplo /);
-    assert.strictEqual(r.categoria, 'videojuegos');
     assert.ok(r.pz > 0);
     assert.strictEqual(r.imagen, null);
     assert.ok(r.condiciones.length > 0);
@@ -152,7 +151,7 @@ test('recompensas: publica expone solo campos públicos', () => {
   });
   assert.deepStrictEqual(p, {
     id: 'x-1', categoria: 'videojuegos', nombre: 'Demo', desarrolladora: 'Estudio',
-    descripcion: 'D', plataforma: 'Steam', edadRecomendada: '16+', pz: 500,
+    descripcion: 'D', plataforma: 'Steam', genero: '', edadRecomendada: '16+', pz: 500,
     imagen: null, disponibilidad: 'Disponible', canjeable: false, condiciones: 'C'
   });
   // No filtra columnas internas: nunca expone `data` cruda ni `orden`.

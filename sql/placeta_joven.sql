@@ -79,13 +79,49 @@ insert into public.placeta_joven_recompensas (id, categoria, orden, activa, data
     "imagen": null,
     "disponibilidad": "Próximamente",
     "condiciones": "Una key por usuario y título. Se informará de la fecha de disponibilidad."
+  }'::jsonb),
+  ('vj-ejemplo-4', 'videojuegos', 4, true, '{
+    "nombre": "Videojuego Ejemplo 4",
+    "desarrolladora": "Estudio Ejemplo Cuatro",
+    "genero": "Aventura",
+    "descripcion": "Una aventura roguelite con un mundo generado. Ejemplo de ficha para la maqueta: este título no existe todavía.",
+    "plataforma": "Steam",
+    "edadRecomendada": "10+",
+    "pz": 400,
+    "imagen": null,
+    "disponibilidad": "Disponible",
+    "condiciones": "Una key por usuario y título. No se pueden revender las claves."
+  }'::jsonb),
+  ('vj-ejemplo-5', 'videojuegos', 5, true, '{
+    "nombre": "Videojuego Ejemplo 5",
+    "desarrolladora": "Estudio Ejemplo Cinco",
+    "genero": "Carreras",
+    "descripcion": "Un arcade de carreras para partidas cortas. Ejemplo de ficha para la maqueta: este título no existe todavía.",
+    "plataforma": "Steam",
+    "edadRecomendada": "7+",
+    "pz": 300,
+    "imagen": null,
+    "disponibilidad": "Disponible",
+    "condiciones": "Una key por usuario y título. No se pueden revender las claves."
+  }'::jsonb),
+  ('vj-ejemplo-6', 'videojuegos', 6, true, '{
+    "nombre": "Videojuego Ejemplo 6",
+    "desarrolladora": "Estudio Ejemplo Seis",
+    "genero": "Estrategia",
+    "descripcion": "Un juego de estrategia por turnos. Ejemplo de ficha para la maqueta: este título no existe todavía.",
+    "plataforma": "Steam",
+    "edadRecomendada": "12+",
+    "pz": 600,
+    "imagen": null,
+    "disponibilidad": "Disponible",
+    "condiciones": "Una key por usuario y título. No se pueden revender las claves."
   }'::jsonb)
 on conflict (id) do nothing;
 
 -- Solo las recompensas «Disponibles» de las que hay stock real se pueden canjear.
 update public.placeta_joven_recompensas
   set data = data || '{"canjeable": true}'::jsonb
-  where id in ('vj-ejemplo-1', 'vj-ejemplo-2');
+  where id in ('vj-ejemplo-1', 'vj-ejemplo-2', 'vj-ejemplo-4', 'vj-ejemplo-5', 'vj-ejemplo-6');
 update public.placeta_joven_recompensas
   set data = data || '{"canjeable": false}'::jsonb
   where id = 'vj-ejemplo-3';
@@ -121,7 +157,13 @@ insert into public.placeta_joven_keypool (id, recompensa_id, codigo, plataforma,
   ('kp-demo-1', 'vj-ejemplo-1', 'VJ1-EJEMPLO-0000-AAAA', 'steam', 'disponible'),
   ('kp-demo-2', 'vj-ejemplo-1', 'VJ1-EJEMPLO-0000-BBBB', 'steam', 'disponible'),
   ('kp-demo-3', 'vj-ejemplo-2', 'VJ2-EJEMPLO-1111-CCCC', 'steam', 'disponible'),
-  ('kp-demo-4', 'vj-ejemplo-2', 'VJ2-EJEMPLO-1111-DDDD', 'steam', 'disponible')
+  ('kp-demo-4', 'vj-ejemplo-2', 'VJ2-EJEMPLO-1111-DDDD', 'steam', 'disponible'),
+  ('kp-demo-5', 'vj-ejemplo-4', 'VJ4-EJEMPLO-2222-EEEE', 'steam', 'disponible'),
+  ('kp-demo-6', 'vj-ejemplo-4', 'VJ4-EJEMPLO-2222-FFFF', 'steam', 'disponible'),
+  ('kp-demo-7', 'vj-ejemplo-5', 'VJ5-EJEMPLO-3333-GGGG', 'steam', 'disponible'),
+  ('kp-demo-8', 'vj-ejemplo-5', 'VJ5-EJEMPLO-3333-HHHH', 'steam', 'disponible'),
+  ('kp-demo-9', 'vj-ejemplo-6', 'VJ6-EJEMPLO-4444-IIII', 'steam', 'disponible'),
+  ('kp-demo-10', 'vj-ejemplo-6', 'VJ6-EJEMPLO-4444-JJJJ', 'steam', 'disponible')
 on conflict (id) do nothing;
 
 -- Vista de stock disponible por recompensa (para mostrar «Quedan N» / «Agotado»
