@@ -1,7 +1,7 @@
 // GET /api/status — estado de Placeta Joven del usuario autenticado
 'use strict';
 
-const { edadOk, docVigente } = require('../lib/placetajoven');
+const { edadOk, docVigente, pendienteCaducada } = require('../lib/placetajoven');
 const cfg = require('../config/placetajoven.json');
 const store = require('../lib/store');
 const { setCors, json, handleOptions, requiereUsuario } = require('./_util');
@@ -76,12 +76,16 @@ module.exports = async (req, res) => {
         planInfo: null,
         expiresAt: null,
         requiereAlta: true,
+        pendienteCaducada: false,
         keys: []
       });
     }
 
     const vigente = !!(doc.expires_at && new Date(doc.expires_at).getTime() > Date.now());
-    const requiereAlta = doc.status === 'EXPIRADO' || (doc.status === 'CANCELADO' && !vigente);
+    // Un pago PENDIENTE abandonado (> 2 h sin confirmar) no debe bloquear al
+    // usuario: se le deja elegir plan de nuevo (requiereAlta = true).
+    const pendienteMuerta = doc.status === 'PENDIENTE' && pendienteCaducada(doc);
+    const requiereAlta = pendienteMuerta || doc.status === 'EXPIRADO' || (doc.status === 'CANCELADO' && !vigente);
 
     return json(res, 200, {
       permitido: true,
@@ -93,6 +97,7 @@ module.exports = async (req, res) => {
       expiresAt: doc.expires_at || null,
       sigueVigente: vigente,
       requiereAlta: requiereAlta,
+      pendienteCaducada: !!pendienteMuerta,
       keys: keysPublicas(doc)
     });
   } catch (e) {

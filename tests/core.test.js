@@ -81,6 +81,18 @@ test('docVigente: ACTIVO con expires_at pasado pasa a EXPIRADO', () => {
   assert.strictEqual(docVigente(doc).status, 'EXPIRADO');
 });
 
+test('pendienteCaducada: pago PENDIENTE abandonado caduca; con sub no; otros no', () => {
+  const { pendienteCaducada, PENDIENTE_CADUCA_MS } = require('../lib/placetajoven');
+  const viejo = { status: 'PENDIENTE', created_at: new Date(Date.now() - PENDIENTE_CADUCA_MS - 60000).toISOString() };
+  assert.strictEqual(pendienteCaducada(viejo), true, 'abandonado > 2 h caduca');
+  const reciente = { status: 'PENDIENTE', created_at: new Date().toISOString() };
+  assert.strictEqual(pendienteCaducada(reciente), false, 'pendiente reciente no caduca');
+  const conSub = { status: 'PENDIENTE', subscription_id: 'sub-9', created_at: new Date(Date.now() - PENDIENTE_CADUCA_MS * 5).toISOString() };
+  assert.strictEqual(pendienteCaducada(conSub), false, 'con subscription_id el webhook lo gestiona');
+  assert.strictEqual(pendienteCaducada({ status: 'ACTIVO' }), false);
+  assert.strictEqual(pendienteCaducada(null), false);
+});
+
 // ── Recompensas disponibles (catálogo) ────────────────────────────────
 const { CATEGORIAS, DEMO, publica, categoriaValida } = require('../lib/recompensas');
 

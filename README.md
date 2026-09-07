@@ -90,7 +90,12 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
 - `POST /api/webhook`    → webhook de Lemon Squeezy (verifica firma `X-Signature`).
 - `GET  /api/recompensas`→ catálogo de recompensas disponibles (ver abajo).
 - `POST /api/recompensas`→ canjear una recompensa (entrega la key al socio).
-- Panel de usuario: `mi.html` («Mi Placeta Joven»).
+- Panel de usuario: espacio multipágina en `public/espacio/`:
+  - `espacio/inicio.html`   → Mi espacio (suscripción, noticias, destacados).
+  - `espacio/academia.html` → Academia Joven (cursos Cisco NetAcad en PlacetaEDU).
+  - `espacio/apoyo.html`    → Apoyo Indie (juegos y keys).
+  - `mi.html` (entrada tras PlacetaID) redirige a `espacio/inicio.html`.
+  - Motor compartido: `public/js/espacio.js` (sesión/estado + contenido por página).
 - Lógica pura testeada: `npm test` (`tests/core.test.js`).
 - Config necesaria en producción: variables de `.env.example`
   (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY, LS_API_KEY, LS_STORE_ID,
@@ -120,6 +125,13 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
   `node scripts/load-keys.js <recompensaId> keys.txt [plataforma]` (una key por línea;
   idempotente: reimportar no duplica). El catálogo muestra el stock real (vista
   `placeta_joven_keypool_stock`) y pasa a **Agotado** cuando no quedan keys.
+- **Academia Joven** (`espacio/academia.html`): los cursos disponibles son los de
+  Cisco Networking Academy a través de PlacetaEDU y la matrícula se gestiona desde
+  Placeta Joven. Ser Placeta Joven suma **+20 puntos de acceso** para conseguir
+  plaza en los cursos.
+- **Pendiente abandonado**: un `PENDIENTE` sin confirmar caduca a las **2 horas**
+  (`pendienteCaducada` en `lib/placetajoven.js`) y deja al usuario elegir plan de
+  nuevo; mientras está reciente puede «Comprobar» o «Pagar de nuevo».
 - **Canje** (`POST /api/recompensas`): comprueba edad 16–30, suscripción activa o
   cancelada con vigencia, recompensa canjeable y **una key por usuario y título**
   (ledger `doc.recompensas`). Al canjear: toma una key del pool, la guarda en

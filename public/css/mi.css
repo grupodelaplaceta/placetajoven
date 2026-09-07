@@ -251,3 +251,121 @@ a{color:var(--violet2)}
   .mi-rw-det-cover .mi-rw-ph{aspect-ratio:16/8}
   .mi-rw-spec{grid-template-columns:1fr}
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   ESPACIO JOVEN · REDISEÑO (multipágina con pestañas)
+   ════════════════════════════════════════════════════════════════════════ */
+body.mi-is-active .mi-intro{display:none}
+body.mi-is-active .mi-main{max-width:1080px;width:94%;margin-top:2.2rem}
+body.mi-is-active{
+  background:
+    radial-gradient(1100px 520px at 88% -6%, rgba(124,58,237,.09), transparent 60%),
+    radial-gradient(860px 480px at -6% 34%, rgba(167,139,250,.12), transparent 55%),
+    var(--soft);
+}
+.mi-view[hidden]{display:none!important}
+@keyframes miViewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.mi-view:not([hidden]){animation:miViewIn .32s ease}
+
+/* ── Cabecera del espacio ── */
+.mi-space-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;padding:.2rem .1rem 0}
+.mi-who{display:flex;align-items:center;gap:.95rem;min-width:0}
+.mi-who-ava{flex:0 0 auto;width:58px;height:58px;border-radius:18px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.55rem;letter-spacing:1px;color:#fff;background:linear-gradient(150deg,#7C3AED,#4E1B94);box-shadow:0 10px 24px rgba(109,40,217,.32)}
+.mi-who-kicker{margin:0;font-size:.7rem;font-weight:800;letter-spacing:1.7px;text-transform:uppercase;color:var(--violet2)}
+.mi-who-txt h1{font-family:var(--font-display);font-weight:400;letter-spacing:.5px;text-transform:uppercase;color:var(--deep);font-size:clamp(1.55rem,4vw,2.1rem);line-height:1;margin:0}
+.mi-head-meta{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.mi-plan-pill{display:inline-flex;align-items:center;gap:.5rem;font-weight:800;font-size:.85rem;color:var(--violet2);background:var(--soft2);border:1px solid var(--accent2);border-radius:999px;padding:.5rem 1rem;white-space:nowrap}
+.mi-plan-pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-bg);flex:none}
+
+/* ── Tabs ── */
+.mi-tabs{display:flex;gap:.3rem;flex-wrap:wrap;margin:1.1rem 0 1.35rem;padding:.4rem;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 6px 18px rgba(42,7,80,.06);width:fit-content;max-width:100%}
+body.mi-is-active .mi-tabs{position:sticky;top:82px;z-index:40;backdrop-filter:blur(6px)}
+@media (max-width:640px){body.mi-is-active .mi-tabs{top:72px}}
+.mi-tab{border:0;cursor:pointer;font-family:var(--font-body);font-weight:800;font-size:.95rem;color:var(--muted);background:transparent;border-radius:13px;padding:.6rem 1.05rem;display:inline-flex;align-items:center;gap:.45rem;transition:color .18s ease,background .18s ease,box-shadow .18s ease}
+.mi-tab::before{font-size:1.05rem;line-height:1}
+.mi-tab[data-view="inicio"]::before{content:"🏠"}
+.mi-tab[data-view="academia"]::before{content:"🎓"}
+.mi-tab[data-view="apoyo"]::before{content:"🎮"}
+.mi-tab:hover{color:var(--violet2);background:var(--soft)}
+.mi-tab.is-on{color:#fff;background:linear-gradient(120deg,var(--violet2),var(--violet));box-shadow:0 8px 18px rgba(109,40,217,.26)}
+
+/* ── Cabeceras de tarjeta con icono ── */
+.mi-card-ic{display:flex;gap:.9rem;align-items:center;margin-bottom:.9rem}
+.mi-card-ic .mi-card-title{margin:0}
+.mi-card-ic .mi-v-ico-lg{flex:0 0 auto;width:52px;height:52px;font-size:1.6rem;border-radius:16px;background:linear-gradient(150deg,var(--soft2),#fff);box-shadow:0 8px 18px rgba(42,7,80,.08)}
+.mi-vents-list{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+
+/* ── Noticias ── */
+.mi-news-list{display:grid;gap:.7rem}
+.mi-news-item{display:flex;gap:.9rem;align-items:flex-start;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:.8rem 1rem;transition:border-color .15s ease,background .15s ease}
+.mi-news-item:hover{border-color:var(--accent2);background:#fff}
+.mi-news-ico{flex:0 0 auto;width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:1.3rem}
+.mi-news-txt{min-width:0}
+.mi-news-txt .mi-news-tipo{display:inline-block;vertical-align:middle;margin-right:.45rem;font-size:.62rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--violet2);background:var(--soft2);border-radius:999px;padding:.22rem .6rem}
+.mi-news-txt b{display:inline;color:var(--deep);font-size:1rem}
+.mi-news-txt p{margin:.25rem 0 0;color:var(--muted);font-size:.9rem}
+
+/* ── Destacados ── */
+.mi-destac-list{display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+.mi-destac-item{display:flex;gap:.85rem;align-items:center;text-align:left;width:100%;background:linear-gradient(180deg,#fff,var(--soft));border:1px solid var(--line);border-radius:18px;padding:.9rem 1rem;cursor:pointer;font-family:var(--font-body);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.mi-destac-item:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(42,7,80,.12);border-color:var(--accent2)}
+.mi-destac-ico{flex:0 0 auto;width:48px;height:48px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;background:var(--soft2)}
+.mi-destac-txt{flex:1;min-width:0}
+.mi-destac-txt b{display:block;color:var(--deep);font-size:1.02rem;line-height:1.2}
+.mi-destac-txt small{color:var(--muted);font-size:.84rem}
+.mi-destac-go{font-weight:800;color:var(--violet2);font-size:.92rem;white-space:nowrap}
+.mi-destac-course .mi-destac-ico{background:linear-gradient(150deg,#e6efff,#fff)}
+
+/* ── Academia Joven (PlacetaEDU +20 Pz) ── */
+.mi-acad{display:grid;gap:1rem}
+.mi-acad-hero{display:flex;gap:1.1rem;align-items:center;background:linear-gradient(150deg,#4E1B94 0%,#2A0750 70%);color:#fff;border:none;overflow:hidden}
+.mi-acad-hero::after{content:"";position:absolute;inset:0;background:radial-gradient(420px 220px at 90% 0,rgba(201,184,255,.2),transparent 60%)}
+.mi-acad-hero>*{position:relative}
+.mi-acad-ico{flex:0 0 auto;width:64px;height:64px;border-radius:18px;background:rgba(255,255,255,.14);display:inline-flex;align-items:center;justify-content:center;font-size:2rem}
+.mi-acad-hero .mi-card-title{color:#fff;margin:0}
+.mi-acad-hero>div p:last-child{color:#E6DDF9;margin:0;max-width:62ch}
+.mi-kicker-inline{display:inline-block;font-weight:800;font-size:.7rem;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent);background:rgba(201,184,255,.16);border-radius:999px;padding:.28rem .8rem;margin:0 0 .45rem}
+.mi-acad-plus{display:flex;align-items:center;gap:1.1rem;background:linear-gradient(120deg,#fff,#f2f6ff);border:1px solid #d9e3fb;border-radius:18px;padding:1rem 1.2rem}
+.mi-acad-plus-num{flex:0 0 auto;font-family:var(--font-display);font-weight:400;font-size:2.4rem;line-height:1;background:linear-gradient(120deg,#2563eb,#7C3AED);-webkit-background-clip:text;background-clip:text;color:transparent}
+.mi-acad-plus p{margin:0;color:var(--muted)}
+.mi-acad-plus p b{color:var(--deep)}
+.mi-acad-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}
+.mi-acad-step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:1rem .95rem;display:flex;flex-direction:column;gap:.55rem}
+.mi-acad-step-n{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--violet2);color:#fff;font-weight:800;font-size:.95rem}
+.mi-acad-step-n.mi-acad-step-pz{background:linear-gradient(120deg,#2563eb,#7C3AED)}
+.mi-acad-step p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.4}
+.mi-acad-step p b{color:var(--deep)}
+.mi-acad-cta{display:flex;align-items:center;justify-content:center;gap:1.1rem;flex-wrap:wrap;text-align:center;padding:.4rem 0}
+.mi-acad-cta .fine{margin:0;max-width:46ch;text-align:left}
+
+/* ── Apoyo Indie ── */
+.mi-apoyo-intro{background:linear-gradient(180deg,#fff,var(--soft))}
+
+/* ── Aceptación de condiciones (única por juego) ── */
+.mi-rw-det-acc{display:flex;flex-direction:column;gap:.7rem}
+.mi-rw-acept{display:flex;align-items:flex-start;gap:.7rem;background:var(--soft2);border:1px solid var(--accent2);border-radius:12px;padding:.75rem 1rem;cursor:pointer;font-weight:700;font-size:.92rem;color:var(--deep);line-height:1.35}
+.mi-rw-acept input{width:19px;height:19px;accent-color:var(--violet2);flex:none;margin-top:1px;cursor:pointer}
+.mi-rw-det-acc .mi-btn{width:100%}
+
+@media (max-width:760px){
+  .mi-vents-list{grid-template-columns:1fr}
+  .mi-destac-list{grid-template-columns:1fr}
+  .mi-acad-steps{grid-template-columns:1fr 1fr}
+  .mi-tabs{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding:.35rem}
+  .mi-tabs::-webkit-scrollbar{display:none}
+  .mi-tab{white-space:nowrap}
+}
+@media (max-width:640px){
+  body.mi-is-active .mi-main{margin-top:1.6rem}
+  .mi-who-ava{width:48px;height:48px;font-size:1.3rem;border-radius:15px}
+  .mi-plan-pill{font-size:.8rem}
+  .mi-acad-hero{flex-direction:column;align-items:flex-start}
+  .mi-acad-plus{flex-direction:column;align-items:flex-start;gap:.5rem}
+  .mi-acad-steps{grid-template-columns:1fr}
+}
+
+/* Ajustes: navegación con enlaces reales entre páginas */
+.mi-tabs .mi-tab{text-decoration:none;color:var(--muted)}
+.mi-tabs .mi-tab.is-on{color:#fff}
+.mi-destac-item{color:var(--ink);text-decoration:none}
+.mi-aviso{margin:.7rem auto 0;max-width:60ch;font-size:.9rem;font-weight:700;color:#7a5c00;background:#fff8e1;border:1px solid #ffe082;border-radius:12px;padding:.6rem 1rem}
