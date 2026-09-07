@@ -80,3 +80,58 @@ test('docVigente: ACTIVO con expires_at pasado pasa a EXPIRADO', () => {
   const doc = { status: 'ACTIVO', expires_at: new Date(Date.now() - 1000).toISOString() };
   assert.strictEqual(docVigente(doc).status, 'EXPIRADO');
 });
+
+// ── Recompensas disponibles (catálogo) ────────────────────────────────
+const { CATEGORIAS, DEMO, publica, categoriaValida } = require('../lib/recompensas');
+
+test('recompensas: categorías esperadas', () => {
+  const ids = CATEGORIAS.map((c) => c.id).sort();
+  assert.deepStrictEqual(ids, ['experiencias', 'formacion', 'otros', 'videojuegos']);
+});
+
+test('recompensas: el catálogo demo no usa nombres de juegos reales', () => {
+  assert.strictEqual(DEMO.length, 3);
+  DEMO.forEach((r, i) => {
+    assert.match(r.id, /^vj-ejemplo-/);
+    assert.match(r.nombre, /^Videojuego Ejemplo \d/);
+    assert.match(r.desarrolladora, /^Estudio Ejemplo /);
+    assert.strictEqual(r.categoria, 'videojuegos');
+    assert.ok(r.pz > 0);
+    assert.strictEqual(r.imagen, null);
+    assert.ok(r.condiciones.length > 0);
+  });
+});
+
+test('recompensas: publica expone solo campos públicos', () => {
+  const p = publica({
+    id: 'x-1',
+    categoria: 'videojuegos',
+    data: {
+      id: 'x-1', nombre: 'Demo', desarrolladora: 'Estudio', descripcion: 'D',
+      plataforma: 'Steam', edadRecomendada: '16+', pz: '500',
+      imagen: null, disponibilidad: 'Disponible', condiciones: 'C'
+    }
+  });
+  assert.deepStrictEqual(p, {
+    id: 'x-1', categoria: 'videojuegos', nombre: 'Demo', desarrolladora: 'Estudio',
+    descripcion: 'D', plataforma: 'Steam', edadRecomendada: '16+', pz: 500,
+    imagen: null, disponibilidad: 'Disponible', condiciones: 'C'
+  });
+  // No filtra columnas internas: nunca expone `data` cruda ni `orden`.
+  assert.ok(!('orden' in p));
+  assert.ok(!('data' in p));
+});
+
+test('recompensas: publica con campos incompletos nunca rompe', () => {
+  const p = publica({ id: 'z', data: {} });
+  assert.strictEqual(p.nombre, 'Recompensa');
+  assert.strictEqual(p.pz, 0);
+  assert.strictEqual(p.disponibilidad, 'Disponible');
+  assert.strictEqual(p.categoria, 'otros');
+});
+
+test('recompensas: categoriaValida cae a otros si no es conocida', () => {
+  assert.strictEqual(categoriaValida('videojuegos'), 'videojuegos');
+  assert.strictEqual(categoriaValida('formacion'), 'formacion');
+  assert.strictEqual(categoriaValida('raro'), 'otros');
+});

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/mi.css?v=20260907d" />
+  <link rel="stylesheet" href="css/mi.css?v=20260907e" />
 </head>
 <body>
   <header class="mi-top">
@@ -134,6 +134,28 @@
               <div><b>Keys de juegos indie</b><span>Claves de estudios colaboradores. Las ves y canjeas abajo.</span></div>
             </li>
           </ul>
+        </article>
+
+        <!-- Recompensas disponibles (catálogo con Placetas · Pz) -->
+        <article class="mi-card mi-rw" id="mi-recompensas">
+          <div class="mi-rw-head">
+            <div>
+              <h3 class="mi-card-title">Recompensas disponibles</h3>
+              <p class="mi-card-sub">Canjea tus Placetas (Pz) por recompensas: videojuegos, formación, experiencias y otros. Cada recompensa tiene su propia ficha con las condiciones.</p>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="mi-rw-filtros" id="mi-rw-filtros" role="group" aria-label="Filtrar recompensas"></div>
+
+          <!-- Estado (carga / aviso / error) -->
+          <p class="mi-rw-estado" id="mi-rw-estado" hidden></p>
+
+          <!-- Grilla de tarjetas -->
+          <div class="mi-rw-grid" id="mi-rw-grid" hidden></div>
+
+          <!-- Ficha de la recompensa (vista detalle dentro de la página) -->
+          <div class="mi-rw-detalle" id="mi-rw-detalle" hidden></div>
         </article>
 
         <!-- Keys -->
@@ -352,6 +374,280 @@
         });
       }
 
+      // ── Recompensas disponibles ──
+      var RW_CATS = [
+        { id: 'todos', etiqueta: 'Todos' },
+        { id: 'videojuegos', etiqueta: 'Videojuegos' },
+        { id: 'formacion', etiqueta: 'Formación' },
+        { id: 'experiencias', etiqueta: 'Experiencias' },
+        { id: 'otros', etiqueta: 'Otros' }
+      ];
+      var RW_UI = {
+        videojuegos: { etiqueta: 'Videojuegos', icono: '🎮' },
+        formacion: { etiqueta: 'Formación', icono: '🎓' },
+        experiencias: { etiqueta: 'Experiencias', icono: '🎟️' },
+        otros: { etiqueta: 'Otros', icono: '🎁' }
+      };
+      var rw = { lista: [], filtro: 'todos', demo: false, activa: false };
+
+      function rwEl(tag, cls, txt) {
+        var n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (txt != null) n.textContent = txt;
+        return n;
+      }
+
+      function rwIcono(cat) {
+        return (RW_UI[cat] && RW_UI[cat].icono) || '🎁';
+      }
+
+      function rwCatLabel(cat) {
+        return (RW_UI[cat] && RW_UI[cat].etiqueta) || cat;
+      }
+
+      // Imagen/portada de la tarjeta: si no hay imagen real se usa un fondo
+      // decorativo con el icono de la categoría (ejemplo, sin nombres reales).
+      function rwCover(r, cls) {
+        var wrap = rwEl('div', cls || 'mi-rw-cover');
+        if (r.imagen) {
+          var img = rwEl('img');
+          img.src = r.image; img.alt = r.nombre;
+          img.loading = 'lazy';
+          wrap.appendChild(img);
+          return wrap;
+        }
+        var ph = rwEl('div', 'mi-rw-ph mi-rw-ph--' + r.categoria);
+        var ico = rwEl('span', 'mi-rw-ph-ico', rwIcono(r.categoria));
+        var cap = rwEl('span', 'mi-rw-ph-cap', 'Imagen de ejemplo');
+        ph.appendChild(ico); ph.appendChild(cap);
+        wrap.appendChild(ph);
+        return wrap;
+      }
+
+      function rwDisponible(r) {
+        return /^disponible$/i.test(String(r.disponibilidad || ''));
+      }
+
+      function renderRwFiltros() {
+        var bar = $id('mi-rw-filtros');
+        bar.innerHTML = '';
+        RW_CATS.forEach(function (c) {
+          var b = rwEl('button', 'mi-rw-filtro' + (c.id === rw.filtro ? ' on' : ''), c.etiqueta);
+          b.type = 'button';
+          b.setAttribute('aria-pressed', String(c.id === rw.filtro));
+          b.addEventListener('click', function () { setRwFiltro(c.id); });
+          bar.appendChild(b);
+        });
+      }
+
+      function setRwFiltro(id) {
+        rw.filtro = id;
+        renderRwFiltros();
+        renderRwGrilla();
+      }
+
+      function rwEstado(txt, tipo) {
+        var e = $id('mi-rw-estado');
+        if (!e) return;
+        e.hidden = !txt;
+        e.textContent = txt || '';
+        e.className = 'mi-rw-estado' + (tipo ? ' ' + tipo : '');
+      }
+
+      function rwPrecio(r) {
+        var n = rwEl('span', 'mi-rw-pz', (Number(r.pz) || 0) + ' Pz');
+        return n;
+      }
+
+      function rwCard(r) {
+        var card = rwEl('article', 'mi-rw-card' + (rwDisponible(r) ? '' : ' soon'));
+        card.setAttribute('data-cat', r.categoria);
+
+        var coverBtn = rwEl('button', 'mi-rw-coverbtn');
+        coverBtn.type = 'button';
+        coverBtn.setAttribute('aria-label', 'Ver ficha de ' + r.nombre);
+        coverBtn.appendChild(rwCover(r));
+        coverBtn.addEventListener('click', function () { abrirRw(r.id); });
+        card.appendChild(coverBtn);
+
+        var body = rwEl('div', 'mi-rw-body');
+        var tagRow = rwEl('div', 'mi-rw-tags');
+        tagRow.appendChild(rwEl('span', 'mi-rw-cat', rwCatLabel(r.categoria)));
+        if (!rwDisponible(r)) tagRow.appendChild(rwEl('span', 'mi-rw-est', r.disponibilidad || 'Próximamente'));
+        body.appendChild(tagRow);
+
+        var h = rwEl('h4', 'mi-rw-nombre', r.nombre);
+        body.appendChild(h);
+        if (r.desarrolladora) body.appendChild(rwEl('p', 'mi-rw-dev', r.desarrolladora));
+
+        var meta = rwEl('div', 'mi-rw-meta');
+        if (r.plataforma) meta.appendChild(rwEl('span', 'mi-rw-plat', r.plataforma));
+        if (r.edadRecomendada) meta.appendChild(rwEl('span', 'mi-rw-edad', r.edadRecomendada));
+        body.appendChild(meta);
+
+        var foot = rwEl('div', 'mi-rw-foot');
+        foot.appendChild(rwPrecio(r));
+        var got = rwEl('button', 'mi-btn primary sm', 'Conseguir');
+        got.type = 'button';
+        got.addEventListener('click', function () { abrirRw(r.id); });
+        foot.appendChild(got);
+        body.appendChild(foot);
+
+        card.appendChild(body);
+        return card;
+      }
+
+      function renderRwGrilla() {
+        var grid = $id('mi-rw-grid');
+        grid.innerHTML = '';
+        var list = rw.lista.filter(function (r) {
+          return rw.filtro === 'todos' || r.categoria === rw.filtro;
+        });
+
+        if (!list.length) {
+          var filtrado = rw.filtro !== 'todos';
+          rwEstado(
+            filtrado
+              ? 'Todavía no hay recompensas en «' + rwCatLabel(rw.filtro) + '». Vuelve pronto: iremos añadiendo más.'
+              : 'Aún no hay recompensas disponibles. Cuando haya colaboraciones confirmadas aparecerán aquí.',
+            'empty'
+          );
+          grid.hidden = true;
+          return;
+        }
+
+        rwEstado('');
+        grid.hidden = false;
+        list.forEach(function (r) { grid.appendChild(rwCard(r)); });
+      }
+
+      // ── Ficha detalle (dentro de la página) ──
+      function abrirRw(id) {
+        var r = null;
+        for (var i = 0; i < rw.lista.length; i++) { if (rw.lista[i].id === id) { r = rw.lista[i]; break; } }
+        if (!r) return;
+
+        var det = $id('mi-rw-detalle');
+        det.innerHTML = '';
+
+        var back = rwEl('button', 'mi-btn ghost sm mi-rw-back', '← Todas las recompensas');
+        back.type = 'button';
+        back.addEventListener('click', cerrarRw);
+        det.appendChild(back);
+
+        var layout = rwEl('div', 'mi-rw-det-layout');
+        var cov = rwCover(r, 'mi-rw-det-cover');
+        layout.appendChild(cov);
+
+        var info = rwEl('div', 'mi-rw-det-info');
+
+        var tagRow = rwEl('div', 'mi-rw-tags');
+        tagRow.appendChild(rwEl('span', 'mi-rw-cat', rwCatLabel(r.categoria)));
+        tagRow.appendChild(rwEl('span', 'mi-rw-est ' + (rwDisponible(r) ? 'ok' : 'soon'), r.disponibilidad || 'Próximamente'));
+        info.appendChild(tagRow);
+
+        info.appendChild(rwEl('h3', 'mi-rw-det-nombre', r.nombre));
+        if (r.desarrolladora) info.appendChild(rwEl('p', 'mi-rw-dev', 'por ' + r.desarrolladora));
+        if (r.descripcion) info.appendChild(rwEl('p', 'mi-rw-desc', r.descripcion));
+
+        // Datos técnicos de la recompensa
+        var spec = rwEl('dl', 'mi-rw-spec');
+        if (r.plataforma) spec.appendChild(rwRow('Plataforma', r.plataforma));
+        if (r.edadRecomendada) spec.appendChild(rwRow('Edad recomendada', r.edadRecomendada));
+        if (r.disponibilidad) spec.appendChild(rwRow('Disponibilidad', r.disponibilidad));
+        info.appendChild(spec);
+
+        var price = rwEl('div', 'mi-rw-det-price', 'Necesitas ');
+        price.appendChild(rwEl('b', 'mi-rw-pz', (Number(r.pz) || 0) + ' Pz'));
+        price.appendChild(rwEl('span', 'mi-rw-pz-txt', ' (Placetas)'));
+        info.appendChild(price);
+
+        if (r.condiciones) {
+          var cond = rwEl('div', 'mi-rw-cond');
+          cond.appendChild(rwEl('b', 'mi-rw-cond-t', 'Condiciones'));
+          cond.appendChild(rwEl('p', '', r.condiciones));
+          info.appendChild(cond);
+        }
+
+        var acc = rwEl('div', 'mi-rw-det-acc');
+        var got = rwEl('button', 'mi-btn primary', 'Conseguir recompensa');
+        got.type = 'button';
+        got.addEventListener('click', function () { conseguirRw(r, got); });
+        acc.appendChild(got);
+        info.appendChild(acc);
+
+        var nota = rwEl('p', 'fine mi-rw-nota',
+          rw.demo
+            ? 'Ejemplo para la maqueta: todavía no hay colaboraciones confirmadas. Cuando las haya, el canje se hará con tus Placetas (Pz).'
+            : 'El canje con Placetas (Pz) se está preparando. Podrás conseguirla desde aquí cuando esté disponible.');
+        info.appendChild(nota);
+
+        layout.appendChild(info);
+        det.appendChild(layout);
+
+        // Mostrar ficha, ocultar filtros/grilla
+        $id('mi-rw-filtros').hidden = true;
+        $id('mi-rw-grid').hidden = true;
+        $id('mi-rw-estado').hidden = true;
+        det.hidden = false;
+        rw.activa = true;
+        det.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function rwRow(k, v) {
+        var wrap = rwEl('div', 'mi-rw-spec-row');
+        wrap.appendChild(rwEl('dt', 'mi-rw-spec-k', k));
+        wrap.appendChild(rwEl('dd', 'mi-rw-spec-v', v));
+        return wrap;
+      }
+
+      function cerrarRw() {
+        rw.activa = false;
+        var det = $id('mi-rw-detalle');
+        det.hidden = true;
+        det.innerHTML = '';
+        $id('mi-rw-filtros').hidden = false;
+        $id('mi-rw-grid').hidden = false;
+        renderRwGrilla();
+      }
+
+      function conseguirRw(r, btn) {
+        // Sin backend de Pz todavía: aviso claro, sin prometer nada.
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.textContent = 'Procesando…';
+        setTimeout(function () {
+          btn.disabled = false;
+          btn.textContent = 'Conseguir recompensa';
+          rwEstado(
+            rw.demo
+              ? 'Aún no se puede conseguir: es una recompensa de ejemplo. Cuando haya colaboraciones reales y saldo en Placetas (Pz), podrás canjearla desde aquí.'
+              : 'El canje con Placetas (Pz) se activará próximamente. Te avisaremos desde tu espacio joven.',
+            'aviso'
+          );
+          var e = $id('mi-rw-estado');
+          if (e) e.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
+      }
+
+      // ── Carga de recompensas ──
+      async function cargarRecompensas() {
+        rwEstado('Cargando recompensas…');
+        $id('mi-rw-grid').hidden = true;
+        try {
+          var res = await api('recompensas');
+          rw.demo = !!(res && res.demo);
+          rw.lista = (res && Array.isArray(res.recompensas)) ? res.recompensas : [];
+          rw.filtro = 'todos';
+          renderRwFiltros();
+          renderRwGrilla();
+        } catch (e) {
+          rw.lista = [];
+          renderRwFiltros();
+          rwEstado('No se han podido cargar las recompensas ahora mismo. Inténtalo en unos minutos.', 'error');
+        }
+      }
+
       // ── Carga de estado ──
       async function cargar() {
         var s = A ? A.getSession() : null;
@@ -370,6 +666,7 @@
           if (st.estado === 'ACTIVO' || (st.estado === 'CANCELADO' && st.sigueVigente)) {
             renderSuscripcion(st);
             renderKeys(st.keys || []);
+            cargarRecompensas();
             mostrar('mi-activo');
             return;
           }

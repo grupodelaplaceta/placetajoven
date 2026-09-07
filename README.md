@@ -88,13 +88,28 @@ El programa se ampliará con más ventajas cuando haya colaboradores reales.
 - `POST /api/renovar`    → checkout para renovar.
 - `POST /api/cancelar`   → cancelar (mantiene las ventajas hasta fin de período).
 - `POST /api/webhook`    → webhook de Lemon Squeezy (verifica firma `X-Signature`).
+- `GET  /api/recompensas`→ catálogo de recompensas disponibles (ver abajo).
 - Panel de usuario: `mi.html` («Mi Placeta Joven»).
 - Lógica pura testeada: `npm test` (`tests/core.test.js`).
 - Config necesaria en producción: variables de `.env.example`
   (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY, LS_API_KEY, LS_STORE_ID,
   LS_WEBHOOK_SECRET, LS_VARIANT_MENSUAL/ANUAL, PLACETAID_BASE_URL).
-  Tabla Supabase: ejecuta `sql/placeta_joven.sql`.
+  Tablas Supabase: ejecuta `sql/placeta_joven.sql`.
+
+## Recompensas disponibles (catálogo con Placetas · Pz)
+- Sección «Recompensas disponibles» dentro del espacio joven (`mi.html`): tarjetas
+  del catálogo con filtros (**Todos · Videojuegos · Formación · Experiencias · Otros**)
+  y una ficha por recompensa (imagen, desarrolladora, descripción, plataforma, edad
+  recomendada, Pz necesarios, disponibilidad, condiciones y botón «Conseguir recompensa»).
+- Datos en Supabase (tabla `placeta_joven_recompensas`, creada por
+  `sql/placeta_joven.sql`). La API lee con la service role key y solo expone campos
+  públicos (ver `lib/recompensas.js` y `api/recompensas.js`).
+- El seed contiene **solo ejemplos** («Videojuego Ejemplo 1–3», nombres inventados):
+  todavía no hay ninguna colaboración confirmada. Si la tabla no existe o Supabase no
+  está configurado, la API devuelve el mismo catálogo de ejemplo con `demo: true`
+  para que la maqueta funcione sin base de datos.
 
 ## Pendiente para fases siguientes
 - Gestión de ventajas (`joven_benefits`) y panel de administración (RSP).
 - Desplegar plid26 con el solicitante de Placeta Joven para validar el login.
+- Canje real con Placetas (Pz) y entrega de keys cuando haya colaboraciones confirmadas.
