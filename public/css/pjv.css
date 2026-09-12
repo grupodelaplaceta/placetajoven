@@ -3,8 +3,7 @@
    Design system v3 · identidad institucional de La Placeta
 
    · Tipografías oficiales: Bebas Neue (títulos) + Plus Jakarta Sans (texto)
-   · Tema CLARO por defecto (blanco) con tema oscuro opcional:
-       <html data-tema="claro|oscuro">  ·  botón [data-action="tema"]
+     · Tema oscuro permanente.
 
    Estructura:
      01. Tokens (claro / oscuro)
@@ -37,19 +36,16 @@
   --ambar:#B45309;
   --rojo:#BE123C;
 
-  /* Superficies (tema claro) */
-  --fondo:#FFFFFF;
-  --fondo-2:#F7F5FD;
-  --fondo-3:#F1ECFB;
-  --superficie:#FFFFFF;
-  --superficie-2:#FBFAFE;
-  --linea:#E6E1F3;
-  --linea-2:#D6CDEC;
-
-  /* Texto */
-  --txt:#1B1428;
-  --txt-2:#544B6B;
-  --txt-3:#7E7595;
+  --fondo:#0B0616;
+  --fondo-2:#120A24;
+  --fondo-3:#180E2E;
+  --superficie:rgba(255,255,255,.045);
+  --superficie-2:rgba(255,255,255,.075);
+  --linea:rgba(168,140,255,.18);
+  --linea-2:rgba(168,140,255,.3);
+  --txt:#F3EFFC;
+  --txt-2:#C3B9DD;
+  --txt-3:#8F84AC;
   --txt-inv:#FFFFFF;
 
   /* Sombras */
@@ -71,10 +67,10 @@
   --hdr-h:72px;
   --ease:cubic-bezier(.22,.68,.32,1);
 
-  color-scheme:light;
+  color-scheme:dark;
 }
 
-/* Tema oscuro (opcional, a elección del usuario) */
+/* Tokens de acento del modo oscuro permanente */
 [data-tema="oscuro"]{
   --fondo:#0B0616;
   --fondo-2:#120A24;
@@ -155,6 +151,8 @@ h1 em,h2 em{font-style:normal;color:var(--violeta)}
   -webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;color:transparent;
 }
+.hero-facts{padding:clamp(1.5rem,4vw,3rem);}
+.hero-facts h2{font-size:clamp(2rem,4vw,3.4rem);margin-bottom:1.3rem;}
 [data-tema="oscuro"] .g-text{
   background:linear-gradient(96deg,#DDD3FF 0%,var(--violeta-suave) 55%,var(--violeta-claro) 100%);
   -webkit-background-clip:text;background-clip:text;
@@ -654,4 +652,7 @@ body.nav-open{overflow:hidden}
   .float-b{left:0}
   .ses{flex-wrap:wrap;border-radius:var(--r);justify-content:center}
   .hero-note{max-width:none}
+  .hero-facts{padding:1.25rem}
+  .pnl-head{align-items:flex-start;flex-wrap:wrap}
+  .pnl-head .pnl-act{width:100%;margin-left:0}
 }

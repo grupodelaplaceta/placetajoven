@@ -10,9 +10,8 @@
   <script>
     (function () {
       try {
-        var t = localStorage.getItem('pjv_tema');
-        document.documentElement.setAttribute('data-tema', t === 'oscuro' ? 'oscuro' : 'claro');
-      } catch (e) { document.documentElement.setAttribute('data-tema', 'claro'); }
+        document.documentElement.setAttribute('data-tema', 'oscuro');
+      } catch (e) { document.documentElement.setAttribute('data-tema', 'oscuro'); }
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -151,8 +151,9 @@ test('recompensas: publica expone solo campos públicos', () => {
   });
   assert.deepStrictEqual(p, {
     id: 'x-1', categoria: 'videojuegos', nombre: 'Demo', desarrolladora: 'Estudio',
-    descripcion: 'D', plataforma: 'Steam', genero: '', edadRecomendada: '16+', pz: 500,
-    imagen: null, disponibilidad: 'Disponible', canjeable: false, condiciones: 'C'
+    descripcion: 'D', plataforma: 'Steam', genero: '', editor: '', fechaLanzamiento: '',
+    edadRecomendada: '16+', pz: 500, imagen: null, galeria: [], video: '', steamUrl: '',
+    disponibilidad: 'Disponible', canjeable: false, condiciones: 'C'
   });
   // No filtra columnas internas: nunca expone `data` cruda ni `orden`.
   assert.ok(!('orden' in p));

@@ -20,6 +20,16 @@ function planInfo(plan) {
   return null;
 }
 
+function planesPublicos() {
+  return ['mensual', 'anual'].map((id) => {
+    const info = planInfo(id);
+    return Object.assign(info, {
+      destacado: id === 'anual',
+      ahorroLabel: id === 'anual' ? 'Ahorra frente a pagar 12 meses' : ''
+    });
+  });
+}
+
 // Devuelve solo las keys del socio.
 function keysPublicas(doc) {
   if (!doc || !Array.isArray(doc.keys)) return [];
@@ -58,6 +68,7 @@ module.exports = async (req, res) => {
         estado: null,
         plan: null,
         planInfo: null,
+        planes: planesPublicos(),
         expiresAt: null,
         requiereAlta: false,
         keys: []
@@ -74,6 +85,7 @@ module.exports = async (req, res) => {
         estado: null,
         plan: null,
         planInfo: null,
+        planes: planesPublicos(),
         expiresAt: null,
         requiereAlta: true,
         pendienteCaducada: false,
@@ -94,6 +106,7 @@ module.exports = async (req, res) => {
       estado: doc.status,
       plan: doc.plan || null,
       planInfo: planInfo(doc.plan),
+      planes: planesPublicos(),
       expiresAt: doc.expires_at || null,
       sigueVigente: vigente,
       requiereAlta: requiereAlta,

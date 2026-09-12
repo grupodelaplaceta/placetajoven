@@ -35,7 +35,9 @@ async function listarCatalogo(req, res) {
     const { demo, recompensas } = await listar();
     return json(res, 200, { ok: true, demo, recompensas });
   } catch (e) {
-    return json(res, 500, { error: 'internal' });
+    const code = e && (e.code === 'catalog_not_configured' || e.code === 'catalog_unavailable')
+      ? e.code : 'internal';
+    return json(res, code === 'catalog_not_configured' ? 503 : 502, { error: code });
   }
 }
 

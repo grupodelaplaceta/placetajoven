@@ -11,13 +11,7 @@
   <meta property="og:type" content="website" />
   <link rel="icon" type="image/png" href="img/jovenlogo.png" />
   <script>
-    /* Tema: claro por defecto; oscuro solo si el usuario lo ha elegido. */
-    (function () {
-      try {
-        var t = localStorage.getItem('pjv_tema');
-        document.documentElement.setAttribute('data-tema', t === 'oscuro' ? 'oscuro' : 'claro');
-      } catch (e) { document.documentElement.setAttribute('data-tema', 'claro'); }
-    })();
+    document.documentElement.setAttribute('data-tema', 'oscuro');
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -105,9 +99,6 @@
       <a href="#colabora">Colabora</a>
     </nav>
     <div class="hdr-actions">
-      <button class="icon-btn" type="button" data-action="tema" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema">
-        <svg class="ico" aria-hidden="true"><use href="#i-luna" data-tema-ico/></svg>
-      </button>
       <a class="btn btn-ghost btn-sm" href="mi.html">Mi espacio</a>
       <a class="btn btn-primary btn-sm" href="https://id.laplaceta.org/" data-login>Entrar<svg class="ico"><use href="#i-arrow"/></svg></a>
     </div>
@@ -141,9 +132,6 @@
   <div class="drawer-foot">
     <a class="btn btn-primary btn-block" href="https://id.laplaceta.org/" data-login>Entrar con PlacetaID</a>
     <a class="btn btn-ghost btn-block" href="mi.html">Mi espacio</a>
-    <button class="btn btn-ghost btn-block" type="button" data-action="tema">
-      <svg class="ico" aria-hidden="true"><use href="#i-luna" data-tema-ico></use></svg> Cambiar tema
-    </button>
     <p>Soporte · <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a></p>
   </div>
 </aside>
@@ -177,40 +165,15 @@
         </div>
 
         <div class="hero-art">
-          <div class="panel" role="img" aria-label="Vista previa del espacio joven: saldo en Placetas, curso en progreso y actividad reciente">
-            <div class="panel-top">
-              <span class="panel-dots"><i></i><i></i><i></i></span>
-              <p class="panel-title">Vista previa · Mi espacio</p>
-            </div>
-            <div class="panel-body">
-              <div class="balance">
-                <small>Saldo disponible</small>
-                <b>1.250 Pz</b>
-                <span>Placetas · saldo de tu <b>Cuenta Joven</b> en Banco de La Placeta</span>
-              </div>
-
-              <div class="mini">
-                <span class="mini-ico"><svg class="ico"><use href="#i-shield"/></svg></span>
-                <div class="mini-txt">
-                  <b>Introducción a la ciberseguridad</b>
-                  <span>PlacetaEDU · Cisco Networking Academy</span>
-                  <div class="bar"><i style="width:82%"></i></div>
-                  <div class="bar-meta"><span>82 % completado</span><span>+100 Pz +20 bonus</span></div>
-                </div>
-              </div>
-
-              <div class="mini">
-                <span class="mini-ico"><svg class="ico"><use href="#i-pad"/></svg></span>
-                <div class="mini-txt"><b>Luminaria</b><span>Enthariel Games · 420 Pz · 1 key por usuario</span></div>
-              </div>
-
-              <div class="mini">
-                <span class="mini-ico"><svg class="ico"><use href="#i-coin"/></svg></span>
-                <div class="mini-txt"><b>Actividad reciente</b><span>+120 Pz curso completado · −420 Pz recompensa</span></div>
-              </div>
-            </div>
-            <span class="float-chip float-a"><span>Pz</span> Formación → recompensa</span>
-            <span class="float-chip float-b"><svg class="ico" style="width:14px;height:14px"><use href="#i-key"/></svg> Keys de estudios indie</span>
+          <div class="panel hero-facts">
+            <p class="eyebrow">Dentro de tu espacio</p>
+            <h2>Contenido real, sin escaparate de mentira.</h2>
+            <ul class="card-list">
+              <li>Catálogo de colaboraciones publicadas.</li>
+              <li>Fichas con imágenes, vídeos y datos del estudio.</li>
+              <li>Keys y movimientos vinculados a tu cuenta.</li>
+            </ul>
+            <a class="btn btn-ghost" href="mi.html">Ver Mi espacio <svg class="ico"><use href="#i-arrow"/></svg></a>
           </div>
         </div>
       </div>

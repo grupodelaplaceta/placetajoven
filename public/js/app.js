@@ -246,8 +246,6 @@
       + '<div class="app-top-r">'
       + '<span class="pz-pill" title="' + (saldo === null ? 'Tu Cuenta Joven de Banco de La Placeta es la que guarda el saldo en Placetas' : 'Saldo de tu Cuenta Joven · Banco de La Placeta') + '">'
       + ico('coin') + (saldo === null ? '— Pz' : num(saldo) + ' Pz') + '<small>PZ</small></span>'
-      + '<button class="icon-btn tema" id="btnTema" type="button" data-action="tema" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema">'
-      + ico('luna') + '</button>'
       + '<span class="user" title="' + esc(plan) + '">'
       + '<span class="user-ava">' + esc(iniciales(nombre)) + '</span>'
       + '<span class="user-txt"><b>' + esc((nombre || 'Joven').split(/\s+/)[0]) + '</b><span>' + esc(plan) + '</span></span>'
@@ -326,25 +324,27 @@
     if (st && st.pendienteCaducada) aviso = 'No recibimos la confirmación de tu pago anterior, así que puedes elegir plan de nuevo.';
     else if (st && st.estado === 'CANCELADO') aviso = 'Tu suscripción terminó. Puedes volver a darte de alta cuando quieras.';
     else if (st && st.estado === 'EXPIRADO') aviso = 'Tu suscripción expiró. Elige un plan para reactivar tu espacio.';
+    var planes = (st && Array.isArray(st.planes) ? st.planes : []).filter(function (p) { return p && p.id; });
+    if (!planes.length) {
+      planes = [
+        { id: 'mensual', etiqueta: 'Plan mensual', precioLabel: '1,95 €/mes', destacado: false },
+        { id: 'anual', etiqueta: 'Plan anual', precioLabel: '10 €/año', destacado: true }
+      ];
+    }
 
     ROOT.innerHTML = gate(
       '<span class="gate-ico">' + ico('spark') + '</span>'
       + '<h1>Elige tu plan</h1>'
       + '<p>Activa Placeta Joven y desbloquea tu espacio: formación de Cisco NetAcad vía PlacetaEDU, becas, keys de juegos indie y el resto de beneficios del programa.</p>'
-      + '<div class="plan-cards">'
-      + '  <article class="plan-card">'
-      + '    <h3>Plan mensual</h3>'
-      + '    <p class="p">1,95&nbsp;€<small>/mes</small></p>'
-      + '    <span>Mes a mes sale por 23,40&nbsp;€ al año.</span>'
-      + '    <button class="btn btn-ghost btn-block" type="button" data-action="alta" data-plan="mensual">Contratar mensual</button>'
-      + '  </article>'
-      + '  <article class="plan-card feat">'
-      + '    <h3>Plan anual <span class="tag tag-mint" style="margin-left:.3rem">Más rentable</span></h3>'
-      + '    <p class="p">10&nbsp;€<small>/año</small></p>'
-      + '    <span>Ahorras un 57&nbsp;% frente al mensual.</span>'
-      + '    <button class="btn btn-primary btn-block" type="button" data-action="alta" data-plan="anual">Quiero el plan anual</button>'
-      + '  </article>'
-      + '</div>'
+      + '<div class="plan-cards">' + planes.map(function (p) {
+        var anual = p.id === 'anual';
+        return '<article class="plan-card' + (p.destacado ? ' feat' : '') + '" data-plan-card="' + esc(p.id) + '">'
+          + '<h3>' + esc(p.etiqueta) + (p.destacado ? ' <span class="tag tag-mint" style="margin-left:.3rem">Oferta</span>' : '') + '</h3>'
+          + '<p class="p">' + esc(p.precioLabel || 'Consultar') + '</p>'
+          + '<span>' + esc(p.ahorroLabel || (anual ? 'La tarifa anual reduce el coste frente a 12 mensualidades.' : 'Cancela cuando quieras y conserva el acceso durante el periodo pagado.')) + '</span>'
+          + '<button class="btn ' + (p.destacado ? 'btn-primary' : 'btn-ghost') + ' btn-block" type="button" data-action="alta" data-plan="' + esc(p.id) + '">' + (anual ? 'Elegir oferta anual' : 'Contratar mensual') + '</button>'
+          + '</article>';
+      }).join('') + '</div>'
       + (aviso ? '<p class="alert" style="text-align:left">' + ico('alert') + '<span>' + esc(aviso) + '</span></p>' : '')
       + '<p class="fine">Coste simbólico destinado a mantener el programa: los ingresos se reinvierten en la entidad y en sus proyectos. Puedes cancelar cuando quieras y mantienes las ventajas hasta el final del período pagado.</p>');
   }
@@ -757,7 +757,7 @@
       var puede = r.canjeable && !conseguida;
       var cats = { videojuegos: 'Videojuegos', formacion: 'Formación', experiencias: 'Experiencias', otros: 'Otros' };
       return '<article class="item">'
-        + '<div class="item-top"><span class="item-cover ' + (conseguida ? 'mint' : '') + '">' + ico(r.categoria === 'videojuegos' ? 'pad' : (r.categoria === 'formacion' ? 'grad' : 'gift')) + '</span>'
+        + '<div class="item-top">' + (r.imagen ? '<img class="item-image" src="' + esc(r.imagen) + '" alt="" loading="lazy" />' : '<span class="item-cover ' + (conseguida ? 'mint' : '') + '">' + ico(r.categoria === 'videojuegos' ? 'pad' : (r.categoria === 'formacion' ? 'grad' : 'gift')) + '</span>')
         + '<div class="item-h"><h3>' + esc(r.nombre) + '</h3>'
         + '<p>' + esc(r.desarrolladora || 'Estudio colaborador') + (r.genero ? ' · ' + esc(r.genero) : '') + '</p></div></div>'
         + '<p>' + esc(r.descripcion || '') + '</p>'
@@ -811,17 +811,22 @@
       + '<div class="pnl-head"><span class="card-ico">' + ico('pad') + '</span>'
       + '<div><h2>' + esc(r.nombre) + '</h2><p>por ' + esc(r.desarrolladora || 'estudio colaborador') + '</p></div>'
       + '<button class="btn btn-ghost btn-sm pnl-act" type="button" data-action="cerrar-recompensa">' + ico('x') + ' Cerrar</button></div>'
+      + (r.imagen ? '<img class="detail-image" src="' + esc(r.imagen) + '" alt="" />' : '')
+      + (r.video ? '<div class="detail-video"><iframe src="' + esc(r.video) + '" title="Vídeo de ' + esc(r.nombre) + '" loading="lazy" allowfullscreen></iframe></div>' : '')
       + '<div class="grid g-2">'
       + '<div>'
       + '<p style="color:var(--txt-2)">' + esc(r.descripcion || '') + '</p>'
       + '<table class="tbl"><tbody>'
       + (r.plataforma ? '<tr><td>Plataforma</td><td class="num">' + esc(r.plataforma) + '</td></tr>' : '')
+      + (r.editor ? '<tr><td>Editor</td><td class="num">' + esc(r.editor) + '</td></tr>' : '')
+      + (r.fechaLanzamiento ? '<tr><td>Lanzamiento</td><td class="num">' + esc(r.fechaLanzamiento) + '</td></tr>' : '')
       + (r.edadRecomendada ? '<tr><td>Edad recomendada</td><td class="num">' + esc(r.edadRecomendada) + '</td></tr>' : '')
       + '<tr><td>Disponibilidad</td><td class="num">' + esc(r.disponibilidad || 'Próximamente') + '</td></tr>'
       + '<tr><td>Precio</td><td class="num">' + num(r.pz) + ' Pz</td></tr>'
       + '</tbody></table>'
       + (r.condiciones ? '<div class="alert" style="margin-top:.9rem">' + ico('alert') + '<p><b>Condiciones</b><br />' + esc(r.condiciones) + '</p></div>' : '')
       + '</div>'
+      + (r.steamUrl ? '<p style="margin-top:1rem"><a class="btn btn-ghost btn-sm" href="' + esc(r.steamUrl) + '" target="_blank" rel="noopener">Ver en Steam ' + ico('out') + '</a></p>' : '')
       + '<div>'
       + '<p class="stat-k" style="margin-bottom:.6rem">Recorrido de la key</p>'
       + '<div class="tl">' + estados.map(function (e, i) {
@@ -1333,6 +1338,8 @@
       App.demo = !!(res && res.demo);
     } catch (e) {
       App.recompensas = [];
+      App.demo = false;
+      App.catalogError = e;
     }
     render();
 
