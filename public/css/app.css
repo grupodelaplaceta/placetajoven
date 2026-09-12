@@ -358,6 +358,19 @@ a.row:hover{background:var(--fondo-2)}
 .plan-card .p small{font-family:var(--font);font-size:.76rem;color:var(--txt-3);font-weight:600}
 .plan-card span{font-size:.78rem;color:var(--txt-3)}
 
+/* ── Inicio: dos datos y accesos, sin saturar ─────────────────────────── */
+.home-top{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:.8rem;margin-bottom:1rem}
+.home-card{border-radius:var(--r);border:1px solid var(--linea);background:var(--superficie);padding:1.1rem;display:grid;gap:.4rem;align-content:start}
+.home-k{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3);font-weight:800}
+.home-num{font-family:var(--mono);font-size:2.1rem;line-height:1.1;color:var(--txt)}
+.home-num small{font-family:var(--font);font-size:.8rem;color:var(--txt-3);font-weight:600}
+.home-title{font-family:var(--display);font-size:1.5rem;font-weight:400;text-transform:uppercase;color:var(--txt)}
+.home-link{display:inline-flex;align-items:center;gap:.35rem;color:var(--violeta);font-weight:700;font-size:.85rem;text-decoration:none}
+.home-link .ico{width:15px;height:15px}
+.home-links .row+.row{margin-top:.15rem}
+.pathway-element.is-locked{opacity:.62}
+.pathway-stage+.pathway-stage{margin-top:1rem}
+
 /* Cargador inicial (antes de que arranque app.js) */
 .boot{
   position:fixed;inset:0;z-index:4000;display:grid;place-items:center;align-content:center;
@@ -377,6 +390,7 @@ a.row:hover{background:var(--fondo-2)}
   .icon-btn:not(.tema){display:grid}
   .g-side{grid-template-columns:1fr}
   .g-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-top{grid-template-columns:1fr}
 }
 @media (max-width:720px){
   .g-2,.g-3,.g-4{grid-template-columns:1fr}

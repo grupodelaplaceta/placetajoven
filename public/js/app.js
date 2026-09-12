@@ -152,48 +152,23 @@
   /* ── Navegación ───────────────────────────────────────────────────── */
   var NAV = [
     { id: 'inicio', label: 'Inicio', icon: 'home', href: 'inicio.html', grupo: 'Tu espacio' },
-    { id: 'rutas', label: 'Caminos formativos', icon: 'route', href: 'rutas.html' },
-    { id: 'empleo', label: 'Empleo y futuro', icon: 'brief', href: 'empleo.html', soon: true },
-    { id: 'beneficios', label: 'Beneficios', icon: 'pad', href: 'beneficios.html' },
-    { id: 'protecciones', label: 'Protecciones', icon: 'shield', href: 'protecciones.html' },
-    { id: 'becas', label: 'Becas', icon: 'gift', href: 'becas.html' },
     { id: 'miplaceta', label: 'Mi Placeta', icon: 'coin', href: 'miplaceta.html' },
+    { id: 'rutas', label: 'Caminos', icon: 'route', href: 'rutas.html', grupo: 'Formación' },
+    { id: 'becas', label: 'Becas', icon: 'gift', href: 'becas.html' },
+    { id: 'beneficios', label: 'Beneficios', icon: 'pad', href: 'beneficios.html', grupo: 'Ventajas' },
+    { id: 'protecciones', label: 'Protecciones', icon: 'shield', href: 'protecciones.html' },
+    { id: 'empleo', label: 'Empleo y futuro', icon: 'brief', href: 'empleo.html', soon: true, grupo: 'Más' },
     { id: 'comunidad', label: 'Comunidad', icon: 'users', href: 'comunidad.html', soon: true }
   ];
   var TITULOS = {
-    inicio: 'Inicio', formacion: 'Caminos formativos', empleo: 'Empleo y futuro',
-    beneficios: 'Beneficios', protecciones: 'Protecciones', becas: 'Becas', miplaceta: 'Mi Placeta', rutas: 'Rutas', comunidad: 'Comunidad'
+    inicio: 'Inicio', formacion: 'Caminos', empleo: 'Empleo y futuro',
+    beneficios: 'Beneficios', protecciones: 'Protecciones', becas: 'Becas', miplaceta: 'Mi Placeta', rutas: 'Caminos', comunidad: 'Comunidad'
   };
 
   /* ── Datos de contenido (catálogos propios de la interfaz) ────────── */
 
-  // Formaciones de Cisco Networking Academy vía PlacetaEDU.
-  var FORMACIONES = [
-    { id: 'ciber-intro', area: 'Ciberseguridad', nombre: 'Introducción a la ciberseguridad',
-      nivel: 'Inicial', horas: '~12 h', icon: 'shield',
-      desc: 'Amenazas más comunes, buenas prácticas y cómo proteger tus dispositivos y cuentas.',
-      matricula: 300, gestion: 50, recompensa: 75, bonus: 20, beca: 50 },
-    { id: 'redes-basico', area: 'Redes', nombre: 'Fundamentos de redes',
-      nivel: 'Inicial', horas: '~14 h', icon: 'route',
-      desc: 'Conceptos básicos de redes, direccionamiento y conectividad.',
-      matricula: 300, gestion: 50, recompensa: 75, bonus: 20, beca: 50 },
-    { id: 'redes-medio', area: 'Redes', nombre: 'Redes · nivel medio',
-      nivel: 'Medio', horas: '~20 h', icon: 'chart',
-      desc: 'Routing, switching y prácticas con equipos.',
-      matricula: 450, gestion: 60, recompensa: 110, bonus: 25, beca: 40 },
-    { id: 'iot', area: 'IoT', nombre: 'Internet de las Cosas',
-      nivel: 'Medio', horas: '~18 h', icon: 'spark',
-      desc: 'Sensores, dispositivos conectados y tratamiento de datos.',
-      matricula: 420, gestion: 60, recompensa: 100, bonus: 25, beca: 40 },
-    { id: 'ti-fund', area: 'Fundamentos', nombre: 'Fundamentos de TI',
-      nivel: 'Inicial', horas: '~15 h', icon: 'book',
-      desc: 'Hardware, sistemas operativos y seguridad básica.',
-      matricula: 280, gestion: 45, recompensa: 70, bonus: 20, beca: 50 },
-    { id: 'prog', area: 'Programación', nombre: 'Programación · primeros pasos',
-      nivel: 'Inicial', horas: '~16 h', icon: 'file',
-      desc: 'Lógica de programación y Python para empezar desde cero.',
-      matricula: 320, gestion: 50, recompensa: 80, bonus: 20, beca: 50 }
-  ];
+  // La formación vive en los caminos: sus elementos vienen de la API
+  // (/api/caminos) y de PlacetaEDU. No hay catálogo local de cursos sueltos.
 
   // Objetivos que organizan el contenido del programa.
   var RUTAS = [
@@ -402,188 +377,57 @@
     var keys = st.keys || [];
     var activa = st.estado === 'ACTIVO';
 
-    var progreso = FORMACIONES[0];   // curso destacado de la maqueta
+    var progresos = (App.caminosEstado.progreso || []).slice().sort(function (a, b) { return b.porcentaje - a.porcentaje; });
+    var progreso = progresos[0];
+    var caminoActual = progreso ? App.caminos.filter(function (c) { return c.id === progreso.caminoId; })[0] : null;
+    var becasPendientes = (App.becas || []).filter(function (b) { return b.estado === 'PENDIENTE'; });
 
     var html = ''
-      + '<div class="page">'
+      + '<div class="page page-home">'
       + '<div class="page-head"><div class="page-head-txt">'
-      + '<h1>Hola, ' + esc(prim) + ' 👋</h1>'
-      + '<p>Este es tu espacio dentro de Placeta Joven. Aquí ves tu formación, tus recompensas y lo que tienes disponible ahora mismo.</p>'
-      + '</div><div class="page-head-act">'
-      + (activa ? '<span class="chip"><i></i> Programa activo</span>' : '<span class="chip"><i style="background:var(--amber);box-shadow:0 0 10px var(--amber)"></i> Programa inactivo</span>')
+      + '<h1>Hola, ' + esc(prim) + '</h1>'
+      + '<p>' + (activa ? 'Esto es lo que tienes ahora.' : 'Tu programa no está activo.') + '</p>'
       + '</div></div>';
 
-    /* Métricas */
-    html += '<div class="grid g-4">'
-      + '<div class="stat is-accent">'
-      + '<span class="stat-k">Saldo disponible</span>'
-      + '<span class="stat-v">' + (saldo === null ? '— <small>Pz</small>' : num(saldo) + ' <small>Pz</small>') + '</span>'
-      + '<span class="stat-sub">' + (saldo === null ? 'Cuenta Joven · pendiente de conexión' : 'Cuenta Joven · Banco de La Placeta') + '</span>'
+    /* Dos datos y una acción: el resto vive en sus secciones */
+    html += '<div class="home-top">'
+      + '<div class="home-card">'
+      + '<span class="home-k">Saldo</span>'
+      + '<b class="home-num">' + (saldo === null ? '—' : num(saldo)) + ' <small>Pz</small></b>'
+      + '<a class="home-link" href="miplaceta.html">Movimientos y Cuenta Joven ' + ico('arrow') + '</a>'
       + '</div>'
-      + '<div class="stat"><span class="stat-k">Keys en tu colección</span>'
-      + '<span class="stat-v">' + keys.length + '</span>'
-      + '<span class="stat-sub">' + (keys.length ? 'Consúltalas en Beneficios' : 'Todavía no tienes ninguna') + '</span></div>'
-      + '<div class="stat"><span class="stat-k">Formaciones</span>'
-      + '<span class="stat-v">' + FORMACIONES.length + '</span>'
-      + '<span class="stat-sub">Cisco NetAcad vía PlacetaEDU</span></div>'
-      + '<div class="stat"><span class="stat-k">Membresía</span>'
-      + '<span class="stat-v" style="font-size:1.15rem">' + esc((st.planInfo && st.planInfo.etiqueta) || '—') + '</span>'
-      + '<span class="stat-sub">' + (st.expiresAt ? 'Válida hasta ' + esc(fecha(st.expiresAt)) : 'Sin período activo') + '</span></div>'
+      + '<div class="home-card">'
+      + '<span class="home-k">Tu camino</span>'
+      + (caminoActual
+        ? '<b class="home-title">' + esc(caminoActual.nombre) + '</b>'
+          + '<div class="pbar"><i style="width:' + (progreso.porcentaje || 0) + '%"></i></div>'
+          + '<div class="pbar-meta"><span>' + progreso.completados + ' de ' + progreso.total + '</span><b>' + (progreso.porcentaje || 0) + ' %</b></div>'
+          + '<a class="btn btn-primary btn-sm" href="rutas.html?camino=' + encodeURIComponent(caminoActual.id) + '">Continuar</a>'
+        : '<b class="home-title">Elige un camino</b>'
+          + '<p class="fine">Todavía no has empezado ninguno.</p>'
+          + '<a class="btn btn-primary btn-sm" href="rutas.html">Ver caminos</a>')
+      + '</div>'
       + '</div>';
 
-    /* Continúa donde lo dejaste + para ti */
-    html += '<div class="grid g-side">'
-      + '<div class="grid" style="gap:1rem">'
-      + '<section class="pnl">'
-      + '<div class="pnl-head"><span class="card-ico">' + ico('grad') + '</span>'
-      + '<div><h2>Continúa donde lo dejaste</h2><p>Formación en curso dentro de PlacetaEDU.</p></div>'
-      + '<a class="btn btn-ghost btn-sm pnl-act" href="formacion.html">Ver todas</a></div>'
-      + '<div class="row"><span class="row-ico">' + ico(progreso.icon) + '</span>'
-      + '<div class="row-txt"><b>' + esc(progreso.nombre) + '</b>'
-      + '<span>PlacetaEDU · Cisco Networking Academy · ' + esc(progreso.horas) + '</span>'
-      + '<div class="pbar" style="margin-top:.5rem"><i style="width:35%"></i></div>'
-      + '<div class="pbar-meta"><span>En curso</span><span>+' + progreso.recompensa + ' Pz al completar</span></div>'
-      + '</div></div>'
-      + '<div class="empty" style="margin-top:1rem;padding:1.6rem 1.2rem">'
-      + '<span class="empty-ico">' + ico('clock') + '</span>'
-      + '<b>El seguimiento de tu progreso llegará pronto</b>'
-      + '<p>De momento el avance de cada formación se consulta en PlacetaEDU. Cuando conectemos el progreso, aparecerá aquí automáticamente.</p>'
-      + '<div class="gate-act"><a class="btn btn-ghost btn-sm" href="https://www.laplaceta.org/proyectos/placetaedu" target="_blank" rel="noopener">Ir a PlacetaEDU</a></div>'
-      + '</div>'
-      + '</section>'
-
-      + '<section class="pnl">'
+    /* Accesos directos: cuatro filas, sin duplicar información */
+    html += '<section class="pnl home-links">'
       + '<div class="pnl-head"><span class="card-ico">' + ico('spark') + '</span>'
-      + '<div><h2>Para ti</h2><p>Atajos a lo que puedes aprovechar ahora.</p></div></div>'
-      + '<a class="row" href="formacion.html"><span class="row-ico">' + ico('grad') + '</span>'
-      + '<div class="row-txt"><b>Introducción a la ciberseguridad</b><span>Cisco NetAcad · beca de hasta el 50 %</span></div>'
+      + '<div><h2>Para ti</h2><p>Solo lo que puedes usar ahora.</p></div></div>'
+      + '<a class="row" href="rutas.html"><span class="row-ico">' + ico('route') + '</span>'
+      + '<div class="row-txt"><b>Caminos formativos</b><span>' + (App.caminos.length ? App.caminos.length + ' caminos disponibles' : 'Elige tu objetivo') + '</span></div>'
       + '<span class="row-go">' + ico('arrow') + '</span></a>'
       + '<a class="row" href="beneficios.html"><span class="row-ico cyan">' + ico('pad') + '</span>'
-      + '<div class="row-txt"><b>Recompensas disponibles</b><span>' + (App.recompensas.length ? App.recompensas.length + ' títulos en el catálogo' : 'Catálogo de juegos indie') + '</span></div>'
+      + '<div class="row-txt"><b>Beneficios y claves</b><span>' + (App.recompensas.length ? App.recompensas.length + ' en el catálogo' : 'Catálogo de estudios indie') + '</span></div>'
       + '<span class="row-go">' + ico('arrow') + '</span></a>'
-      + '<a class="row" href="empleo.html"><span class="row-ico warn">' + ico('brief') + '</span>'
-      + '<div class="row-txt"><b>Mi primer currículum</b><span>En preparación</span></div>'
+      + '<a class="row" href="becas.html"><span class="row-ico mint">' + ico('gift') + '</span>'
+      + '<div class="row-txt"><b>Becas</b><span>' + (becasPendientes.length ? becasPendientes.length + ' solicitud pendiente' : 'Pide beca desde cualquier elemento') + '</span></div>'
       + '<span class="row-go">' + ico('arrow') + '</span></a>'
-      + '<a class="row" href="rutas.html"><span class="row-ico">' + ico('route') + '</span>'
-      + '<div class="row-txt"><b>Explora las rutas</b><span>9 objetivos con sus pasos</span></div>'
+      + '<a class="row" href="miplaceta.html"><span class="row-ico">' + ico('key') + '</span>'
+      + '<div class="row-txt"><b>Mis claves</b><span>' + (keys.length ? keys.length + ' conseguidas' : 'Todavía no tienes ninguna') + '</span></div>'
       + '<span class="row-go">' + ico('arrow') + '</span></a>'
       + '</section>'
-      + '</div>'
-
-      + '<div class="grid" style="gap:1rem">'
-      + '<section class="pnl">'
-      + '<div class="pnl-head"><span class="card-ico">' + ico('shield') + '</span>'
-      + '<div><h2>Tu membresía</h2><p>Estado del programa.</p></div></div>'
-      + '<table class="tbl"><tbody>'
-      + '<tr><td>Estado</td><td class="num">' + esc(st.estado || '—') + '</td></tr>'
-      + '<tr><td>Plan</td><td class="num">' + esc((st.planInfo && st.planInfo.etiqueta) || '—') + '</td></tr>'
-      + '<tr><td>Precio</td><td class="num">' + esc((st.planInfo && st.planInfo.precioLabel) || '—') + '</td></tr>'
-      + '<tr><td>Válida hasta</td><td class="num">' + (st.expiresAt ? esc(fecha(st.expiresAt)) : '—') + '</td></tr>'
-      + '</tbody></table>'
-      + '<div class="gate-act" style="justify-content:flex-start;margin-top:1rem">'
-      + '<button class="btn btn-ghost btn-sm" type="button" data-action="renovar">Renovar ahora</button>'
-      + '<button class="btn btn-ghost btn-sm" type="button" data-action="cancelar">Cancelar</button>'
-      + '</div></section>'
-
-      + noticiasHtml()
-      + '</div>'
       + '</div>';
     return html;
-  }
-
-  function noticiasHtml() {
-    var items = [
-      { icon: 'spark', tipo: 'Novedad', titulo: 'Tu espacio se renueva', texto: 'Ahora con Formación, Beneficios, Mi Placeta, Rutas y Comunidad en un mismo sitio.' },
-      { icon: 'grad', tipo: 'Formación', titulo: 'Cisco NetAcad vía PlacetaEDU', texto: 'Cursos oficiales con recompensa en Pz al completarlos y becas sobre la matrícula.' },
-      { icon: 'pad', tipo: 'Beneficios', titulo: 'Estudios independientes', texto: 'Cuando un estudio colabore, sus juegos aparecerán en el catálogo: una key por usuario y título.' }
-    ];
-    var html = '<section class="pnl"><div class="pnl-head"><span class="card-ico">' + ico('book') + '</span>'
-      + '<div><h2>Noticias de Placeta Joven</h2><p>Lo último del programa.</p></div></div>';
-    items.forEach(function (n) {
-      html += '<div class="row"><span class="row-ico">' + ico(n.icon) + '</span>'
-        + '<div class="row-txt"><b>' + esc(n.titulo) + '</b><span>' + esc(n.tipo) + ' · ' + esc(n.texto) + '</span></div></div>';
-    });
-    return html + '</section>';
-  }
-
-  /* ── Formación ────────────────────────────────────────────────────── */
-  function pageFormacion() {
-    var areas = ['todas'];
-    FORMACIONES.forEach(function (f) { if (areas.indexOf(f.area) < 0) areas.push(f.area); });
-
-    var html = '<div class="page">'
-      + pageHead('Formación',
-        'Cursos de <b>Cisco Networking Academy</b> a través de <b>PlacetaEDU</b>, actividades propias de La Placeta y rutas formativas. Matrícula y recompensa van separadas: primero te formas y, al completar, recibes tus Pz.',
-        '<a class="btn btn-ghost btn-sm" href="https://www.laplaceta.org/proyectos/placetaedu" target="_blank" rel="noopener">Ir a PlacetaEDU</a>');
-
-    /* Cómo funciona la ficha de un curso */
-    html += '<div class="banner">' + ico('spark','ico')
-      + '<div class="banner-txt"><b>Precio y recompensa, separados</b>'
-      + '<span>Cada formación muestra su matrícula, sus gastos de gestión, la recompensa que obtienes al completarla, el bonus y la beca máxima que puede cubrirla.</span></div>'
-      + '</div>';
-
-    /* Catálogo */
-    html += '<section class="pnl">'
-      + '<div class="pnl-head"><span class="card-ico">' + ico('book') + '</span>'
-      + '<div><h2>Catálogo de formaciones</h2><p>Áreas de Cisco NetAcad disponibles a través de PlacetaEDU.</p></div></div>'
-      + '<div class="tabs" id="filtrosFormacion" role="group" aria-label="Filtrar por área">'
-      + areas.map(function (a) {
-          return '<button class="tab' + (a === 'todas' ? ' is-on' : '') + '" type="button" data-action="filtrar-formacion" data-area="' + esc(a) + '">'
-            + esc(a === 'todas' ? 'Todas' : a) + '</button>';
-        }).join('')
-      + '</div>'
-      + '<div class="grid g-3" id="gridFormacion" style="margin-top:1.1rem">' + formacionCards('todas') + '</div>'
-      + '</section>';
-
-    /* Becas + historial */
-    html += '<div class="grid g-2">'
-      + '<section class="pnl">'
-      + '<div class="pnl-head"><span class="card-ico mint">' + ico('gift') + '</span>'
-      + '<div><h2>Becas PlacetaEDU</h2><p>Una beca reduce el precio, nunca añade Pz.</p></div></div>'
-      + '<p style="color:var(--txt-2);font-size:.9rem">La beca se aplica a la <b>matrícula más los gastos de gestión</b>. La diferencia la asume la Junta del Grupo de La Placeta. La recompensa por completar se mantiene intacta: si te formas con beca, sigues ganando tus Pz.</p>'
-      + '<table class="tbl" style="margin-top:.9rem"><tbody>'
-      + '<tr><td>Precio del curso</td><td class="num">500 Pz</td></tr>'
-      + '<tr><td>Beca concedida (40 %)</td><td class="num minus">−200 Pz</td></tr>'
-      + '<tr><td>Lo que pagas</td><td class="num">300 Pz</td></tr>'
-      + '<tr><td>Al completar recibes</td><td class="num plus">+120 Pz</td></tr>'
-      + '</tbody></table>'
-      + '<p class="fine" style="margin-top:.8rem">Ejemplo ilustrativo del funcionamiento. Los porcentajes, convocatorias, plazas y presupuesto disponible se configuran en cada convocatoria de becas.</p>'
-      + '</section>'
-
-      + '<section class="pnl">'
-      + '<div class="pnl-head"><span class="card-ico">' + ico('chart') + '</span>'
-      + '<div><h2>Mi historial de formación</h2><p>Evaluaciones, certificados y cursos completados.</p></div></div>'
-      + '<div class="empty">'
-      + '<span class="empty-ico">' + ico('grad') + '</span>'
-      + '<b>Todavía no hay formaciones registradas</b>'
-      + '<p>Cuando completes una formación en PlacetaEDU, aparecerá aquí con su certificado, la recompensa obtenida y el bonus aplicado.</p>'
-      + '<div class="gate-act"><a class="btn btn-ghost btn-sm" href="https://www.laplaceta.org/proyectos/placetaedu" target="_blank" rel="noopener">Ver formaciones en PlacetaEDU</a></div>'
-      + '</div></section>'
-      + '</div>'
-      + '</div>';
-    return html;
-  }
-
-  function formacionCards(area) {
-    return FORMACIONES.filter(function (f) { return area === 'todas' || f.area === area; })
-      .map(function (f) {
-        var total = f.matricula + f.gestion;
-        return '<article class="item">'
-          + '<div class="item-top"><span class="item-cover">' + ico(f.icon) + '</span>'
-          + '<div class="item-h"><h3>' + esc(f.nombre) + '</h3>'
-          + '<p>' + esc(f.area) + ' · ' + esc(f.nivel) + ' · ' + esc(f.horas) + '</p></div></div>'
-          + '<p>' + esc(f.desc) + '</p>'
-          + '<div class="item-meta"><span class="tag">Cisco NetAcad</span><span class="tag tag-cyan">PlacetaEDU</span></div>'
-          + '<div class="tile-rows">'
-          + '<div><span>Matrícula + gestión</span><b>' + num(f.matricula) + ' + ' + num(f.gestion) + ' Pz</b></div>'
-          + '<div class="ok"><span>Recompensa al completar</span><b>+' + num(f.recompensa) + ' Pz</b></div>'
-          + '<div class="ok"><span>Bonus</span><b>+' + num(f.bonus) + ' Pz</b></div>'
-          + '<div class="cut"><span>Beca máxima</span><b>' + num(f.beca) + ' %</b></div>'
-          + '</div>'
-          + '<div class="item-foot"><span class="item-price">' + num(total) + ' <small>Pz totales</small></span>'
-          + '<a class="btn btn-ghost btn-sm" href="https://www.laplaceta.org/proyectos/placetaedu" target="_blank" rel="noopener">Ver en PlacetaEDU</a></div>'
-          + '</article>';
-      }).join('');
   }
 
   /* ── Empleo y futuro ──────────────────────────────────────────────── */
@@ -1006,6 +850,10 @@
   function pageRutas() {
     var rutas = App.caminos;
     var progreso = App.caminosEstado.progreso || [];
+    var pedido = new URLSearchParams(window.location.search).get('camino');
+    if (pedido && !App.caminoSeleccionado) {
+      App.caminoSeleccionado = App.caminos.filter(function (item) { return item.id === pedido; })[0] || null;
+    }
     if (App.caminoSeleccionado) return detalleCamino(App.caminoSeleccionado);
     var html = '<div class="page">'
       + pageHead('Caminos formativos', 'Elige una meta. El camino ordena cursos, actividades y proyectos sin duplicarlos.', '<span class="tag tag-cyan">Activo</span>');
@@ -1297,26 +1145,24 @@
       var texto = 'Beca reconocida: ' + r.porcentajeReconocido + '%\n' + 'Máximo del elemento: ' + r.pmb + '%\n' + 'Beca aplicada: ' + r.porcentajeAplicado + '%\n\nPrecio elegible: ' + r.precioElegible + ' Pz\nBeca: -' + r.becaPz + ' Pz\nAportación: ' + r.aportacionPz + ' Pz\n\n¿Quieres enviar la solicitud?';
       if (!window.confirm(texto)) return;
       return api('becas', { method: 'POST', body: JSON.stringify({ caminoId: caminoId, elementoId: elementoId }) }).then(function () { window.location.href = 'becas.html'; });
-    }).catch(function (error) { pintarError(error); }).finally(function () { btn.disabled = false; btn.textContent = 'Acceder con beca'; });
+    }).catch(function (error) {
+      // Un fallo al calcular no debe vaciar el espacio: se avisa en la página.
+      render();
+      avisoApp('alert err', ico('alert') + '<span>' + esc(mensajeBeca(error)) + '</span>');
+    }).finally(function () { btn.disabled = false; btn.textContent = 'Acceder con beca'; });
+  }
+
+  function mensajeBeca(error) {
+    var c = (error && (error.code || error.status)) || '';
+    if (c === 'rsp_beca_no_configurada') return 'La valoración de becas aún no está conectada con RSP. Escríbenos si necesitas la beca ahora.';
+    if (c === 'valoracion_no_disponible') return 'Todavía no tenemos tu valoración socioeconómica. La Junta debe registrarla en RSP para poder calcular la beca.';
+    if (c === 'valoracion_no_encontrada') return 'Todavía no tenemos tu valoración socioeconómica. La Junta debe registrarla en RSP para poder calcular la beca.';
+    if (c === 'elemento_formativo_no_encontrado') return 'No hemos podido identificar ese elemento formativo.';
+    if (error && error.status === 401) return 'Tu sesión ha caducado. Vuelve a identificarte.';
+    return 'No hemos podido calcular la beca ahora mismo. Reinténtalo en un momento.';
   }
 
   function tAttr(element, name) { return element.getAttribute(name) || ''; }
-
-  function accionSolicitarBeca() {
-    var seleccion = String(document.getElementById('becaElemento').value || '').split('|');
-    return api('becas', { method: 'POST', body: JSON.stringify({
-      caminoId: seleccion[0], elementoId: seleccion[1],
-      indicadores: {
-        renta: document.getElementById('becaRenta').value,
-        laboral: document.getElementById('becaLaboral').value,
-        dependientes: document.getElementById('becaDependientes').value,
-        vulnerabilidad: document.getElementById('becaVulnerabilidad').value,
-        patrimonio: document.getElementById('becaPatrimonio').value,
-        gastos: document.getElementById('becaGastos').value
-      },
-      documentacion: [document.getElementById('becaDocs').value]
-    }) }).then(function (data) { App.becas.unshift(data.beca); render(); });
-  }
 
   /* ── Eventos (delegación) ─────────────────────────────────────────── */
   document.addEventListener('click', function (ev) {
@@ -1364,14 +1210,6 @@
         App.filtro = t.getAttribute('data-cat');
         actualizarCatalogo();
         break;
-      case 'filtrar-formacion':
-        App.filtroFormacion = t.getAttribute('data-area');
-        var g = document.getElementById('gridFormacion');
-        if (g) g.innerHTML = formacionCards(App.filtroFormacion);
-        Array.prototype.forEach.call(document.querySelectorAll('#filtrosFormacion .tab'), function (b) {
-          b.classList.toggle('is-on', b.getAttribute('data-area') === App.filtroFormacion);
-        });
-        break;
       case 'cv-guardar': cvGuardar(); break;
       case 'cv-limpiar': cvLimpiar(); break;
       case 'cv-imprimir': window.print(); break;
@@ -1384,13 +1222,6 @@
     if (ev.target && ev.target.id === 'aceptoRecompensa') {
       var b = ROOT.querySelector('[data-action="canjear"]');
       if (b) b.disabled = !ev.target.checked;
-    }
-  });
-
-  document.addEventListener('submit', function (ev) {
-    if (ev.target && ev.target.id === 'becaForm') {
-      ev.preventDefault();
-      accionSolicitarBeca().catch(function (error) { pintarError(error); });
     }
   });
 
