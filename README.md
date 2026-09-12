@@ -175,6 +175,11 @@ La integración bancaria usa `PLACETA_BANCO_API_URL` y `PLACETA_BANCO_API_KEY`.
 Si no están configuradas, la solicitud de Cuenta Joven devuelve `banco_no_configurado`
 y no se simula ninguna cuenta ni movimiento de Pz.
 
+Los caminos consumen `GET {PLACETAEDU_API_URL}/pathways` cuando
+`PLACETAEDU_API_URL` está configurada. Placeta Joven organiza esos elementos,
+pero PlacetaEDU conserva la fuente de verdad de cursos, actividades, progreso y
+certificados.
+
 ## Protecciones
 
 La sección Protecciones es actualmente un catálogo de interés, no un seguro

@@ -995,21 +995,24 @@
 
   /* ── Rutas ────────────────────────────────────────────────────────── */
   function pageRutas() {
-    var rutas = App.caminos.length ? App.caminos : RUTAS.map(function (r) { return { id: r.id, nombre: r.nombre, descripcion: r.desc, nivel: 'Propuesta', recompensaFinal: 0, cursos: r.pasos.map(function (p, i) { return { id: r.id + '-' + i, titulo: p, proveedor: 'Placeta Joven', tipo: 'interno', recompensa: 0, convalidable: false }; }) }; });
+    var rutas = App.caminos;
+    var progreso = App.caminosEstado.progreso || [];
     var html = '<div class="page">'
-      + pageHead('Caminos formativos', 'Elige un objetivo y combina cursos de PlacetaEDU, actividades y formacion externa. Puedes pedir una convalidacion desde cada curso.', '<span class="tag tag-cyan">Activo</span>');
+      + pageHead('Caminos formativos', 'Elige una meta. El camino ordena cursos, actividades y proyectos sin duplicarlos.', '<span class="tag tag-cyan">Activo</span>');
 
     html += '<div class="grid g-3">'
       + rutas.map(function (r) {
+          var p = progreso.filter(function (item) { return item.caminoId === r.id; })[0] || { completados: 0, total: 0, porcentaje: 0, elementos: [] };
+          var items = (r.etapas || []).reduce(function (all, etapa) { return all.concat((etapa.elementos || []).map(function (item) { return Object.assign({}, item, { etapa: etapa.nombre }); })); }, []);
           return '<article class="item">'
             + '<div class="item-top"><span class="item-cover">' + ico('route') + '</span>'
             + '<div class="item-h"><h3>' + esc(r.nombre) + '</h3><p>' + esc(r.descripcion || '') + '</p></div></div>'
-            + '<div class="tl">' + r.cursos.map(function (curso, i) {
-                return '<div class="tl-item"><span class="tl-dot">' + (i + 1) + '</span>'
-                  + '<div class="tl-txt"><b>' + esc(curso.titulo) + '</b><span>' + esc(curso.proveedor || '') + ' · +' + num(curso.recompensa || 0) + ' Pz</span></div></div>';
+            + '<div class="pbar" style="margin:.9rem 0 .35rem"><i style="width:' + p.porcentaje + '%"></i></div><div class="pbar-meta"><span>' + p.completados + ' de ' + p.total + ' elementos</span><b>' + p.porcentaje + ' %</b></div>'
+            + '<div class="tl">' + (r.etapas || []).map(function (etapa) {
+                return '<div class="tl-item"><span class="tl-dot">' + esc(etapa.id.slice(0, 1).toUpperCase()) + '</span><div class="tl-txt"><b>' + esc(etapa.nombre) + '</b><span>' + etapa.elementos.length + ' elementos</span></div></div>';
               }).join('') + '</div>'
-            + '<div class="item-meta"><span class="tag tag-cyan">' + esc(r.nivel || 'Ruta') + '</span><span class="tag">' + r.cursos.length + ' cursos</span></div>'
-            + '<div class="item-foot"><a class="btn btn-ghost btn-sm" href="formacion.html">Ver cursos</a><button class="btn btn-primary btn-sm" type="button" data-action="solicitar-convalidacion" data-camino="' + esc(r.id) + '">Convalidar un curso</button></div>'
+            + '<div class="item-meta"><span class="tag tag-cyan">' + esc(r.nivel || 'Ruta') + '</span><span class="tag">+' + num(r.recompensaFinal || 0) + ' Pz al completar</span></div>'
+            + '<div class="item-foot"><a class="btn btn-ghost btn-sm" href="formacion.html">Ver elementos</a>' + (items.some(function (item) { return item.convalidable; }) ? '<button class="btn btn-primary btn-sm" type="button" data-action="solicitar-convalidacion" data-camino="' + esc(r.id) + '">Convalidar</button>' : '') + '</div>'
             + '</article>';
         }).join('')
       + '</div>';
@@ -1234,7 +1237,9 @@
   function accionConvalidar(caminoId) {
     var camino = App.caminos.filter(function (item) { return item.id === caminoId; })[0];
     if (!camino) return;
-    var curso = window.prompt('Escribe el ID del curso que has completado:\n' + camino.cursos.map(function (item) { return item.id + ' · ' + item.titulo; }).join('\n'));
+    var elementosCamino = (camino.etapas || []).reduce(function (all, etapa) { return all.concat(etapa.elementos || []); }, []);
+    var convalidables = elementosCamino.filter(function (item) { return item.convalidable; });
+    var curso = window.prompt('Escribe el ID del elemento que has completado:\n' + convalidables.map(function (item) { return item.id + ' · ' + item.titulo; }).join('\n'));
     if (!curso) return;
     var referencia = window.prompt('Referencia del certificado o actividad (opcional):') || '';
     return api('caminos', { method: 'POST', body: JSON.stringify({ caminoId: caminoId, cursoId: curso, referencia: referencia }) })

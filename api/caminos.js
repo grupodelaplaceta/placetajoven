@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
   const dip = String(u.registro.dip || '').trim().toUpperCase();
   try {
     if (req.method === 'GET') {
-      return json(res, 200, { ok: true, caminos: caminos.catalogo(), estado: await caminos.estado(dip) });
+      return json(res, 200, { ok: true, caminos: await caminos.catalogo(), estado: await caminos.estado(dip) });
     }
     let body = {};
     try { const raw = await readBody(req); if (raw) body = JSON.parse(raw); } catch (e) { return json(res, 400, { error: 'json_invalido' }); }
