@@ -152,17 +152,16 @@
   /* ── Navegación ───────────────────────────────────────────────────── */
   var NAV = [
     { id: 'inicio', label: 'Inicio', icon: 'home', href: 'inicio.html', grupo: 'Tu espacio' },
-    { id: 'formacion', label: 'Formación', icon: 'grad', href: 'formacion.html' },
+    { id: 'rutas', label: 'Caminos formativos', icon: 'route', href: 'rutas.html' },
     { id: 'empleo', label: 'Empleo y futuro', icon: 'brief', href: 'empleo.html', soon: true },
     { id: 'beneficios', label: 'Beneficios', icon: 'pad', href: 'beneficios.html' },
     { id: 'protecciones', label: 'Protecciones', icon: 'shield', href: 'protecciones.html' },
     { id: 'becas', label: 'Becas', icon: 'gift', href: 'becas.html' },
     { id: 'miplaceta', label: 'Mi Placeta', icon: 'coin', href: 'miplaceta.html' },
-    { id: 'rutas', label: 'Rutas', icon: 'route', href: 'rutas.html', soon: true, grupo: 'Crece' },
     { id: 'comunidad', label: 'Comunidad', icon: 'users', href: 'comunidad.html', soon: true }
   ];
   var TITULOS = {
-    inicio: 'Inicio', formacion: 'Formación', empleo: 'Empleo y futuro',
+    inicio: 'Inicio', formacion: 'Caminos formativos', empleo: 'Empleo y futuro',
     beneficios: 'Beneficios', protecciones: 'Protecciones', becas: 'Becas', miplaceta: 'Mi Placeta', rutas: 'Rutas', comunidad: 'Comunidad'
   };
 
@@ -1020,6 +1019,7 @@
   function pageRutas() {
     var rutas = App.caminos;
     var progreso = App.caminosEstado.progreso || [];
+    if (App.caminoSeleccionado) return detalleCamino(App.caminoSeleccionado);
     var html = '<div class="page">'
       + pageHead('Caminos formativos', 'Elige una meta. El camino ordena cursos, actividades y proyectos sin duplicarlos.', '<span class="tag tag-cyan">Activo</span>');
 
@@ -1035,12 +1035,31 @@
                 return '<div class="tl-item"><span class="tl-dot">' + esc(etapa.id.slice(0, 1).toUpperCase()) + '</span><div class="tl-txt"><b>' + esc(etapa.nombre) + '</b><span>' + etapa.elementos.length + ' elementos</span></div></div>';
               }).join('') + '</div>'
             + '<div class="item-meta"><span class="tag tag-cyan">' + esc(r.nivel || 'Ruta') + '</span><span class="tag">+' + num(r.recompensaFinal || 0) + ' Pz al completar</span></div>'
-            + '<div class="item-foot"><a class="btn btn-ghost btn-sm" href="formacion.html">Ver elementos</a>' + (items.some(function (item) { return item.convalidable; }) ? '<button class="btn btn-primary btn-sm" type="button" data-action="solicitar-convalidacion" data-camino="' + esc(r.id) + '">Convalidar</button>' : '') + '</div>'
+            + '<div class="item-foot"><button class="btn btn-primary btn-sm" type="button" data-action="abrir-camino" data-camino="' + esc(r.id) + '">Continuar camino</button></div>'
             + '</article>';
         }).join('')
       + '</div>';
     html += '<section class="pnl" style="margin-top:1rem"><div class="pnl-head"><span class="card-ico">' + ico('check') + '</span><div><h2>Convalidaciones</h2><p>Las revisa el equipo antes de conceder la recompensa.</p></div></div>' + ((App.caminosEstado.convalidaciones || []).length ? App.caminosEstado.convalidaciones.map(function (s) { return '<div class="row"><span class="row-ico warn">' + ico('clock') + '</span><div class="row-txt"><b>' + esc(s.curso) + '</b><span>' + esc(s.proveedor) + ' · ' + esc(s.estado) + '</span></div></div>'; }).join('') : '<div class="empty"><b>Aún no tienes solicitudes</b><p>Presenta un curso externo y adjunta una referencia o certificado.</p></div>') + '</section>'
       + '</div>';
+    return html;
+  }
+
+  function detalleCamino(camino) {
+    var progreso = (App.caminosEstado.progreso || []).filter(function (item) { return item.caminoId === camino.id; })[0] || { elementos: [], porcentaje: 0 };
+    var estados = progreso.elementos || [];
+    var indice = 0;
+    var html = '<div class="page">' + pageHead(camino.nombre, camino.descripcion || '', '<button class="btn btn-ghost btn-sm" type="button" data-action="cerrar-camino">Todos los caminos</button>')
+      + '<section class="pnl"><div class="pnl-head"><span class="card-ico">' + ico('route') + '</span><div><h2>Tu recorrido</h2><p>' + estados.filter(function (item) { return item.estado === 'COMPLETADO'; }).length + ' elementos completados · ' + progreso.porcentaje + '%</p></div></div><div class="pbar"><i style="width:' + progreso.porcentaje + '%"></i></div></section>';
+    (camino.etapas || []).forEach(function (etapa) {
+      html += '<section class="pnl pathway-stage"><div class="pnl-head"><span class="card-ico cyan"><b>' + (++indice) + '</b></span><div><h2>' + esc(etapa.nombre) + '</h2><p>' + etapa.elementos.length + ' elementos</p></div></div><div class="grid g-2">';
+      etapa.elementos.forEach(function (elemento) {
+        var estado = estados.filter(function (item) { return item.id === elemento.id; })[0] || { estado: 'BLOQUEADO' };
+        var bloqueado = estado.estado === 'BLOQUEADO';
+        html += '<article class="item pathway-element ' + (bloqueado ? 'is-locked' : '') + '"><div class="item-top"><span class="item-cover ' + (estado.estado === 'COMPLETADO' ? 'mint' : '') + '">' + ico(estado.estado === 'COMPLETADO' ? 'check' : (bloqueado ? 'lock' : 'book')) + '</span><div class="item-h"><h3>' + esc(elemento.titulo) + '</h3><p>' + esc(elemento.proveedor || '') + '</p></div></div><div class="item-meta"><span class="tag">' + esc(elemento.tipo || 'elemento') + '</span><span class="tag">+' + num(elemento.recompensa || 0) + ' Pz</span>' + (elemento.pmb != null ? '<span class="tag tag-cyan">Beca hasta ' + elemento.pmb + '%</span>' : '') + '</div><p class="fine">' + (bloqueado ? 'Completa primero: ' + esc((elemento.requisitos || []).join(', ')) : (estado.estado === 'COMPLETADO' ? 'Completado' : 'Disponible ahora')) + '</p>' + (elemento.convalidable && !bloqueado ? '<button class="btn btn-ghost btn-sm" type="button" data-action="solicitar-convalidacion" data-camino="' + esc(camino.id) + '">Convalidar este elemento</button>' : '') + '</article>';
+      });
+      html += '</div></section>';
+    });
+    html += '</div>';
     return html;
   }
 
@@ -1101,7 +1120,7 @@
 
   var PAGINAS = {
     inicio: pageInicio,
-    formacion: pageFormacion,
+    formacion: pageRutas,
     empleo: pageEmpleo,
     beneficios: pageBeneficios,
     protecciones: pageProtecciones,
@@ -1334,6 +1353,8 @@
       case 'cerrar-recompensa': App.vista = null; render(); break;
       case 'canjear': accionCanjear(t.getAttribute('data-id'), t); break;
       case 'solicitar-convalidacion': accionConvalidar(t.getAttribute('data-camino')); break;
+      case 'abrir-camino': App.caminoSeleccionado = App.caminos.filter(function (item) { return item.id === t.getAttribute('data-camino'); })[0] || null; render(); break;
+      case 'cerrar-camino': App.caminoSeleccionado = null; render(); break;
       case 'cuenta-joven': accionCuentaJoven(t); break;
       case 'interes-proteccion': api('protecciones', { method: 'POST', body: JSON.stringify({ proteccionId: t.getAttribute('data-id') }) }).then(function () { t.textContent = 'Interés registrado'; t.disabled = true; }).catch(function (e) { pintarError(e); }); break;
       case 'filtrar-recompensa':
