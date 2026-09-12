@@ -350,8 +350,8 @@ a.row:hover{background:var(--fondo-2)}
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:1.2rem 0 .5rem;text-align:left}
-.plan-card{border-radius:var(--r);padding:1rem;border:1px solid var(--linea);background:var(--superficie);display:grid;gap:.3rem}
+.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin:1rem 0 .5rem;text-align:left}
+.plan-card{border-radius:var(--r);padding:.85rem;border:1px solid var(--linea);background:var(--superficie);display:grid;gap:.25rem}
 .plan-card.feat{border-color:var(--violeta-suave);background:linear-gradient(150deg,var(--violeta-tenue),var(--superficie))}
 .plan-card h3{margin:0;font-size:1.25rem}
 .plan-card .p{font-family:var(--mono);font-size:1.5rem;font-weight:700;line-height:1.15;margin:0;color:var(--txt)}

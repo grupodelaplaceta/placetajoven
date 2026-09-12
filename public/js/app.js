@@ -349,14 +349,14 @@
     ROOT.innerHTML = gate(
       '<span class="gate-ico">' + ico('spark') + '</span>'
       + '<h1>Elige tu plan</h1>'
-      + '<p>Activa Placeta Joven y desbloquea tu espacio: formación de Cisco NetAcad vía PlacetaEDU, becas, keys de juegos indie y el resto de beneficios del programa.</p>'
+      + '<p>Un paso más y ya tienes acceso a tu espacio joven.</p>'
       + '<div class="plan-cards">' + planes.map(function (p) {
         var anual = p.id === 'anual';
         return '<article class="plan-card' + (p.destacado ? ' feat' : '') + '" data-plan-card="' + esc(p.id) + '">'
-          + '<h3>' + esc(p.etiqueta) + (p.destacado ? ' <span class="tag tag-mint" style="margin-left:.3rem">Oferta</span>' : '') + '</h3>'
+          + '<h3>' + esc(p.id === 'anual' ? 'Anual' : 'Mensual') + (p.destacado ? ' <span class="tag tag-mint" style="margin-left:.3rem">Mejor precio</span>' : '') + '</h3>'
           + '<p class="p">' + esc(p.precioLabel || 'Consultar') + '</p>'
-          + '<span>' + esc(p.ahorroLabel || (anual ? 'La tarifa anual reduce el coste frente a 12 mensualidades.' : 'Cancela cuando quieras y conserva el acceso durante el periodo pagado.')) + '</span>'
-          + '<button class="btn ' + (p.destacado ? 'btn-primary' : 'btn-ghost') + ' btn-block" type="button" data-action="alta" data-plan="' + esc(p.id) + '">' + (anual ? 'Elegir oferta anual' : 'Contratar mensual') + '</button>'
+          + '<span>' + esc(p.ahorroLabel || (anual ? 'Ahorra frente a 12 mensualidades.' : 'Flexibilidad mes a mes.')) + '</span>'
+          + '<button class="btn ' + (p.destacado ? 'btn-primary' : 'btn-ghost') + ' btn-block" type="button" data-action="alta" data-plan="' + esc(p.id) + '">' + (anual ? 'Elegir anual' : 'Empezar') + '</button>'
           + '</article>';
       }).join('') + '</div>'
       + (aviso ? '<p class="alert" style="text-align:left">' + ico('alert') + '<span>' + esc(aviso) + '</span></p>' : '')
