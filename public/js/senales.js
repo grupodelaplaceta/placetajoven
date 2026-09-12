@@ -20,8 +20,8 @@
   var NEGRO = '#141414';
   var AMBAR = '#E8A33D';
 
-  var FUENTE = 'Dibujo propio de Placeta Joven según el Catálogo oficial de señales (Real Decreto 1428/2003)';
-  var FUENTE_MARCAS = 'Dibujo propio de Placeta Joven según las marcas viales del Reglamento General de Circulación';
+  var FUENTE = 'Dibujo propio según el Catálogo oficial de señales (DGT)';
+  var FUENTE_MARCAS = 'Dibujo propio según las marcas viales del Reglamento General de Circulación';
 
   var TIPO = 'system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif';
 
@@ -55,9 +55,10 @@
 
   var DIBUJOS = {
     // ── Señales de reglamentación ────────────────────────────────────
+    // La leyenda solo se enseña al corregir: durante la pregunta sería la respuesta.
     stop: {
       fuente: FUENTE,
-      leyenda: 'Señal R-2: detención obligatoria',
+      leyenda: 'Señal R-2 «STOP»: detenerse y ceder el paso',
       svg: function () { return envolver(octogono(texto('STOP', 60, BLANCO, 25))); }
     },
     ceda: {
@@ -222,7 +223,7 @@
     },
     'paso-cebra': {
       fuente: FUENTE_MARCAS,
-      leyenda: 'Paso de peatones: marca de paso para peatones',
+      leyenda: 'Marca de paso para peatones (paso de cebra)',
       svg: function () {
         var t = '';
         for (var i = 0; i < 6; i++) t += '<rect x="' + (8 + i * 15) + '" y="26" width="10" height="48" rx="2" fill="' + BLANCO + '"/>';
@@ -231,7 +232,7 @@
     },
     'flecha-carril': {
       fuente: FUENTE_MARCAS,
-      leyenda: 'Marca de flecha: indica el sentido obligatorio del carril',
+      leyenda: 'Marca de flecha: sentido obligatorio del carril',
       svg: function () {
         return envolver('<rect width="100" height="100" fill="#5A5A5A"/>'
           + '<path d="M50 90V30" stroke="' + BLANCO + '" stroke-width="10" stroke-linecap="round"/>'

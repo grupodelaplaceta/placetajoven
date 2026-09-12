@@ -443,14 +443,23 @@ a.row:hover{background:var(--fondo-2)}
 .lr-act-nota{margin:0 auto 0 0 !important}
 .lr-act .btn{display:inline-flex;align-items:center;gap:.5rem}
 kbd{font-family:var(--mono);font-size:.7rem;padding:.12rem .4rem;border-radius:6px;border:1px solid currentColor;opacity:.6;line-height:1.4}
-/* Figuras de los ejercicios: señales y marcas viales dibujadas en SVG */
-.lr-fig{margin:1.05rem 0 .1rem;display:flex;gap:.95rem;align-items:center;background:var(--fondo-2);border:1px solid var(--linea);border-radius:15px;padding:.8rem .95rem}
-.lr-fig .senal-svg{width:94px;height:94px;flex:none;border-radius:12px;background:#fff;display:block}
-.lr-fig figcaption{min-width:0;display:grid;gap:.25rem}
-.lr-fig b{font-size:.86rem;font-weight:700;line-height:1.35}
-.lr-fuente{font-size:.71rem;color:var(--txt-3);line-height:1.5}
-.lr-rev-fig{flex:none;width:44px;height:44px;border-radius:10px;overflow:hidden;background:#fff;display:grid;place-items:center}
+/* Figuras de los ejercicios: señales y marcas viales dibujadas en SVG.
+   En pantallas estrechas se apilan para que el dibujo no se aplaste. */
+.lr-fig{margin:1.05rem 0 .1rem;display:flex;gap:.9rem;align-items:center;background:var(--fondo-2);border:1px solid var(--linea);border-radius:15px;padding:.8rem .9rem;flex-wrap:wrap}
+.lr-fig .senal-svg{width:96px;height:96px;min-width:96px;flex:0 0 auto;aspect-ratio:1/1;border-radius:12px;background:#fff;display:block}
+.lr-fig figcaption{flex:1 1 11rem;min-width:0;display:grid;gap:.25rem}
+.lr-fuente{font-size:.72rem;color:var(--txt-3);line-height:1.5}
+.lr-rev-fig{flex:none;width:44px;height:44px;min-width:44px;border-radius:10px;overflow:hidden;background:#fff;display:grid;place-items:center}
 .lr-rev-fig .senal-svg{width:100%;height:100%;display:block}
+.lr-rev-fig-name{color:var(--txt-3);font-size:.78rem}
+@media (max-width:480px){
+  .lr-fig{gap:.65rem;padding:.7rem}
+  .lr-fig .senal-svg{width:78px;height:78px;min-width:78px}
+  .lr-fig figcaption{flex:1 1 100%}
+}
+@media (max-width:340px){
+  .lr-fig{flex-direction:column;align-items:flex-start}
+}
 .lr-score{display:flex;align-items:baseline;gap:.55rem;font-family:var(--mono);font-size:2.4rem;font-weight:700;line-height:1;color:var(--txt)}
 .lr-score small{font-family:var(--font);font-size:.86rem;font-weight:600;color:var(--txt-3)}
 .lr-rev-title{margin:1.4rem 0 .7rem;font-size:1rem}

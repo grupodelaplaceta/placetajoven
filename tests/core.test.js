@@ -444,8 +444,25 @@ test('carnet: las figuras llegan al catálogo público sin filtrar la respuesta'
   assert.ok(conFigura.length >= 10);
   conFigura.forEach((e) => {
     assert.strictEqual(typeof e.imagen.dibujo, 'string');
-    assert.ok(!/solucion|esperado|correcta|respuestas/.test(JSON.stringify(e.imagen)),
-      'la figura no puede llevar la respuesta dentro');
+    // El nombre de la señal es la respuesta: no puede viajar antes de corregir.
+    assert.ok(Object.keys(e.imagen).every((k) => k === 'dibujo' || k === 'texto'),
+      'la figura solo envía el dibujo, nunca su nombre: ' + JSON.stringify(e.imagen));
+    assert.ok(!/leyenda/.test(JSON.stringify(e.imagen)));
+  });
+});
+
+test('carnet: cada bloque perdona un fallo, ni cero ni dos', () => {
+  const carnet = actividades.CATALOGO.filter((a) => a.categoria === 'Carnet de conducir');
+  assert.ok(carnet.length >= 6, 'están los seis bloques de carnet');
+  carnet.forEach((a) => {
+    const total = a.ejercicios.reduce((s, e) => s + e.puntos, 0);
+    assert.strictEqual(total, 100, a.id + ' debe sumar 100 puntos');
+    const valores = new Set(a.ejercicios.map((e) => e.puntos));
+    assert.strictEqual(valores.size, 1, a.id + ': todas las preguntas valen lo mismo');
+    const fallos = Math.floor((a.ejercicios.length * (100 - a.evaluacion.minimo)) / 100);
+    assert.ok(fallos >= 1, a.id + ': con un fallo no debería suspenderse');
+    assert.strictEqual(a.evaluacion.penalizacion, 0, a.id + ': repetir no debe restar puntos');
+    assert.ok(a.evaluacion.intentos >= 3, a.id + ': hay que poder practicar');
   });
 });
 
