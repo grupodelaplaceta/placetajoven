@@ -334,8 +334,113 @@ function respuestasCorrectas(a) {
   return out;
 }
 
-test('actividades: comprobar un ejercicio no revela la solución', () => {
-  const mal = actividades.comprobarEjercicio('sql-basico', 'e4', 'select nombre from usuarios');
+test('actividades: las respuestas abiertas se corrigen con criterio, no literal', () => {
+  const escrita = { tipo: 'escrita', puntos: 10, respuestas: ['gestor de contraseñas'] };
+  const sql = { tipo: 'sql', puntos: 10, esperado: 'select nombre from usuarios where edad > 18' };
+  const excel = { tipo: 'excel', puntos: 10, esperado: '=b2*c2', alternativas: ['=c2*b2'] };
+
+  // tolera acentos, mayúsculas, puntuación y espacios de más
+  assert.strictEqual(actividades.corregirEjercicio(escrita, '  Gestor de Contraseñas ').ok, true);
+  assert.strictEqual(actividades.corregirEjercicio(escrita, 'gestor de contrasenas').ok, true, 'la ñ sin tilde no puede penalizar');
+  assert.strictEqual(actividades.corregirEjercicio(escrita, 'gestor de claves').ok, false, 'una respuesta distinta no cuela');
+  // tolera una errata leve cuando la respuesta tiene cuerpo
+  assert.strictEqual(actividades.corregirEjercicio(escrita, 'gestor de contraseñs').ok, true);
+  // pero nunca en siglas cortas
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'escrita', puntos: 10, respuestas: ['dns'] }, 'dms').ok, false);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'escrita', puntos: 10, respuestas: ['ip'] }, 'la IP').ok, true);
+
+  // SQL: mismo enunciado escrito de otra forma
+  assert.strictEqual(actividades.corregirEjercicio(sql, 'SELECT nombre FROM usuarios WHERE edad>18;').ok, true);
+  assert.strictEqual(actividades.corregirEjercicio(sql, 'select * from usuarios').ok, false);
+  // Excel: las alternativas declaradas también valen
+  assert.strictEqual(actividades.corregirEjercicio(excel, '=C2*B2').ok, true);
+  assert.strictEqual(actividades.corregirEjercicio(excel, '=B2+C2').ok, false);
+
+  // respuesta vacía nunca aprueba
+  assert.strictEqual(actividades.corregirEjercicio(escrita, '').ok, false);
+  assert.strictEqual(actividades.corregirEjercicio(escrita, '   ').ok, false);
+});
+
+test('actividades: el repaso incluye la respuesta del usuario', async () => {
+  sinSupabase();
+  const dip = 'DIP-TEST-REPASO';
+  const a = actividades.actividad('redes-conceptos');
+  const respuestas = respuestasCorrectas(a);
+  respuestas.e1 = 2;                    // fallada a propósito
+  respuestas.e4 = 'la IP';              // acertada con artículo y mayúsculas
+  const salida = await actividades.enviarIntento(dip, a.id, respuestas);
+
+  const fallada = salida.revision.find((e) => e.id === 'e1');
+  assert.strictEqual(fallada.ok, false);
+  assert.strictEqual(fallada.dada, 2, 'el repaso puede explicar qué contestó el usuario');
+  assert.ok(textoLegible(fallada));
+  const acertada = salida.revision.find((e) => e.id === 'e4');
+  assert.strictEqual(acertada.ok, true);
+});
+
+// Traduce la respuesta guardada a texto, igual que hace la interfaz.
+function textoLegible(e) {
+  if (e.tipo === 'test') return (e.opciones || [])[Number(e.dada)] || '';
+  return String(e.dada);
+}
+
+test('carnet: los caminos de conducir exigen el nivel de un examen real', async () => {
+  sinSupabase();
+  const caminos = require('../lib/caminos');
+  const lista = await caminos.catalogo();
+  const b = lista.find((c) => c.id === 'carnet-b');
+  assert.ok(b, 'existe el camino del permiso B');
+  const etapas = (b.etapas || []).map((e) => e.id);
+  assert.deepStrictEqual(etapas, ['senales', 'normas', 'prioridad', 'seguridad', 'documentacion', 'examen']);
+
+  const elementos = caminos.elementosDe(b);
+  const examen = elementos.find((e) => e.actividadId === 'carnet-examen');
+  assert.ok(examen, 'el camino termina con un examen tipo');
+
+  const act = actividades.actividad('carnet-examen');
+  assert.strictEqual(act.evaluacion.minimo, 90, 'un 10 % de fallos es el margen del examen');
+  assert.strictEqual(act.ejercicios.length, 20);
+  assert.strictEqual(act.evaluacion.penalizacion, 0, 'repetir no resta: se practica hasta salir');
+
+  // los test propios no copian bancos oficiales: solo enlazamos a la DGT
+  const recurso = elementos.find((e) => e.tipo === 'recurso' && /dgt/i.test(e.proveedor || ''));
+  assert.ok(recurso && /^https:\/\/www\.dgt\.es/.test(recurso.url));
+
+  // ningún enunciado del catálogo de carnet menciona una fuente oficial
+  const prohibido = /dgt|autoescuela|examen oficial/i;
+  actividades.CATALOGO.filter((a) => a.categoria === 'Carnet de conducir').forEach((a) => {
+    a.ejercicios.forEach((e) => {
+      assert.ok(!prohibido.test(e.enunciado), 'enunciado propio, no copiado: ' + e.enunciado);
+    });
+  });
+});
+
+test('carnet: se puede suspender y volver a intentarlo', async () => {
+  sinSupabase();
+  const dip = 'DIP-TEST-CARNET';
+  const a = actividades.actividad('carnet-examen');
+  const regular = respuestasCorrectas(a);
+  // 2 fallos de 20 = 90 % → aprueba justo en el límite
+  regular.e1 = 3;
+  regular.e2 = 3;
+  const justo = await actividades.enviarIntento(dip, a.id, regular);
+  assert.strictEqual(justo.resultado.aprobado, true);
+  assert.strictEqual(justo.resultado.porcentaje, 90);
+
+  // 3 fallos = 85 % → suspende y puede repetir
+  const dip2 = 'DIP-TEST-CARNET-2';
+  const peor = respuestasCorrectas(a);
+  peor.e1 = 3; peor.e2 = 3; peor.e3 = 3;
+  const suspenso = await actividades.enviarIntento(dip2, a.id, peor);
+  assert.strictEqual(suspenso.resultado.porcentaje, 85);
+  assert.strictEqual(suspenso.resultado.aprobado, false);
+  assert.strictEqual(suspenso.recompensaPendiente, 0, 'suspender no genera recompensa');
+  const estado = await actividades.estado(dip2);
+  assert.strictEqual(estado[0].intentos, 1);
+  assert.strictEqual(estado[0].completada, false);
+});
+
+test('actividades: comprobar un ejercicio no revela la solución', () => {  const mal = actividades.comprobarEjercicio('sql-basico', 'e4', 'select nombre from usuarios');
   assert.strictEqual(mal.ok, false);
   assert.strictEqual(mal.obtenidos, 0);
   assert.strictEqual(mal.maximo, 20);

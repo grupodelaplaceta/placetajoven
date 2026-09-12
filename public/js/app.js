@@ -906,38 +906,47 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function pintarRun() {
-    var y = window.scrollY;
-    render();
-    window.scrollTo(0, y);
+    var host = document.getElementById('lrHost');
+    if (!host) { var y = window.scrollY; render(); window.scrollTo(0, y); return; }
+    host.innerHTML = runnerContenido();
+    var campo = document.getElementById('lrCampo');
+    if (campo && !campo.disabled) campo.focus();
+  }
+  function runnerActividad() {
+    return '<div class="page" id="lrHost">' + runnerContenido() + '</div>';
   }
 
-  function runnerActividad() {
+  function runnerContenido() {
     var r = App.run, a = r.a;
     var total = a.ejercicios.length;
     var camino = (App.caminos || []).filter(function (c) { return c.id === r.caminoId; })[0];
+    var intento = estadoActividad(a.id);
 
-    var html = '<div class="page">'
-      + pageHead(a.titulo, (camino ? '<a href="rutas.html?camino=' + esc(camino.id) + '">' + esc(camino.nombre) + '</a> · ' : '') + esc(a.categoria) + ' · ' + a.minutos + ' min',
+    var html = pageHead(a.titulo, (camino ? '<a href="rutas.html?camino=' + esc(camino.id) + '">' + esc(camino.nombre) + '</a> · ' : '') + esc(a.categoria) + ' · ' + a.minutos + ' min',
         '<button class="btn btn-ghost btn-sm" type="button" data-action="cerrar-actividad">Salir</button>')
       + '<div class="lr-top"><div class="lr-steps">'
       + a.ejercicios.map(function (e, i) {
           var h = r.hechos[e.id];
           return '<span class="lr-dot' + (h ? (h.ok ? ' ok' : ' bad') : (i === r.paso && !r.final ? ' now' : '')) + '"></span>';
         }).join('')
-      + '</div><div class="pbar-meta"><span>Paso ' + Math.min(r.paso + 1, total) + ' de ' + total + '</span><b>' + puntosRun() + ' / ' + maxRun() + ' puntos</b></div></div>';
+      + '</div><div class="pbar-meta"><span>' + (r.final ? 'Actividad terminada' : 'Ejercicio ' + (r.paso + 1) + ' de ' + total) + '</span>'
+      + '<b>' + puntosRun() + ' / ' + maxRun() + ' puntos</b></div></div>';
 
-    if (r.final) return html + panelResultado() + '</div>';
+    if (r.final) return html + panelResultado();
 
     var e = a.ejercicios[r.paso];
-    html += '<section class="pnl lr"><p class="lr-hint">Ejercicio ' + (r.paso + 1) + ' · ' + esc(TIPOS_TXT[e.tipo] || e.tipo) + ' · ' + e.puntos + ' puntos</p>'
+    var fb = r.fb;
+    html += '<section class="pnl lr ' + (fb ? '' : 'lr-in') + '" key="' + r.paso + '">'
+      + '<div class="lr-tipo">' + esc(TIPOS_TXT[e.tipo] || e.tipo) + '<span>' + e.puntos + ' pts</span></div>'
       + '<h2 class="lr-ask">' + esc(e.enunciado) + '</h2>'
       + cuerpoEjercicio(e)
-      + (r.fb ? '<div class="lr-fb ' + (r.fb.ok ? 'ok' : 'bad') + '">' + ico(r.fb.ok ? 'check' : 'alert') + '<span>' + (r.fb.ok ? '<b>¡Correcto!</b> +' + r.fb.obtenidos + ' puntos' : '<b>No es correcto.</b> Verás la respuesta al terminar el repaso.') + '</span></div>' : '')
+      + (fb ? '<div class="lr-fb ' + (fb.ok ? 'ok' : 'bad') + '">' + ico(fb.ok ? 'check' : 'alert') + '<span>' + (fb.ok ? '<b>¡Correcto!</b> +' + fb.obtenidos + ' puntos' : '<b>No es correcto.</b> Verás la respuesta en el repaso final.') + '</span></div>' : '')
       + '<div class="lr-act">'
-      + (r.fb
-          ? '<button class="btn btn-primary" type="button" data-action="lr-paso">' + (r.paso + 1 >= total ? 'Ver mi resultado' : 'Siguiente ejercicio') + '</button>'
-          : (cuerpoEjercicioAuto(e) ? '' : '<button class="btn btn-primary" type="button" data-action="lr-comprobar">Comprobar</button>'))
-      + '</div></section></div>';
+      + (intento && intento.completada ? '<span class="lr-hint lr-act-nota">' + ico('check') + 'Ya la superaste con ' + intento.mejorPorcentaje + '%</span>' : '')
+      + (fb
+          ? '<button class="btn btn-primary" type="button" data-action="lr-paso">' + (r.paso + 1 >= total ? 'Ver mi resultado' : 'Siguiente ejercicio') + '<kbd>Intro</kbd></button>'
+          : (cuerpoEjercicioAuto(e) ? '' : '<button class="btn btn-primary" type="button" data-action="lr-comprobar">Comprobar<kbd>Intro</kbd></button>'))
+      + '</div></section>';
     return html;
   }
 
@@ -957,18 +966,28 @@
         var on = elegido === idx;
         var cls = on && bloque ? (fb.ok ? ' is-ok' : ' is-bad') : (on ? ' is-on' : '');
         return '<button class="lr-opt' + cls + '" type="button" data-action="lr-opcion" data-idx="' + idx + '"' + (fb ? ' disabled' : '') + '>'
-          + '<span class="lr-opt-key">' + String.fromCharCode(65 + idx) + '</span><span>' + esc(o) + '</span></button>';
-      }).join('') + '</div>';
+          + '<span class="lr-opt-key">' + esc(teclaLibre(idx)) + '</span><span class="lr-opt-txt">' + esc(o) + '</span>'
+          + (on && bloque ? '<span class="lr-opt-mark">' + ico(fb.ok ? 'check' : 'x') + '</span>' : '') + '</button>';
+      }).join('') + '</div>'
+        + (fb ? '' : '<p class="lr-hint lr-kbd">Elige con el ratón o pulsa <kbd>' + esc(teclaLibre(0)) + '</kbd>–<kbd>' + esc(teclaLibre(opciones.length - 1)) + '</kbd></p>');
     }
 
     if (e.tipo === 'ordenar') {
       var orden = Array.isArray(resp) ? resp : [];
-      return '<p class="lr-hint">Pulsa los pasos en el orden correcto. Pulsa un paso colocado para quitarlo.</p>'
-        + '<div class="lr-seq">' + (orden.length ? orden.map(function (orig, pos) {
-            return '<button class="lr-chip" type="button" data-action="lr-quitar" data-pos="' + pos + '"' + (fb ? ' disabled' : '') + '><span class="lr-num">' + (pos + 1) + '</span>' + esc(e.elementos[orig]) + '</button>';
-          }).join('') : '<span class="lr-hint">Aquí aparecerá tu orden…</span>') + '</div>'
-        + '<div class="lr-opts">' + (e.elementos || []).map(function (el, idx) {
-            return '<button class="lr-chip' + (orden.indexOf(idx) >= 0 ? ' is-used' : '') + '" type="button" data-action="lr-poner" data-idx="' + idx + '"' + (fb ? ' disabled' : '') + '>' + esc(el) + '</button>';
+      var hechos = orden.length === (e.elementos || []).length;
+      return '<div class="lr-toolbar"><span class="lr-hint">' + (hechos ? 'Revisa el orden y comprueba.' : 'Pulsa los pasos en orden de arriba a abajo.') + '</span>'
+        + (orden.length && !fb ? '<button class="lr-mini" type="button" data-action="lr-vaciar">Vaciar</button>' : '') + '</div>'
+        + '<ol class="lr-seq' + (orden.length ? '' : ' is-empty') + '">' + (orden.length ? orden.map(function (orig, pos) {
+            return '<li class="lr-step"><span class="lr-num">' + (pos + 1) + '</span><span class="lr-step-txt">' + esc(e.elementos[orig]) + '</span>'
+              + (fb ? '' : '<span class="lr-step-act">'
+                + '<button class="lr-mini" type="button" data-action="lr-mover" data-pos="' + pos + '" data-dir="-1" title="Subir" aria-label="Subir"' + (pos === 0 ? ' disabled' : '') + '>↑</button>'
+                + '<button class="lr-mini" type="button" data-action="lr-mover" data-pos="' + pos + '" data-dir="1" title="Bajar" aria-label="Bajar"' + (pos === orden.length - 1 ? ' disabled' : '') + '>↓</button>'
+                + '<button class="lr-mini" type="button" data-action="lr-quitar" data-pos="' + pos + '" title="Quitar" aria-label="Quitar">×</button>'
+                + '</span>') + '</li>';
+          }).join('') : '<li class="lr-hint">Tu orden aparecerá aquí…</li>') + '</ol>'
+        + '<div class="lr-pool">' + (e.elementos || []).map(function (el, idx) {
+            var usado = orden.indexOf(idx) >= 0;
+            return '<button class="lr-chip' + (usado ? ' is-used' : '') + '" type="button" data-action="lr-poner" data-idx="' + idx + '"' + (fb || usado ? ' disabled' : '') + '>' + esc(el) + '</button>';
           }).join('') + '</div>';
     }
 
@@ -985,20 +1004,31 @@
         }
       }
       var usados = Object.keys(mapa).map(function (cl) { return mapa[cl]; });
-      return '<div class="lr-opts">' + izquierda.map(function (izq) {
-        return '<button class="lr-opt' + (r.sel === izq ? ' is-on' : (mapa[izq] ? ' is-ok' : '')) + '" type="button" data-action="lr-izq" data-izq="' + esc(izq) + '"' + (fb ? ' disabled' : '') + '>'
-          + '<span class="lr-opt-key">' + esc(izq.slice(0, 2).toUpperCase()) + '</span><span>' + esc(izq) + (mapa[izq] ? ' <b>→ ' + esc(mapa[izq]) + '</b>' : '') + '</span></button>';
-      }).join('') + '</div>'
-        + '<p class="lr-hint">' + (r.sel ? 'Ahora elige con qué se relaciona «' + esc(r.sel) + '».' : 'Elige primero un elemento de la izquierda.') + '</p>'
-        + '<div class="lr-seq">' + r[mezcla].map(function (i) {
-            return '<button class="lr-chip' + (usados.indexOf(derecha[i]) >= 0 ? ' is-used' : '') + '" type="button" data-action="lr-der" data-val="' + esc(derecha[i]) + '"' + (fb ? ' disabled' : '') + '>' + esc(derecha[i]) + '</button>';
+      return '<div class="lr-toolbar"><span class="lr-hint">' + (r.sel ? 'Ahora elige con qué se relaciona «' + esc(r.sel) + '».' : 'Pulsa un elemento de la izquierda y luego su pareja.') + '</span>'
+        + (Object.keys(mapa).length && !fb ? '<button class="lr-mini" type="button" data-action="lr-vaciar">Vaciar</button>' : '') + '</div>'
+        + '<div class="lr-pairs">' + izquierda.map(function (izq) {
+            var dado = mapa[izq];
+            var cls = r.sel === izq ? ' is-on' : (dado ? ' is-ok' : '');
+            return '<button class="lr-opt' + cls + '" type="button" data-action="lr-izq" data-izq="' + esc(izq) + '"' + (fb ? ' disabled' : '') + '>'
+              + '<span class="lr-opt-txt">' + esc(izq) + '</span>'
+              + '<span class="lr-opt-side">' + (dado ? esc(dado) : '—') + '</span></button>';
+          }).join('') + '</div>'
+        + '<div class="lr-pool">' + r[mezcla].map(function (i) {
+            var usado = usados.indexOf(derecha[i]) >= 0;
+            return '<button class="lr-chip' + (usado ? ' is-used' : '') + '" type="button" data-action="lr-der" data-val="' + esc(derecha[i]) + '"' + (fb || usado || !r.sel ? ' disabled' : '') + '>' + esc(derecha[i]) + '</button>';
           }).join('') + '</div>';
     }
 
     return '<input class="lr-field' + (e.tipo === 'sql' || e.tipo === 'excel' ? ' mono' : '') + '" id="lrCampo" type="text" autocomplete="off" spellcheck="false"'
       + ' placeholder="' + (e.tipo === 'sql' ? 'SELECT … FROM …' : (e.tipo === 'excel' ? '=B2*C2' : 'Escribe tu respuesta')) + '"'
       + ' value="' + esc(resp == null ? '' : resp) + '"' + (fb ? ' disabled' : '') + ' />'
+      + (!fb && e.tipo === 'escrita' ? '<p class="lr-hint">No hace falta copiar la respuesta exacta: no cuenta el acento ni una errata leve.</p>' : '')
       + (e.pista && !fb ? '<p class="lr-hint">' + ico('spark') + ' ' + esc(e.pista) + '</p>' : '');
+  }
+
+  function teclaLibre(idx) {
+    if (idx < 9) return String(idx + 1);
+    return String.fromCharCode(65 + idx - 9);
   }
 
   function puedeComprobar(e) {
@@ -1011,7 +1041,7 @@
 
   function comprobarPaso() {
     var r = App.run, e = r.a.ejercicios[r.paso];
-    if (!puedeComprobar(e)) { avisoApp('alert warn', ico('alert') + '<span>Responde antes de comprobar.</span>'); return Promise.resolve(); }
+    if (!puedeComprobar(e)) { avisoApp('alert warn', ico('alert') + '<span>' + (cuerpoEjercicioAuto(e) ? 'Elige una opción.' : 'Completa el ejercicio antes de comprobar.') + '</span>'); return Promise.resolve(); }
     return api('actividades', { method: 'POST', body: JSON.stringify({ accion: 'comprobar', actividadId: r.a.id, ejercicioId: e.id, respuesta: r.respuestas[e.id] }) })
       .then(function (data) {
         r.hechos[e.id] = data.comprobacion;
@@ -1062,6 +1092,23 @@
     return e.solucion || '';
   }
 
+  // Traduce la respuesta cruda del usuario a algo legible para el repaso.
+  function textoRespuesta(e, dada) {
+    if (dada == null || dada === '') return null;
+    if (e.tipo === 'test') return (e.opciones || [])[Number(dada)] || null;
+    if (e.tipo === 'verdadero_falso') return dada === true || dada === 'true' ? 'Verdadero' : 'Falso';
+    if (e.tipo === 'ordenar') {
+      var arr = Array.isArray(dada) ? dada : [];
+      if (!arr.length || arr.length !== (e.elementos || []).length) return arr.length ? arr.map(function (i) { return e.elementos[i]; }).join(' → ') : null;
+      return arr.map(function (i) { return e.elementos[i]; }).join(' → ');
+    }
+    if (e.tipo === 'relacionar') {
+      var claves = Object.keys(dada || {});
+      return claves.length ? claves.map(function (k) { return k + ' → ' + dada[k]; }).join(' · ') : null;
+    }
+    return String(dada);
+  }
+
   function panelResultado() {
     var r = App.run, f = r.final, res = f.resultado;
     var revision = f.revision || [];
@@ -1075,9 +1122,13 @@
     if (premio) html += '<p class="alert ok" style="margin-top:1rem">' + ico('coin') + '<span><b>+' + num(premio) + ' Pz</b> enviados al Banco de La Placeta como orden pendiente. La actividad no crea Placetas por sí misma.</span></p>';
     else if (res.aprobado) html += '<p class="alert" style="margin-top:1rem">' + ico('coin') + '<span>Esta actividad ya estaba superada, así que no genera una recompensa nueva.</span></p>';
     if (revision.length) {
-      html += '<h3 style="margin:1.3rem 0 .6rem">Repaso del intento</h3><div class="lr-rev">' + revision.map(function (e) {
-        return '<div class="lr-rev-row"><span class="row-ico ' + (e.ok ? 'ok' : 'warn') + '">' + ico(e.ok ? 'check' : 'alert') + '</span><div class="row-txt"><b>' + esc(e.enunciado) + '</b>'
-          + '<span>' + (e.ok ? 'Correcto' : 'Respuesta correcta: ' + esc(textoSolucion(e) || '—')) + '</span></div></div>';
+      html += '<h3 class="lr-rev-title">Repaso del intento</h3><div class="lr-rev">' + revision.map(function (e) {
+        var dado = textoRespuesta(e, e.dada);
+        return '<div class="lr-rev-row' + (e.ok ? ' is-ok' : '') + '"><span class="lr-rev-mark">' + ico(e.ok ? 'check' : 'x') + '</span><div class="lr-rev-txt"><b>' + esc(e.enunciado) + '</b>'
+          + (e.ok ? '<span class="lr-rev-good">Correcto</span>' : '')
+          + (!e.ok && dado ? '<span class="lr-rev-bad">Tu respuesta: ' + esc(dado) + '</span>' : '')
+          + (!e.ok ? '<span class="lr-rev-good">Correcta: ' + esc(textoSolucion(e) || '—') + '</span>' : '')
+          + (!e.ok && !dado ? '<span class="lr-rev-bad">Sin responder</span>' : '') + '</div></div>';
       }).join('') + '</div>';
     }
     html += '<div class="lr-act">'
@@ -1126,6 +1177,14 @@
     var estados = progreso.elementos || [];
     var hechos = estados.filter(function (item) { return item.estado === 'COMPLETADO'; }).length;
     var indice = 0;
+    // Los requisitos se guardan como identificadores; al usuario se le enseña el título.
+    var tituloDe = {};
+    (camino.etapas || []).forEach(function (etapa) {
+      (etapa.elementos || []).forEach(function (el) { if (el) tituloDe[el.id] = el.titulo; });
+    });
+    var nombreReq = function (ids) {
+      return (ids || []).map(function (id) { return tituloDe[id] || 'otro paso'; }).join(', ');
+    };
 
     var html = '<div class="page">'
       + pageHead(camino.nombre, camino.descripcion || '', '<button class="btn btn-ghost btn-sm" type="button" data-action="cerrar-camino">Todos los caminos</button>')
@@ -1157,6 +1216,7 @@
         var bloqueado = estado.estado === 'BLOQUEADO';
         var hecho = estado.estado === 'COMPLETADO';
         var esActividad = elemento.tipo === 'actividad';
+        var esRecurso = elemento.tipo === 'recurso';
         var intento = esActividad ? estadoActividad(elemento.actividadId) : null;
         html += '<article class="item pathway-element ' + (bloqueado ? 'is-locked' : '') + '">'
           + '<div class="item-top"><span class="item-cover ' + (hecho ? 'mint' : (esActividad ? 'cyan' : '')) + '">' + ico(hecho ? 'check' : (bloqueado ? 'lock' : (esActividad ? 'spark' : 'book'))) + '</span>'
@@ -1164,14 +1224,15 @@
           + '<div class="item-meta">'
           + (esActividad
               ? (elemento.recompensaActividad ? '<span class="tag tag-mint">+' + num(elemento.recompensaActividad) + ' Pz al aprobar</span>' : '')
-                + (elemento.bonusActividad ? '<span class="tag tag-cyan">+' + num(elemento.bonusActividad) + ' Pz si aciertas casi todo</span>' : '')
-              : '<span class="tag">+' + num(elemento.recompensa || 0) + ' Pz</span>' + (elemento.pmb != null ? '<span class="tag tag-cyan">Beca hasta ' + elemento.pmb + '%</span>' : ''))
+                + (elemento.bonusActividad ? '<span class="tag tag-cyan">+' + num(elemento.bonusActividad) + ' Pz extra si aciertas todo</span>' : '')
+              : (esRecurso ? '<span class="tag">Recurso externo</span>' : '<span class="tag">+' + num(elemento.recompensa || 0) + ' Pz</span>' + (elemento.pmb != null ? '<span class="tag tag-cyan">Beca hasta ' + elemento.pmb + '%</span>' : '')))
           + (intento ? '<span class="tag">Nota ' + intento.mejorPorcentaje + '%</span>' : '')
           + '</div>'
-          + '<p class="fine">' + (bloqueado ? 'Se abre al completar: ' + esc((elemento.requisitos || []).join(', ')) : (hecho ? 'Completado' : 'Disponible ahora')) + '</p>'
+          + '<p class="fine">' + (bloqueado ? 'Se abre al completar: ' + esc(nombreReq(elemento.requisitos)) : (hecho ? 'Completado' : 'Disponible ahora')) + '</p>'
           + '<div class="gate-act" style="justify-content:flex-start">'
           + (esActividad && !bloqueado ? '<button class="btn ' + (hecho ? 'btn-ghost' : 'btn-primary') + ' btn-sm" type="button" data-action="lr-abrir" data-actividad="' + esc(elemento.actividadId) + '" data-camino="' + esc(camino.id) + '" data-elemento="' + esc(elemento.id) + '">' + (hecho ? 'Volver a hacerla' : 'Hacer la actividad') + '</button>' : '')
-          + (!esActividad && !bloqueado && !hecho && (elemento.matricula || elemento.gestion) ? '<button class="btn btn-primary btn-sm" type="button" data-action="abrir-beca" data-camino="' + esc(camino.id) + '" data-elemento="' + esc(elemento.id) + '">Acceder con beca</button>' : '')
+          + (esRecurso && elemento.url ? '<a class="btn btn-ghost btn-sm" href="' + esc(elemento.url) + '" target="_blank" rel="noopener">Abrir en la DGT</a>' : '')
+          + (!esActividad && !esRecurso && !bloqueado && !hecho && (elemento.matricula || elemento.gestion) ? '<button class="btn btn-primary btn-sm" type="button" data-action="abrir-beca" data-camino="' + esc(camino.id) + '" data-elemento="' + esc(elemento.id) + '">Acceder con beca</button>' : '')
           + (elemento.convalidable && !bloqueado ? '<button class="btn btn-ghost btn-sm" type="button" data-action="solicitar-convalidacion" data-camino="' + esc(camino.id) + '">Convalidar</button>' : '')
           + '</div></article>';
       });
@@ -1504,6 +1565,19 @@
         pintarRun();
         break;
       }
+      case 'lr-mover': {
+        var em = App.run.a.ejercicios[App.run.paso];
+        var lm = Array.isArray(App.run.respuestas[em.id]) ? App.run.respuestas[em.id].slice() : [];
+        var pos = Number(t.getAttribute('data-pos'));
+        var dir = Number(t.getAttribute('data-dir'));
+        var destino = pos + dir;
+        if (destino >= 0 && destino < lm.length) {
+          var tmp = lm[pos]; lm[pos] = lm[destino]; lm[destino] = tmp;
+          App.run.respuestas[em.id] = lm;
+          pintarRun();
+        }
+        break;
+      }
       case 'lr-quitar': {
         var eq = App.run.a.ejercicios[App.run.paso];
         var lq = Array.isArray(App.run.respuestas[eq.id]) ? App.run.respuestas[eq.id].slice() : [];
@@ -1512,7 +1586,26 @@
         pintarRun();
         break;
       }
-      case 'lr-izq': App.run.sel = t.getAttribute('data-izq'); pintarRun(); break;
+      case 'lr-vaciar': {
+        var ev = App.run.a.ejercicios[App.run.paso];
+        App.run.respuestas[ev.id] = ev.tipo === 'ordenar' ? [] : {};
+        App.run.sel = null;
+        pintarRun();
+        break;
+      }
+      case 'lr-izq': {
+        var ei = App.run.a.ejercicios[App.run.paso];
+        var izq = t.getAttribute('data-izq');
+        var actual = App.run.respuestas[ei.id] || {};
+        if (App.run.sel === izq) App.run.sel = null;                  // volver a pulsar lo deselecciona
+        else if (actual[izq]) {                                       // ya emparejado: se suelta
+          delete actual[izq];
+          App.run.respuestas[ei.id] = actual;
+          App.run.sel = null;
+        } else App.run.sel = izq;
+        pintarRun();
+        break;
+      }
       case 'lr-der': {
         var er = App.run.a.ejercicios[App.run.paso];
         if (App.run.sel) {
@@ -1520,8 +1613,8 @@
           mapa[App.run.sel] = t.getAttribute('data-val');
           App.run.respuestas[er.id] = mapa;
           App.run.sel = null;
+          pintarRun();
         }
-        pintarRun();
         break;
       }
       case 'lr-abrir': abrirActividad(t.getAttribute('data-actividad'), t.getAttribute('data-camino'), t.getAttribute('data-elemento')); break;
@@ -1563,9 +1656,23 @@
 
   document.addEventListener('keydown', function (ev) {
     if (!App.run || App.run.final) return;
-    if (ev.key === 'Enter' && (ev.target.id === 'lrCampo' || !ev.target.closest('button'))) {
+    var e = App.run.a.ejercicios[App.run.paso];
+    if (ev.key === 'Escape') { App.run = null; render(); return; }
+    if (ev.key === 'Enter') {
       ev.preventDefault();
       if (App.run.fb) avanzarPaso(); else comprobarPaso();
+      return;
+    }
+    // En opción única: 1..9 / A..Z eligen y corrigen de una vez.
+    if (!App.run.fb && cuerpoEjercicioAuto(e) && !ev.ctrlKey && !ev.metaKey && !ev.altKey) {
+      var opciones = e.tipo === 'test' ? (e.opciones || []).length : 2;
+      var pos = '123456789'.indexOf(ev.key);
+      if (pos < 0) pos = 'abcdefghijklmnopqrstuvwxyz'.indexOf(String(ev.key).toLowerCase());
+      if (pos >= 0 && pos < opciones) {
+        ev.preventDefault();
+        App.run.respuestas[e.id] = e.tipo === 'test' ? pos : (pos === 0);
+        comprobarPaso();
+      }
     }
   });
 
