@@ -293,8 +293,7 @@
       + '<p>Entra para ver tu espacio. Si tienes entre 16 y 30 años podrás participar en Placeta Joven; si no, el acceso al programa queda bloqueado.</p>'
       + '<div class="gate-act"><a class="btn btn-primary btn-lg" href="' + esc(url) + '">'
       + 'Acceder con PlacetaID' + ico('arrow') + '</a></div>'
-      + planesHtml(App.planes)
-      + '<p class="fine" style="margin-top:1.2rem">Placeta Joven es opcional: puedes seguir usando La Placeta sin participar en el programa.</p>');
+      + '<p class="fine" style="margin-top:1.2rem">Placeta Joven es opcional.</p>');
   }
 
   function planesHtml(source) {

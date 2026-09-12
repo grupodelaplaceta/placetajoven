@@ -153,6 +153,8 @@ h1 em,h2 em{font-style:normal;color:var(--violeta)}
 }
 .hero-facts{padding:clamp(1.5rem,4vw,3rem);}
 .hero-facts h2{font-size:clamp(2rem,4vw,3.4rem);margin-bottom:1.3rem;}
+.pricing{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea)}
+.pricing-grid{max-width:760px;margin:0}
 [data-tema="oscuro"] .g-text{
   background:linear-gradient(96deg,#DDD3FF 0%,var(--violeta-suave) 55%,var(--violeta-claro) 100%);
   -webkit-background-clip:text;background-clip:text;
