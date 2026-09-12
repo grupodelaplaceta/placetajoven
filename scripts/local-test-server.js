@@ -17,6 +17,8 @@ const API = new Map([
   ['/api/cancelar', require('../api/cancelar')],
   ['/api/verificar', require('../api/verificar')],
   ['/api/keys', require('../api/keys')]
+  ,['/api/caminos', require('../api/caminos')]
+  ,['/api/cuenta-joven', require('../api/cuenta-joven')]
 ]);
 
 const MIME = {

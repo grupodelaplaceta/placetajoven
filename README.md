@@ -129,6 +129,9 @@ Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas com
 |---|---|---|
 | GET | `/api/status` | Estado del usuario (control de edad 16–30) + sus keys |
 | GET | `/api/planes` | Tarifas públicas, sin sesión |
+| GET | `/api/caminos` | Caminos formativos, cursos y estado de convalidaciones |
+| POST | `/api/caminos` | Solicitar convalidación de un curso o actividad externa |
+| POST | `/api/cuenta-joven` | Solicitar apertura contractual de Cuenta Joven vía Banco/PlacetaID |
 | POST | `/api/alta` | Checkout para darse de alta (`{ plan }`) |
 | POST | `/api/renovar` | Checkout para renovar |
 | POST | `/api/cancelar` | Cancelar (mantiene las ventajas hasta fin de período) |
@@ -165,6 +168,10 @@ El modo se bloquea automáticamente cuando `VERCEL_ENV=production` o
 - Credenciales (nunca en git): `LS_API_KEY`, `LS_WEBHOOK_SECRET`, `LS_STORE_ID`,
   `LS_VARIANT_MENSUAL`, `LS_VARIANT_ANUAL`, `SUPABASE_URL`,
   `SUPABASE_SERVICE_ROLE_KEY`, `PLACETAID_BASE_URL` (ver `.env.example`).
+
+La integración bancaria usa `PLACETA_BANCO_API_URL` y `PLACETA_BANCO_API_KEY`.
+Si no están configuradas, la solicitud de Cuenta Joven devuelve `banco_no_configurado`
+y no se simula ninguna cuenta ni movimiento de Pz.
 
 ## Despliegue (Vercel)
 

@@ -33,6 +33,8 @@
     st: null,            // respuesta de /api/status
     planes: [],          // tarifas públicas
     recompensas: [],     // catálogo
+    caminos: [],         // caminos formativos
+    caminosEstado: { caminos: {}, convalidaciones: [], recompensasPendientes: [] },
     demo: false,         // el catálogo viene de ejemplo (sin Supabase)
     filtro: 'todos',
     busqueda: '',
@@ -686,6 +688,12 @@
       + '<div class="grid g-3" id="gridRecompensas" style="margin-top:1.1rem">' + recompensasHtml() + '</div>'
       + '</section>';
 
+    html += '<section class="pnl">'
+      + '<div class="pnl-head"><span class="card-ico cyan">' + ico('heart') + '</span>'
+      + '<div><h2>Otros juegos recomendados</h2><p>Juegos gratuitos o de acceso libre. No se pagan con Placetas.</p></div></div>'
+      + '<div class="grid g-3">' + recomendacionesHtml() + '</div>'
+      + '</section>';
+
     /* Estado del flujo de una key */
     html += '<div class="grid g-2">'
       + '<section class="pnl">'
@@ -756,6 +764,7 @@
     }
     var q = App.busqueda.trim().toLowerCase();
     var lista = App.recompensas.filter(function (r) {
+      if (r.tipoJuego === 'recomendado' || r.gratis) return false;
       if (App.filtro !== 'todos' && r.categoria !== App.filtro) return false;
       if (!q) return true;
       return String((r.nombre || '') + ' ' + (r.desarrolladora || '') + ' ' + (r.genero || '')).toLowerCase().indexOf(q) >= 0;
@@ -787,6 +796,17 @@
         + (puede ? 'data-action="abrir-recompensa" data-id="' + esc(r.id) + '"' : 'disabled')
         + '>' + (conseguida ? 'Conseguida' : (puede ? 'Ver y conseguir' : esc(r.disponibilidad || 'Próximamente'))) + '</button>'
         + '</div></article>';
+    }).join('');
+  }
+
+  function recomendacionesHtml() {
+    var lista = App.recompensas.filter(function (r) { return r.tipoJuego === 'recomendado' || r.gratis; });
+    if (!lista.length) return '<div class="empty" style="grid-column:1/-1"><b>Aún no hay recomendaciones publicadas</b><p>Cuando un estudio comparta un juego gratuito, aparecerá aquí con su enlace oficial.</p></div>';
+    return lista.map(function (r) {
+      return '<article class="item"><div class="item-top">' + (r.imagen ? '<img class="item-image" src="' + esc(r.imagen) + '" alt="" loading="lazy" />' : '<span class="item-cover mint">' + ico('heart') + '</span>')
+        + '<div class="item-h"><h3>' + esc(r.nombre) + '</h3><p>' + esc(r.desarrolladora || 'Estudio colaborador') + '</p></div></div>'
+        + '<p>' + esc(r.descripcion || '') + '</p><div class="item-meta"><span class="tag tag-mint">Gratis</span>' + (r.plataforma ? '<span class="tag tag-cyan">' + esc(r.plataforma) + '</span>' : '') + '</div>'
+        + '<div class="item-foot"><a class="btn btn-ghost btn-sm" href="' + esc(r.url || r.steamUrl || '#') + '" target="_blank" rel="noopener"' + (!r.url && !r.steamUrl ? ' aria-disabled="true"' : '') + '>Visitar juego ' + ico('out') + '</a></div></article>';
     }).join('');
   }
 
@@ -912,6 +932,13 @@
           + '<div class="gate-act"><a class="btn btn-ghost btn-sm" href="https://www.laplaceta.org/" target="_blank" rel="noopener">Ir a La Placeta</a></div></div>')
       + '</section>'
 
+      + '<section class="pnl">'
+      + '<div class="pnl-head"><span class="card-ico mint">' + ico('coin') + '</span>'
+      + '<div><h2>Cuenta Joven</h2><p>Abrela con un contrato firmado en PlacetaID.</p></div></div>'
+      + '<p style="color:var(--txt-2);font-size:.9rem">Tu saldo de Placetas vive en Banco de La Placeta. La solicitud se revisa y se firma de forma segura.</p>'
+      + '<button class="btn btn-primary btn-sm" type="button" data-action="cuenta-joven">Solicitar Cuenta Joven</button>'
+      + '</section>'
+
       + '<div class="grid" style="gap:1rem">'
       + '<section class="pnl">'
       + '<div class="pnl-head"><span class="card-ico mint">' + ico('gift') + '</span>'
@@ -957,37 +984,25 @@
 
   /* ── Rutas ────────────────────────────────────────────────────────── */
   function pageRutas() {
+    var rutas = App.caminos.length ? App.caminos : RUTAS.map(function (r) { return { id: r.id, nombre: r.nombre, descripcion: r.desc, nivel: 'Propuesta', recompensaFinal: 0, cursos: r.pasos.map(function (p, i) { return { id: r.id + '-' + i, titulo: p, proveedor: 'Placeta Joven', tipo: 'interno', recompensa: 0, convalidable: false }; }) }; });
     var html = '<div class="page">'
-      + pageHead('Rutas',
-        'En vez de un catálogo suelto de cursos, organizamos el contenido por objetivos. Elige qué quieres conseguir y sigue los pasos de la ruta.',
-        '<span class="tag tag-amber">En preparación</span>');
-
-    html += '<div class="alert">' + ico('alert')
-      + '<p><b>Estas rutas están en preparación.</b> Aquí tienes la estructura prevista de cada una: los pasos ya están definidos, pero el itinerario guiado, las evaluaciones y las recompensas por ruta todavía no están activos.</p></div>';
+      + pageHead('Caminos formativos', 'Elige un objetivo y combina cursos de PlacetaEDU, actividades y formacion externa. Puedes pedir una convalidacion desde cada curso.', '<span class="tag tag-cyan">Activo</span>');
 
     html += '<div class="grid g-3">'
-      + RUTAS.map(function (r) {
+      + rutas.map(function (r) {
           return '<article class="item">'
-            + '<div class="item-top"><span class="item-cover">' + esc(r.ico) + '</span>'
-            + '<div class="item-h"><h3>' + esc(r.nombre) + '</h3><p>' + esc(r.desc) + '</p></div></div>'
-            + '<div class="tl">' + r.pasos.map(function (p, i) {
+            + '<div class="item-top"><span class="item-cover">' + ico('route') + '</span>'
+            + '<div class="item-h"><h3>' + esc(r.nombre) + '</h3><p>' + esc(r.descripcion || '') + '</p></div></div>'
+            + '<div class="tl">' + r.cursos.map(function (curso, i) {
                 return '<div class="tl-item"><span class="tl-dot">' + (i + 1) + '</span>'
-                  + '<div class="tl-txt"><b>' + esc(p) + '</b></div></div>';
+                  + '<div class="tl-txt"><b>' + esc(curso.titulo) + '</b><span>' + esc(curso.proveedor || '') + ' · +' + num(curso.recompensa || 0) + ' Pz</span></div></div>';
               }).join('') + '</div>'
-            + '<div class="item-meta"><span class="tag tag-amber">En preparación</span>'
-            + '<span class="tag">' + r.pasos.length + ' pasos</span></div>'
-            + '<div class="item-foot"><a class="btn btn-ghost btn-sm" href="formacion.html">Ver formaciones</a></div>'
+            + '<div class="item-meta"><span class="tag tag-cyan">' + esc(r.nivel || 'Ruta') + '</span><span class="tag">' + r.cursos.length + ' cursos</span></div>'
+            + '<div class="item-foot"><a class="btn btn-ghost btn-sm" href="formacion.html">Ver cursos</a><button class="btn btn-primary btn-sm" type="button" data-action="solicitar-convalidacion" data-camino="' + esc(r.id) + '">Convalidar un curso</button></div>'
             + '</article>';
         }).join('')
       + '</div>';
-
-    html += '<section class="pnl">'
-      + '<div class="pnl-head"><span class="card-ico">' + ico('spark') + '</span>'
-      + '<div><h2>¿Falta alguna ruta?</h2><p>Las rutas se construyen según lo que pedís.</p></div></div>'
-      + '<p style="color:var(--txt-2);font-size:.9rem">Si hay un objetivo que no ves y crees que debería estar, dínoslo: el programa se amplía según las necesidades reales de quienes lo usan.</p>'
-      + '<div class="gate-act" style="justify-content:flex-start;margin-top:1rem">'
-      + '<a class="btn btn-primary btn-sm" href="mailto:joven@laplaceta.org?subject=Propuesta%20de%20ruta">Proponer una ruta</a>'
-      + '</div></section>'
+    html += '<section class="pnl" style="margin-top:1rem"><div class="pnl-head"><span class="card-ico">' + ico('check') + '</span><div><h2>Convalidaciones</h2><p>Las revisa el equipo antes de conceder la recompensa.</p></div></div>' + ((App.caminosEstado.convalidaciones || []).length ? App.caminosEstado.convalidaciones.map(function (s) { return '<div class="row"><span class="row-ico warn">' + ico('clock') + '</span><div class="row-txt"><b>' + esc(s.curso) + '</b><span>' + esc(s.proveedor) + ' · ' + esc(s.estado) + '</span></div></div>'; }).join('') : '<div class="empty"><b>Aún no tienes solicitudes</b><p>Presenta un curso externo y adjunta una referencia o certificado.</p></div>') + '</section>'
       + '</div>';
     return html;
   }
@@ -1204,6 +1219,27 @@
     if (e) e.textContent = 'Borrador vaciado.';
   }
 
+  function accionConvalidar(caminoId) {
+    var camino = App.caminos.filter(function (item) { return item.id === caminoId; })[0];
+    if (!camino) return;
+    var curso = window.prompt('Escribe el ID del curso que has completado:\n' + camino.cursos.map(function (item) { return item.id + ' · ' + item.titulo; }).join('\n'));
+    if (!curso) return;
+    var referencia = window.prompt('Referencia del certificado o actividad (opcional):') || '';
+    return api('caminos', { method: 'POST', body: JSON.stringify({ caminoId: caminoId, cursoId: curso, referencia: referencia }) })
+      .then(function () { return api('caminos'); })
+      .then(function (data) { App.caminosEstado = data.estado || App.caminosEstado; render(); });
+  }
+
+  function accionCuentaJoven(btn) {
+    conBoton(btn, 'Preparando contrato…', function () {
+      return api('cuenta-joven', { method: 'POST', body: JSON.stringify({ aceptarCashback: true }) }).then(function (data) {
+        var url = data && data.solicitud && (data.solicitud.firmaUrl || data.solicitud.url);
+        if (!url) throw Object.assign(new Error('firma_no_disponible'), { code: 'firma_no_disponible' });
+        window.location.href = url;
+      });
+    });
+  }
+
   /* ── Eventos (delegación) ─────────────────────────────────────────── */
   document.addEventListener('click', function (ev) {
     var t = ev.target.closest('[data-action]');
@@ -1240,6 +1276,8 @@
         break;
       case 'cerrar-recompensa': App.vista = null; render(); break;
       case 'canjear': accionCanjear(t.getAttribute('data-id'), t); break;
+      case 'solicitar-convalidacion': accionConvalidar(t.getAttribute('data-camino')); break;
+      case 'cuenta-joven': accionCuentaJoven(t); break;
       case 'filtrar-recompensa':
         App.filtro = t.getAttribute('data-cat');
         actualizarCatalogo();
@@ -1363,6 +1401,13 @@
       App.recompensas = [];
       App.demo = false;
       App.catalogError = e;
+    }
+    try {
+      var caminosRes = await api('caminos');
+      App.caminos = Array.isArray(caminosRes.caminos) ? caminosRes.caminos : [];
+      App.caminosEstado = caminosRes.estado || App.caminosEstado;
+    } catch (e) {
+      App.caminos = [];
     }
     render();
 

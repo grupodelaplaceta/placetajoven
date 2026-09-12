@@ -35,6 +35,9 @@ create table if not exists public.placeta_joven_recompensas (
   updated_at timestamptz not null default now()
 );
 
+-- tipoJuego = clave (se canjea con Pz) o recomendado (acceso gratuito externo).
+-- Estos campos viven dentro de `data` para mantener compatibilidad con filas existentes.
+
 alter table public.placeta_joven_recompensas enable row level security;
 
 -- Permisos de lectura para el rol anónimo si en el futuro el catálogo se
