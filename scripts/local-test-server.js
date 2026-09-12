@@ -21,6 +21,7 @@ const API = new Map([
   ,['/api/cuenta-joven', require('../api/cuenta-joven')]
   ,['/api/protecciones', require('../api/protecciones')]
   ,['/api/becas', require('../api/becas')]
+  ,['/api/actividades', require('../api/actividades')]
 ]);
 
 const MIME = {

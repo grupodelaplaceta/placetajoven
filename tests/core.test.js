@@ -261,3 +261,166 @@ test('keypool: importar en bloque es idempotente y no duplica códigos', async (
   const t = await keypool.tomarUna('recompensa-x', 'DIP-Y');
   assert.ok(t);
 });
+
+// ── Motor de actividades ─────────────────────────────────────────────
+const actividades = require('../lib/actividades');
+
+test('actividades: corrección por tipo', () => {
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'test', puntos: 10, correcta: 0 }, 0).ok, true);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'test', puntos: 10, correcta: 0 }, 2).ok, false);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'verdadero_falso', puntos: 5, correcta: true }, true).ok, true);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'escrita', puntos: 5, respuestas: ['order by'] }, ' ORDER BY ').ok, true);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'ordenar', puntos: 5, correcta: [0, 1, 2] }, [0, 1, 2]).ok, true);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'ordenar', puntos: 5, correcta: [0, 1, 2] }, [1, 0, 2]).ok, false);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'relacionar', puntos: 5, pares: [['SELECT', 'columnas']] }, { SELECT: 'columnas' }).ok, true);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'sql', puntos: 20, esperado: 'select * from usuarios' }, 'SELECT * FROM usuarios;').ok, true);
+  assert.strictEqual(actividades.corregirEjercicio({ tipo: 'excel', puntos: 20, esperado: '=b2*c2' }, '=B2*C2').ok, true);
+});
+
+test('actividades: el catálogo público no filtra soluciones', () => {
+  const publico = actividades.catalogoPublico();
+  assert.ok(publico.length > 0);
+  const serializado = JSON.stringify(publico);
+  assert.ok(!/solucion/.test(serializado));
+  assert.ok(!/esperado/.test(serializado));
+
+  publico.forEach((pub) => {
+    const original = actividades.actividad(pub.id);
+    pub.ejercicios.forEach((e) => {
+      const fuente = original.ejercicios.find((x) => x.id === e.id);
+      if (e.tipo === 'ordenar') {
+        // si el orden mostrado fuese el correcto, el ejercicio se resolvería solo
+        assert.notDeepStrictEqual(e.elementos.map((_, i) => i), fuente.correcta, 'ordenar debe salir desordenado');
+        assert.strictEqual(e.elementos.length, fuente.elementos.length);
+      }
+      if (e.tipo === 'relacionar') {
+        assert.ok(e.izquierda.length > 0 && e.izquierda.length === e.derecha.length, 'relacionar publica las dos columnas');
+        assert.strictEqual(e.pares, undefined, 'nunca se envía el emparejamiento');
+      }
+      if (e.tipo === 'test') assert.strictEqual(e.correcta, undefined, 'no se envía la opción correcta');
+      if (e.tipo === 'verdadero_falso') assert.strictEqual(e.correcta, undefined);
+      if (e.tipo === 'escrita') assert.strictEqual(e.respuestas, undefined);
+    });
+  });
+});
+
+test('actividades: la nota y el bonus se calculan, no se regalan Pz', () => {
+  const sql = actividades.actividad('sql-basico');
+  const respuestas = {};
+  sql.ejercicios.forEach((e) => {
+    if (e.tipo === 'test') respuestas[e.id] = e.correcta;
+    if (e.tipo === 'verdadero_falso') respuestas[e.id] = e.correcta;
+    if (e.tipo === 'escrita') respuestas[e.id] = (e.respuestas || [])[0];
+    if (e.tipo === 'sql') respuestas[e.id] = e.esperado;
+    if (e.tipo === 'ordenar') respuestas[e.id] = e.correcta;
+    if (e.tipo === 'relacionar') respuestas[e.id] = Object.fromEntries(e.pares);
+  });
+  const r = actividades.puntuar(sql, respuestas);
+  assert.strictEqual(r.porcentaje, 100);
+  assert.strictEqual(r.aprobado, true);
+});
+
+// Responde correctamente cualquier actividad del catálogo, sin hardcodear tipos.
+function respuestasCorrectas(a) {
+  const out = {};
+  a.ejercicios.forEach((e) => {
+    if (e.tipo === 'test') out[e.id] = e.correcta;
+    if (e.tipo === 'verdadero_falso') out[e.id] = e.correcta;
+    if (e.tipo === 'escrita') out[e.id] = (e.respuestas || [])[0];
+    if (e.tipo === 'sql' || e.tipo === 'excel') out[e.id] = e.esperado;
+    if (e.tipo === 'ordenar') out[e.id] = e.correcta;
+    if (e.tipo === 'relacionar') out[e.id] = Object.fromEntries(e.pares);
+  });
+  return out;
+}
+
+test('actividades: comprobar un ejercicio no revela la solución', () => {
+  const mal = actividades.comprobarEjercicio('sql-basico', 'e4', 'select nombre from usuarios');
+  assert.strictEqual(mal.ok, false);
+  assert.strictEqual(mal.obtenidos, 0);
+  assert.strictEqual(mal.maximo, 20);
+  assert.ok(!JSON.stringify(mal).includes('usuarios'), 'no filtra la respuesta esperada');
+
+  const bien = actividades.comprobarEjercicio('sql-basico', 'e4', 'SELECT * FROM usuarios;');
+  assert.strictEqual(bien.ok, true);
+  assert.strictEqual(bien.obtenidos, 20);
+
+  assert.throws(() => actividades.comprobarEjercicio('no-existe', 'e1', 0), /actividad_no_encontrada/);
+  assert.throws(() => actividades.comprobarEjercicio('sql-basico', 'no-existe', 0), /ejercicio_no_encontrado/);
+});
+
+test('actividades: la revisión completa solo llega al cerrar el intento', async () => {
+  sinSupabase();
+  const dip = 'DIP-TEST-REVISION';
+  const a = actividades.actividad('ciber-fundamentos');
+  const salida = await actividades.enviarIntento(dip, a.id, respuestasCorrectas(a));
+
+  assert.strictEqual(salida.resultado.aprobado, true);
+  assert.strictEqual(salida.revision.length, a.ejercicios.length);
+  assert.ok(salida.revision.some((e) => e.solucion), 'la revisión explica la respuesta correcta');
+
+  // el estado guardado no puede contener soluciones: se consulta por GET
+  const guardado = JSON.stringify(await actividades.estado(dip));
+  assert.ok(!/solucion/.test(guardado), 'el estado no filtra soluciones');
+  assert.ok(!/esperado/.test(guardado), 'el estado no filtra la respuesta esperada');
+
+  // la recompensa no se paga sola: queda como orden pendiente para el Banco
+  assert.strictEqual(salida.recompensaPendiente, 35);
+  assert.strictEqual(salida.bonusPendiente, 15);
+});
+
+test('tesoreria: las recompensas quedan como órdenes pendientes del Banco', async () => {
+  sinSupabase();
+  delete process.env.PLACETA_JOVEN_CUENTA_BUSINESS;
+  const tesoreria = require('../lib/tesoreria');
+  const dip = 'DIP-TEST-TESORERIA';
+  const a = actividades.actividad('ciber-fundamentos');
+  await actividades.enviarIntento(dip, a.id, respuestasCorrectas(a));
+
+  const t = await tesoreria.estado(dip);
+  assert.strictEqual(t.ordenesPendientes.length, 1);
+  assert.strictEqual(t.ordenesPendientes[0].estado, 'PENDIENTE_BANCO');
+  assert.strictEqual(t.ordenesPendientes[0].origen, 'actividad');
+  assert.strictEqual(t.totalPendientePz, 50);
+  // sin cuenta configurada no se inventa ningún saldo, solo se avisa
+  assert.strictEqual(t.cuenta.lista, false);
+  assert.ok(t.aviso);
+  assert.strictEqual(t.flujos.find((f) => f.id === 'becas').direccion, 'entrada', 'las becas las paga la Administración');
+
+  process.env.PLACETA_JOVEN_CUENTA_BUSINESS = 'PJ-BUSINESS-1';
+  const conCuenta = await tesoreria.estado(dip);
+  assert.strictEqual(conCuenta.cuenta.lista, true);
+  assert.strictEqual(conCuenta.cuenta.cuentaBusiness, 'PJ-BUSINESS-1');
+  assert.strictEqual(conCuenta.aviso, null);
+  delete process.env.PLACETA_JOVEN_CUENTA_BUSINESS;
+});
+
+test('caminos: las actividades son pasos del camino y se completan al aprobarlas', async () => {
+  sinSupabase();
+  const caminos = require('../lib/caminos');
+  const lista = await caminos.catalogo();
+  const ciber = lista.find((c) => c.id === 'ciberseguridad');
+  const planos = caminos.elementosDe(ciber);
+  const act = planos.find((e) => e.tipo === 'actividad');
+  assert.ok(act, 'el camino incluye actividades');
+  assert.strictEqual(act.id, 'act-' + act.actividadId);
+  assert.strictEqual(act.recompensa, 0, 'la recompensa la paga la actividad, no el camino');
+  assert.deepStrictEqual(act.requisitos, [], 'la práctica no depende de trámites externos');
+
+  const dip = 'DIP-TEST-CAMINOS';
+  const elemento = async (id) => (await caminos.estado(dip)).progreso
+    .find((p) => p.caminoId === 'ciberseguridad').elementos.find((e) => e.id === id);
+
+  assert.strictEqual((await elemento(act.id)).estado, 'DISPONIBLE', 'se puede empezar el primer día');
+  // una actividad encadenada a otra sí espera a la anterior
+  const encadenada = planos.find((e) => e.tipo === 'actividad' && (e.requisitos || []).length);
+  assert.ok(encadenada);
+  assert.strictEqual((await elemento(encadenada.id)).estado, 'BLOQUEADO');
+
+  const a = actividades.actividad(act.actividadId);
+  const salida = await actividades.enviarIntento(dip, a.id, respuestasCorrectas(a));
+  assert.strictEqual(salida.resultado.aprobado, true);
+
+  assert.strictEqual((await elemento(act.id)).estado, 'COMPLETADO', 'aprobar la actividad avanza el camino');
+  assert.strictEqual((await elemento(encadenada.id)).estado, 'DISPONIBLE', 'desbloquea el siguiente paso');
+});

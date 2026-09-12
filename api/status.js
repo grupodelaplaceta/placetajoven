@@ -4,6 +4,7 @@
 const { edadOk, docVigente, pendienteCaducada } = require('../lib/placetajoven');
 const cfg = require('../config/placetajoven.json');
 const store = require('../lib/store');
+const tesoreria = require('../lib/tesoreria');
 const { setCors, json, handleOptions, requiereUsuario } = require('./_util');
 
 const EURO = (n) => n.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
@@ -88,6 +89,7 @@ module.exports = async (req, res) => {
         sigueVigente: true,
         requiereAlta: false,
         pendienteCaducada: false,
+        tesoreria: await tesoreria.estado(dip),
         keys: [],
         test: true
       });
@@ -129,6 +131,7 @@ module.exports = async (req, res) => {
       sigueVigente: vigente,
       requiereAlta: requiereAlta,
       pendienteCaducada: !!pendienteMuerta,
+      tesoreria: await tesoreria.estado(dip, doc),
       keys: keysPublicas(doc)
     });
   } catch (e) {
