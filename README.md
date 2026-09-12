@@ -132,6 +132,8 @@ Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas com
 | GET | `/api/caminos` | Caminos formativos, cursos y estado de convalidaciones |
 | POST | `/api/caminos` | Solicitar convalidación de un curso o actividad externa |
 | POST | `/api/cuenta-joven` | Solicitar apertura contractual de Cuenta Joven vía Banco/PlacetaID |
+| GET | `/api/protecciones` | Catálogo informativo de propuestas de protección |
+| POST | `/api/protecciones` | Registrar interés del usuario, sin contratación |
 | POST | `/api/alta` | Checkout para darse de alta (`{ plan }`) |
 | POST | `/api/renovar` | Checkout para renovar |
 | POST | `/api/cancelar` | Cancelar (mantiene las ventajas hasta fin de período) |
@@ -172,6 +174,13 @@ El modo se bloquea automáticamente cuando `VERCEL_ENV=production` o
 La integración bancaria usa `PLACETA_BANCO_API_URL` y `PLACETA_BANCO_API_KEY`.
 Si no están configuradas, la solicitud de Cuenta Joven devuelve `banco_no_configurado`
 y no se simula ninguna cuenta ni movimiento de Pz.
+
+## Protecciones
+
+La sección Protecciones es actualmente un catálogo de interés, no un seguro
+contratable. No publica primas, coberturas contractuales ni exclusiones hasta
+que exista una aseguradora autorizada, producto aprobado, documentación legal
+y un flujo de firma integrado con PlacetaID.
 
 ## Despliegue (Vercel)
 

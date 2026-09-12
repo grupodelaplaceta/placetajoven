@@ -19,6 +19,7 @@ const API = new Map([
   ['/api/keys', require('../api/keys')]
   ,['/api/caminos', require('../api/caminos')]
   ,['/api/cuenta-joven', require('../api/cuenta-joven')]
+  ,['/api/protecciones', require('../api/protecciones')]
 ]);
 
 const MIME = {

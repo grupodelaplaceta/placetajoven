@@ -35,6 +35,7 @@
     recompensas: [],     // catálogo
     caminos: [],         // caminos formativos
     caminosEstado: { caminos: {}, convalidaciones: [], recompensasPendientes: [] },
+    protecciones: [],
     demo: false,         // el catálogo viene de ejemplo (sin Supabase)
     filtro: 'todos',
     busqueda: '',
@@ -153,13 +154,14 @@
     { id: 'formacion', label: 'Formación', icon: 'grad', href: 'formacion.html' },
     { id: 'empleo', label: 'Empleo y futuro', icon: 'brief', href: 'empleo.html', soon: true },
     { id: 'beneficios', label: 'Beneficios', icon: 'pad', href: 'beneficios.html' },
+    { id: 'protecciones', label: 'Protecciones', icon: 'shield', href: 'protecciones.html' },
     { id: 'miplaceta', label: 'Mi Placeta', icon: 'coin', href: 'miplaceta.html' },
     { id: 'rutas', label: 'Rutas', icon: 'route', href: 'rutas.html', soon: true, grupo: 'Crece' },
     { id: 'comunidad', label: 'Comunidad', icon: 'users', href: 'comunidad.html', soon: true }
   ];
   var TITULOS = {
     inicio: 'Inicio', formacion: 'Formación', empleo: 'Empleo y futuro',
-    beneficios: 'Beneficios', miplaceta: 'Mi Placeta', rutas: 'Rutas', comunidad: 'Comunidad'
+    beneficios: 'Beneficios', protecciones: 'Protecciones', miplaceta: 'Mi Placeta', rutas: 'Rutas', comunidad: 'Comunidad'
   };
 
   /* ── Datos de contenido (catálogos propios de la interfaz) ────────── */
@@ -982,6 +984,15 @@
     return html;
   }
 
+  function pageProtecciones() {
+    var items = App.protecciones.length ? App.protecciones : [];
+    return '<div class="page">' + pageHead('Protecciones', 'Ideas de protección para jóvenes. Solo se activarán cuando exista una aseguradora y un contrato válido.', '<span class="tag tag-amber">En preparación</span>')
+      + '<div class="alert">' + ico('alert') + '<p><b>Esto no es una póliza.</b> Aquí puedes dejar interés. No hay precio, cobertura ni contratación activa.</p></div>'
+      + '<div class="grid g-3">' + (items.length ? items.map(function (p) {
+        return '<article class="item"><div class="item-top"><span class="item-cover cyan">' + ico(p.icono || 'shield') + '</span><div class="item-h"><h3>' + esc(p.nombre) + '</h3><p>' + esc(p.resumen) + '</p></div></div><p class="fine">' + esc(p.nota) + '</p><div class="item-foot"><button class="btn btn-ghost btn-sm" type="button" data-action="interes-proteccion" data-id="' + esc(p.id) + '">Me interesa</button></div></article>';
+      }).join('') : '<div class="empty" style="grid-column:1/-1"><b>No hay propuestas publicadas</b></div>') + '</div></div>';
+  }
+
   /* ── Rutas ────────────────────────────────────────────────────────── */
   function pageRutas() {
     var rutas = App.caminos.length ? App.caminos : RUTAS.map(function (r) { return { id: r.id, nombre: r.nombre, descripcion: r.desc, nivel: 'Propuesta', recompensaFinal: 0, cursos: r.pasos.map(function (p, i) { return { id: r.id + '-' + i, titulo: p, proveedor: 'Placeta Joven', tipo: 'interno', recompensa: 0, convalidable: false }; }) }; });
@@ -1067,6 +1078,7 @@
     formacion: pageFormacion,
     empleo: pageEmpleo,
     beneficios: pageBeneficios,
+    protecciones: pageProtecciones,
     miplaceta: pageMiPlaceta,
     rutas: pageRutas,
     comunidad: pageComunidad
@@ -1278,6 +1290,7 @@
       case 'canjear': accionCanjear(t.getAttribute('data-id'), t); break;
       case 'solicitar-convalidacion': accionConvalidar(t.getAttribute('data-camino')); break;
       case 'cuenta-joven': accionCuentaJoven(t); break;
+      case 'interes-proteccion': api('protecciones', { method: 'POST', body: JSON.stringify({ proteccionId: t.getAttribute('data-id') }) }).then(function () { t.textContent = 'Interés registrado'; t.disabled = true; }).catch(function (e) { pintarError(e); }); break;
       case 'filtrar-recompensa':
         App.filtro = t.getAttribute('data-cat');
         actualizarCatalogo();
@@ -1409,6 +1422,10 @@
     } catch (e) {
       App.caminos = [];
     }
+    try {
+      var proteccionesRes = await api('protecciones');
+      App.protecciones = Array.isArray(proteccionesRes.protecciones) ? proteccionesRes.protecciones : [];
+    } catch (e) { App.protecciones = []; }
     render();
 
     if (new URLSearchParams(window.location.search).get('pago') === 'ok') {
