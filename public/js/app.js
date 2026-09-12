@@ -36,6 +36,7 @@
     caminos: [],         // caminos formativos
     caminosEstado: { caminos: {}, convalidaciones: [], recompensasPendientes: [] },
     protecciones: [],
+    becas: [],
     demo: false,         // el catálogo viene de ejemplo (sin Supabase)
     filtro: 'todos',
     busqueda: '',
@@ -155,13 +156,14 @@
     { id: 'empleo', label: 'Empleo y futuro', icon: 'brief', href: 'empleo.html', soon: true },
     { id: 'beneficios', label: 'Beneficios', icon: 'pad', href: 'beneficios.html' },
     { id: 'protecciones', label: 'Protecciones', icon: 'shield', href: 'protecciones.html' },
+    { id: 'becas', label: 'Becas', icon: 'gift', href: 'becas.html' },
     { id: 'miplaceta', label: 'Mi Placeta', icon: 'coin', href: 'miplaceta.html' },
     { id: 'rutas', label: 'Rutas', icon: 'route', href: 'rutas.html', soon: true, grupo: 'Crece' },
     { id: 'comunidad', label: 'Comunidad', icon: 'users', href: 'comunidad.html', soon: true }
   ];
   var TITULOS = {
     inicio: 'Inicio', formacion: 'Formación', empleo: 'Empleo y futuro',
-    beneficios: 'Beneficios', protecciones: 'Protecciones', miplaceta: 'Mi Placeta', rutas: 'Rutas', comunidad: 'Comunidad'
+    beneficios: 'Beneficios', protecciones: 'Protecciones', becas: 'Becas', miplaceta: 'Mi Placeta', rutas: 'Rutas', comunidad: 'Comunidad'
   };
 
   /* ── Datos de contenido (catálogos propios de la interfaz) ────────── */
@@ -993,6 +995,27 @@
       }).join('') : '<div class="empty" style="grid-column:1/-1"><b>No hay propuestas publicadas</b></div>') + '</div></div>';
   }
 
+  function pageBecas() {
+    var opciones = [];
+    App.caminos.forEach(function (camino) { (camino.etapas || []).forEach(function (etapa) { (etapa.elementos || []).forEach(function (elemento) { opciones.push({ camino: camino, elemento: elemento }); }); }); });
+    var historial = App.becas || [];
+    var html = '<div class="page">' + pageHead('Becas', 'Pide ayuda para un elemento formativo. La Junta revisa tu situación y deja el resultado explicado.', '<span class="tag tag-cyan">Solicitud clara</span>')
+      + '<section class="pnl"><div class="pnl-head"><span class="card-ico mint">' + ico('gift') + '</span><div><h2>Solicitar una beca</h2><p>Los Pz, las keys y la actividad no cambian tu necesidad económica.</p></div></div>'
+      + '<form id="becaForm" class="grid g-2"><label>Elemento formativo<select id="becaElemento" required>' + opciones.map(function (o) { return '<option value="' + esc(o.camino.id + '|' + o.elemento.id) + '">' + esc(o.elemento.titulo + ' · ' + o.camino.nombre) + '</option>'; }).join('') + '</select></label>'
+      + '<label>Personas en la unidad<input id="becaPersonas" type="number" min="1" value="1" required /></label>'
+      + '<label>Renta por persona (0–40)<input id="becaRenta" type="number" min="0" max="40" value="0" required /></label>'
+      + '<label>Situación laboral (0–15)<input id="becaLaboral" type="number" min="0" max="15" value="0" required /></label>'
+      + '<label>Personas dependientes (0–15)<input id="becaDependientes" type="number" min="0" max="15" value="0" required /></label>'
+      + '<label>Vulnerabilidad económica (0–15)<input id="becaVulnerabilidad" type="number" min="0" max="15" value="0" required /></label>'
+      + '<label>Patrimonio y recursos (0–10)<input id="becaPatrimonio" type="number" min="0" max="10" value="0" required /></label>'
+      + '<label>Gastos esenciales (0–5)<input id="becaGastos" type="number" min="0" max="5" value="0" required /></label>'
+      + '<label class="grid-span-2">Documentación o contexto<input id="becaDocs" type="text" placeholder="Ej. certificado de desempleo, alquiler…" /></label>'
+      + '<div class="gate-act grid-span-2" style="justify-content:flex-start"><button class="btn btn-primary" type="submit">Enviar solicitud</button></div></form></section>'
+      + '<section class="pnl"><div class="pnl-head"><span class="card-ico">' + ico('file') + '</span><div><h2>Mi historial</h2><p>Verás qué se ha aceptado o denegado y por qué.</p></div></div>'
+      + (historial.length ? historial.map(function (b) { return '<article class="row"><span class="row-ico ' + (b.estado === 'ACEPTADA' ? 'ok' : (b.estado === 'DENEGADA' ? 'warn' : 'cyan')) + '">' + ico(b.estado === 'ACEPTADA' ? 'check' : 'file') + '</span><div class="row-txt"><b>' + esc(b.elemento) + '</b><span>' + esc(b.estado) + ' · INB ' + b.inb + ' · beca aplicada ' + b.porcentajeAplicado + '%</span><span>' + (b.motivo ? esc(b.motivo) : 'Pendiente de revisión') + '</span></div></article>'; }).join('') : '<div class="empty"><b>Aún no tienes solicitudes</b><p>Cuando envíes una, quedará guardada con todos sus datos.</p></div>') + '</section></div>';
+    return html;
+  }
+
   /* ── Rutas ────────────────────────────────────────────────────────── */
   function pageRutas() {
     var rutas = App.caminos;
@@ -1082,6 +1105,7 @@
     empleo: pageEmpleo,
     beneficios: pageBeneficios,
     protecciones: pageProtecciones,
+    becas: pageBecas,
     miplaceta: pageMiPlaceta,
     rutas: pageRutas,
     comunidad: pageComunidad
@@ -1257,6 +1281,22 @@
     });
   }
 
+  function accionSolicitarBeca() {
+    var seleccion = String(document.getElementById('becaElemento').value || '').split('|');
+    return api('becas', { method: 'POST', body: JSON.stringify({
+      caminoId: seleccion[0], elementoId: seleccion[1],
+      indicadores: {
+        renta: document.getElementById('becaRenta').value,
+        laboral: document.getElementById('becaLaboral').value,
+        dependientes: document.getElementById('becaDependientes').value,
+        vulnerabilidad: document.getElementById('becaVulnerabilidad').value,
+        patrimonio: document.getElementById('becaPatrimonio').value,
+        gastos: document.getElementById('becaGastos').value
+      },
+      documentacion: [document.getElementById('becaDocs').value]
+    }) }).then(function (data) { App.becas.unshift(data.beca); render(); });
+  }
+
   /* ── Eventos (delegación) ─────────────────────────────────────────── */
   document.addEventListener('click', function (ev) {
     var t = ev.target.closest('[data-action]');
@@ -1320,6 +1360,13 @@
     if (ev.target && ev.target.id === 'aceptoRecompensa') {
       var b = ROOT.querySelector('[data-action="canjear"]');
       if (b) b.disabled = !ev.target.checked;
+    }
+  });
+
+  document.addEventListener('submit', function (ev) {
+    if (ev.target && ev.target.id === 'becaForm') {
+      ev.preventDefault();
+      accionSolicitarBeca().catch(function (error) { pintarError(error); });
     }
   });
 
@@ -1431,6 +1478,10 @@
       var proteccionesRes = await api('protecciones');
       App.protecciones = Array.isArray(proteccionesRes.protecciones) ? proteccionesRes.protecciones : [];
     } catch (e) { App.protecciones = []; }
+    try {
+      var becasRes = await api('becas');
+      App.becas = Array.isArray(becasRes.becas) ? becasRes.becas : [];
+    } catch (e) { App.becas = []; }
     render();
 
     if (new URLSearchParams(window.location.search).get('pago') === 'ok') {

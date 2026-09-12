@@ -134,6 +134,9 @@ Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas com
 | POST | `/api/cuenta-joven` | Solicitar apertura contractual de Cuenta Joven vía Banco/PlacetaID |
 | GET | `/api/protecciones` | Catálogo informativo de propuestas de protección |
 | POST | `/api/protecciones` | Registrar interés del usuario, sin contratación |
+| GET | `/api/becas` | Historial personal de solicitudes y baremo aplicado |
+| POST | `/api/becas` | Crear solicitud de beca con INB y desglose económico |
+| POST | `/api/becas` | Resolver desde la Junta usando `X-Junta-API-Key` y `accion=resolver` |
 | POST | `/api/alta` | Checkout para darse de alta (`{ plan }`) |
 | POST | `/api/renovar` | Checkout para renovar |
 | POST | `/api/cancelar` | Cancelar (mantiene las ventajas hasta fin de período) |
@@ -179,6 +182,10 @@ Los caminos consumen `GET {PLACETAEDU_API_URL}/pathways` cuando
 `PLACETAEDU_API_URL` está configurada. Placeta Joven organiza esos elementos,
 pero PlacetaEDU conserva la fuente de verdad de cursos, actividades, progreso y
 certificados.
+
+Las becas se registran en la API propia con expediente completo: indicadores,
+INB, nivel reconocido, PMB del elemento, porcentaje aplicado, importes,
+documentación, estado y motivo de resolución. Una denegación exige motivo.
 
 ## Protecciones
 
