@@ -466,6 +466,25 @@ test('carnet: cada bloque perdona un fallo, ni cero ni dos', () => {
   });
 });
 
+test('caminos: un recurso de apoyo no cuenta como paso ni bloquea nada', async () => {
+  sinSupabase();
+  const caminos = require('../lib/caminos');
+  const lista = await caminos.catalogo();
+  const b = lista.find((c) => c.id === 'carnet-b');
+  const todos = caminos.elementosDe(b);
+  const recursos = todos.filter((e) => e.tipo === 'recurso');
+  assert.ok(recursos.length >= 1, 'el camino enlaza a los test oficiales de la DGT');
+
+  const progreso = (await caminos.estado('DIP-TEST-RECURSO')).progreso.find((p) => p.caminoId === 'carnet-b');
+  assert.strictEqual(progreso.total, todos.length - recursos.length, 'solo los pasos de verdad cuentan');
+  assert.ok(progreso.total > 0);
+  // Si un recurso contara, el camino nunca podría llegar al 100 %.
+  recursos.forEach((r) => {
+    assert.ok(!progreso.elementos.some((e) => e.id === r.id), 'el recurso no entra en el progreso: ' + r.id);
+  });
+  assert.ok(progreso.porcentaje === 0);
+});
+
 test('carnet: se puede suspender y volver a intentarlo', async () => {
   sinSupabase();
   const dip = 'DIP-TEST-CARNET';

@@ -192,49 +192,62 @@
     { icon: 'book', titulo: 'Noticias', texto: 'Novedades del programa, colaboraciones nuevas y convocatorias.', estado: 'En preparación' }
   ];
 
-  /* ── Shell (barra lateral + cabecera) ─────────────────────────────── */
-  function sideHtml() {
-    var nombre = nombreUsuario();
+  /* ── Armazón: cabecera de plataforma ──────────────────────────────────
+     Placeta Joven se navega como una plataforma (cabecera arriba y contenido
+     a lo ancho), no como un panel de trabajo con barra lateral. */
+  function navItems(clase, soloPronto) {
     var items = '';
     NAV.forEach(function (n) {
-      if (n.grupo) items += '<p class="side-group">' + esc(n.grupo) + '</p>';
-      items += '<a class="side-item' + (n.id === PAGE ? ' is-on' : '') + '" href="' + n.href + '"'
+      if (soloPronto === true && !n.soon) return;
+      if (soloPronto === false && n.soon) return;
+      items += '<a class="' + clase + '-item' + (n.id === PAGE ? ' is-on' : '') + '" href="' + n.href + '"'
         + (n.id === PAGE ? ' aria-current="page"' : '') + '>' + ico(n.icon)
         + '<span>' + esc(n.label) + '</span>'
-        + (n.soon ? '<span class="soon">En preparación</span>' : '') + '</a>';
+        + (n.soon ? '<i class="soon">Pronto</i>' : '') + '</a>';
     });
-    return '<aside class="side" id="side" aria-label="Secciones">'
-      + '<a class="side-brand" href="../index.html">'
-      + '<img src="../img/jovenlogo.png" alt="" />'
-      + '<span><b>Placeta Joven</b><span>Mi espacio</span></span></a>'
-      + '<nav class="side-nav">' + items + '</nav>'
-      + '<div class="side-foot">'
-      + '<a href="../index.html">← Web pública</a>'
-      + '<a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a>'
-      + '<span class="fine">' + esc(nombre || 'Sesión PlacetaID') + '</span>'
-      + '</div></aside>'
-      + '<div class="side-backdrop" id="sideBackdrop"></div>';
+    return items;
   }
 
-  function topHtml() {
+  function headerHtml() {
     var nombre = nombreUsuario();
     var saldo = saldoPz();
     var plan = (App.st && App.st.planInfo && App.st.planInfo.etiqueta) || 'Placeta Joven';
-    return '<header class="app-top">'
-      + '<div class="app-top-l">'
-      + '<button class="icon-btn" id="sideToggle" type="button" aria-label="Abrir menú" aria-controls="side">' + ico('menu') + '</button>'
-      + '<p class="crumb">Mi espacio · <b>' + esc(TITULOS[PAGE] || 'Inicio') + '</b></p>'
-      + '</div>'
-      + '<div class="app-top-r">'
-      + '<span class="pz-pill" title="' + (saldo === null ? 'Tu Cuenta Joven de Banco de La Placeta es la que guarda el saldo en Placetas' : 'Saldo de tu Cuenta Joven · Banco de La Placeta') + '">'
-      + ico('coin') + (saldo === null ? '— Pz' : num(saldo) + ' Pz') + '<small>PZ</small></span>'
-      + '<span class="user" title="' + esc(plan) + '">'
+    var primerNombre = (nombre || 'Joven').split(/\s+/)[0];
+    return '<header class="topbar" id="topbar">'
+      + '<div class="topbar-in">'
+      + '<a class="brand" href="inicio.html" aria-label="Placeta Joven">'
+      + '<img src="../img/jovenlogo.png" alt="" />'
+      + '<span class="brand-txt"><b>Placeta Joven</b><span>' + esc(TITULOS[PAGE] || 'Inicio') + '</span></span></a>'
+      + '<nav class="topnav" aria-label="Secciones">' + navItems('topnav', false)
+      + '<div class="moremenu">'
+      + '<button class="topnav-item" type="button" data-action="menu-mas" aria-expanded="false" aria-controls="masPanel">'
+      + ico('spark') + '<span>Más</span>' + ico('down') + '</button>'
+      + '<div class="usermenu-panel" id="masPanel" hidden>' + navItems('usermenu', true) + '</div>'
+      + '</div></nav>'
+      + '<div class="topbar-r">'
+      + '<span class="pz-pill" title="' + (saldo === null ? 'Tu Cuenta Joven de Banco de La Placeta guarda el saldo en Placetas' : 'Saldo de tu Cuenta Joven · Banco de La Placeta') + '">'
+      + ico('coin') + (saldo === null ? '—' : num(saldo)) + '<small>PZ</small></span>'
+      + '<div class="usermenu">'
+      + '<button class="user" type="button" data-action="menu-usuario" aria-expanded="false" aria-controls="userPanel">'
       + '<span class="user-ava">' + esc(iniciales(nombre)) + '</span>'
-      + '<span class="user-txt"><b>' + esc((nombre || 'Joven').split(/\s+/)[0]) + '</b><span>' + esc(plan) + '</span></span>'
-      + '</span>'
-      + '<button class="icon-btn danger" type="button" data-action="logout" aria-label="Cerrar sesión PlacetaID">' + ico('out') + '</button>'
-      + '</div></header>';
+      + '<span class="user-txt"><b>' + esc(primerNombre) + '</b><span>' + esc(plan) + '</span></span>'
+      + ico('down') + '</button>'
+      + '<div class="usermenu-panel" id="userPanel" hidden>'
+      + '<a href="miplaceta.html">' + ico('coin') + 'Mi Placeta</a>'
+      + '<a href="rutas.html">' + ico('route') + 'Mis caminos</a>'
+      + '<a href="becas.html">' + ico('gift') + 'Mis becas</a>'
+      + '<a href="../index.html">' + ico('home') + 'Web pública</a>'
+      + '<a href="mailto:joven@laplaceta.org">' + ico('file') + 'Ayuda</a>'
+      + '<button type="button" data-action="logout" class="is-danger">' + ico('out') + 'Cerrar sesión</button>'
+      + '</div></div>'
+      + '<button class="icon-btn" id="navToggle" type="button" aria-label="Abrir menú" aria-controls="navDrawer" aria-expanded="false">' + ico('menu') + '</button>'
+      + '</div></div>'
+      + '<nav class="navdrawer" id="navDrawer" aria-label="Secciones" hidden>' + navItems('navdrawer') + '</nav>'      + '</header>';
   }
+
+  function plural(n, singular, prural) { return Number(n) === 1 ? singular : (prural || singular + 's'); }
+  function pasos(n) { return n + ' ' + plural(n, 'paso'); }
+  function elementos(n) { return n + ' ' + plural(n, 'elemento'); }
 
   /* Saldo de Placetas. Vive en la Cuenta Joven del titular en Banco de La
      Placeta. La API todavía no lo expone: si llega en /api/status (st.saldo),
@@ -251,10 +264,13 @@
   }
 
   function shellHtml(contenido) {
-    return '<div class="shell">' + sideHtml()
-      + '<div class="app-main">' + topHtml()
+    return '<div class="shell">' + headerHtml()
       + '<main class="app-body" id="main">' + contenido + '</main>'
-      + '</div></div>';
+      + '<footer class="app-foot">'
+      + '<span><b>Placeta Joven</b> · programa joven de La Placeta</span>'
+      + '<span><a href="../index.html">Web pública</a> · <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a></span>'
+      + '</footer>'
+      + '</div>';
   }
 
   /* ── Puertas (estados sin suscripción activa) ─────────────────────── */
@@ -1165,28 +1181,61 @@
     }
     if (App.caminoSeleccionado) return detalleCamino(App.caminoSeleccionado);
     var html = '<div class="page">'
-      + pageHead('Caminos formativos', 'Elige una meta. El camino ordena cursos, actividades y proyectos sin duplicarlos.', '<span class="tag tag-cyan">Activo</span>');
+      + pageHead('Caminos formativos', 'Elige una meta. El camino ordena cursos, actividades y proyectos sin duplicarlos.', '<span class="tag tag-cyan">' + rutas.length + ' disponibles</span>');
 
-    html += '<div class="grid g-3">'
-      + rutas.map(function (r) {
-          var p = progreso.filter(function (item) { return item.caminoId === r.id; })[0] || { completados: 0, total: 0, porcentaje: 0, elementos: [] };
-          var items = (r.etapas || []).reduce(function (all, etapa) { return all.concat((etapa.elementos || []).map(function (item) { return Object.assign({}, item, { etapa: etapa.nombre }); })); }, []);
-          return '<article class="item">'
-            + '<div class="item-top"><span class="item-cover">' + ico('route') + '</span>'
-            + '<div class="item-h"><h3>' + esc(r.nombre) + '</h3><p>' + esc(r.descripcion || '') + '</p></div></div>'
-            + '<div class="pbar" style="margin:.9rem 0 .35rem"><i style="width:' + p.porcentaje + '%"></i></div><div class="pbar-meta"><span>' + p.completados + ' de ' + p.total + ' elementos</span><b>' + p.porcentaje + ' %</b></div>'
-            + '<div class="tl">' + (r.etapas || []).map(function (etapa) {
-                return '<div class="tl-item"><span class="tl-dot">' + esc(etapa.id.slice(0, 1).toUpperCase()) + '</span><div class="tl-txt"><b>' + esc(etapa.nombre) + '</b><span>' + etapa.elementos.length + ' elementos</span></div></div>';
-              }).join('') + '</div>'
-            + '<div class="item-meta"><span class="tag tag-cyan">' + esc(r.nivel || 'Ruta') + '</span><span class="tag">+' + num(r.recompensaFinal || 0) + ' Pz al completar</span></div>'
-            + '<div class="item-foot"><button class="btn btn-primary btn-sm" type="button" data-action="abrir-camino" data-camino="' + esc(r.id) + '">Continuar camino</button></div>'
-            + '</article>';
-        }).join('')
-      + '</div>';
+    html += '<div class="grid g-3">' + rutas.map(tarjetaCamino).join('') + '</div>';
+
     html += '<section class="pnl" style="margin-top:1rem"><div class="pnl-head"><span class="card-ico">' + ico('check') + '</span><div><h2>Convalidaciones</h2><p>Las revisa el equipo antes de conceder la recompensa.</p></div></div>' + ((App.caminosEstado.convalidaciones || []).length ? App.caminosEstado.convalidaciones.map(function (s) { return '<div class="row"><span class="row-ico warn">' + ico('clock') + '</span><div class="row-txt"><b>' + esc(s.curso) + '</b><span>' + esc(s.proveedor) + ' · ' + esc(s.estado) + '</span></div></div>'; }).join('') : '<div class="empty"><b>Aún no tienes solicitudes</b><p>Presenta un curso externo y adjunta una referencia o certificado.</p></div>') + '</section>'
       + '</div>';
     return html;
   }
+
+  /* Tarjeta de camino: qué es, cuánto llevas y cuál es el siguiente paso. */
+  function tarjetaCamino(r) {
+    var progreso = (App.caminosEstado.progreso || []).filter(function (item) { return item.caminoId === r.id; })[0] || { completados: 0, total: 0, porcentaje: 0, elementos: [] };
+    var estados = progreso.elementos || [];
+    var etapas = (r.etapas || []).filter(function (e) { return e && e.elementos; });
+    var hechos = estados.filter(function (e) { return e.estado === 'COMPLETADO'; }).length;
+    var empezado = hechos > 0;
+
+    var pasos = etapas.map(function (etapa, i) {
+      var ids = (etapa.elementos || []).filter(function (el) { return el && el.tipo !== 'recurso'; }).map(function (el) { return el.id; });
+      var hechosEtapa = ids.filter(function (id) {
+        var st = estados.filter(function (e) { return e.id === id; })[0];
+        return st && st.estado === 'COMPLETADO';
+      }).length;
+      var enCurso = ids.some(function (id) {
+        var st = estados.filter(function (e) { return e.id === id; })[0];
+        return st && st.estado === 'DISPONIBLE';
+      });
+      var completo = ids.length > 0 && hechosEtapa === ids.length;
+      return '<li class="ps' + (completo ? ' is-done' : (enCurso ? ' is-now' : '')) + '">'
+        + '<span class="ps-num">' + (completo ? ico('check') : (i + 1)) + '</span>'
+        + '<span class="ps-name">' + esc(etapa.nombre) + '</span>'
+        + '<span class="ps-count">' + (completo ? 'Hecho' : hechosEtapa + '/' + ids.length) + '</span></li>';
+    }).join('');
+
+    return '<article class="pathway' + (empezado ? ' is-started' : '') + '">'
+      + '<header class="pathway-h">'
+      + '<span class="pathway-ico">' + ico('route') + '</span>'
+      + '<div class="pathway-h-txt"><h3>' + esc(r.nombre) + '</h3><p>' + esc(r.descripcion || '') + '</p></div>'
+      + '</header>'
+      + '<div class="pathway-tags">'
+      + '<span class="tag">' + esc(r.nivel || 'Ruta') + '</span>'
+      + '<span class="tag">' + pasos2(progreso.total) + '</span>'
+      + (r.recompensaFinal ? '<span class="tag tag-mint">+' + num(r.recompensaFinal) + ' Pz al completar</span>' : '')
+      + '</div>'
+      + '<div class="pathway-prog">'
+      + '<div class="pbar"><i style="width:' + progreso.porcentaje + '%"></i></div>'
+      + '<div class="pbar-meta"><span>' + hechos + ' de ' + progreso.total + ' hechos</span><b>' + progreso.porcentaje + ' %</b></div>'
+      + '</div>'
+      + '<ol class="pathway-steps">' + pasos + '</ol>'
+      + '<footer class="pathway-f">'
+      + '<button class="btn ' + (empezado ? 'btn-ghost' : 'btn-primary') + ' btn-sm btn-block" type="button" data-action="abrir-camino" data-camino="' + esc(r.id) + '">'
+      + ico('arrow') + (empezado ? 'Seguir donde lo dejaste' : 'Empezar el camino') + '</button>'
+      + '</footer></article>';
+  }
+  function pasos2(n) { return n + ' ' + plural(n, 'paso'); }
 
   function detalleCamino(camino) {
     var progreso = (App.caminosEstado.progreso || []).filter(function (item) { return item.caminoId === camino.id; })[0] || { elementos: [], porcentaje: 0 };
@@ -1210,30 +1259,35 @@
 
     (camino.etapas || []).forEach(function (etapa) {
       var items = (etapa.elementos || []).filter(Boolean);
-      var hechosEtapa = items.filter(function (el) {
+      var soloPasos = items.filter(function (el) { return el.tipo !== 'recurso'; });
+      var hechosEtapa = soloPasos.filter(function (el) {
         var st = estados.filter(function (it) { return it.id === el.id; })[0];
         return st && st.estado === 'COMPLETADO';
       }).length;
-      var esActual = items.some(function (el) {
+      var esActual = soloPasos.some(function (el) {
         var st = estados.filter(function (it) { return it.id === el.id; })[0];
         return st && st.estado === 'DISPONIBLE';
       });
-      var pct = items.length ? Math.round((hechosEtapa / items.length) * 100) : 0;
+      var pct = soloPasos.length ? Math.round((hechosEtapa / soloPasos.length) * 100) : 0;
+      var etapaHecha = soloPasos.length > 0 && hechosEtapa === soloPasos.length;
 
-      html += '<section class="stage' + (hechosEtapa === items.length && items.length ? ' is-done' : (esActual ? ' is-now' : '')) + '">'
-        + '<div class="stage-top"><span class="stage-num">' + (hechosEtapa === items.length && items.length ? '✓' : (++indice)) + '</span>'
-        + '<div class="stage-txt"><h2>' + esc(etapa.nombre) + '</h2><p>' + hechosEtapa + ' de ' + items.length + ' pasos</p></div>'
-        + '<span class="tag' + (esActual ? ' tag-cyan' : '') + '">' + (hechosEtapa === items.length && items.length ? 'Etapa hecha' : (esActual ? 'En curso' : 'Pendiente')) + '</span></div>'
+      html += '<section class="stage' + (etapaHecha ? ' is-done' : (esActual ? ' is-now' : '')) + '">'
+        + '<div class="stage-top"><span class="stage-num">' + (etapaHecha ? '✓' : (++indice)) + '</span>'
+        + '<div class="stage-txt"><h2>' + esc(etapa.nombre) + '</h2><p>' + (soloPasos.length ? hechosEtapa + ' de ' + soloPasos.length + ' ' + plural(soloPasos.length, 'paso') : 'Recursos de apoyo') + '</p></div>'
+        + '<span class="tag' + (esActual ? ' tag-cyan' : '') + '">' + (etapaHecha ? 'Etapa hecha' : (esActual ? 'En curso' : (soloPasos.length ? 'Pendiente' : 'Apoyo'))) + '</span></div>'
         + '<div class="stage-bar"><i style="width:' + pct + '%"></i></div>'
         + '<div class="grid g-2">';
 
       items.forEach(function (elemento) {
-        var estado = estados.filter(function (item) { return item.id === elemento.id; })[0] || { estado: 'BLOQUEADO' };
-        var bloqueado = estado.estado === 'BLOQUEADO';
-        var hecho = estado.estado === 'COMPLETADO';
         var esActividad = elemento.tipo === 'actividad';
         var esRecurso = elemento.tipo === 'recurso';
+        // Un recurso no es un paso: ni se completa ni se bloquea.
+        var estado = esRecurso
+          ? { estado: 'RECURSO' }
+          : (estados.filter(function (item) { return item.id === elemento.id; })[0] || { estado: 'BLOQUEADO' });
         var intento = esActividad ? estadoActividad(elemento.actividadId) : null;
+        var bloqueado = estado.estado === 'BLOQUEADO';
+        var hecho = estado.estado === 'COMPLETADO';
         html += '<article class="item pathway-element ' + (bloqueado ? 'is-locked' : '') + '">'
           + '<div class="item-top"><span class="item-cover ' + (hecho ? 'mint' : (esActividad ? 'cyan' : '')) + '">' + ico(hecho ? 'check' : (bloqueado ? 'lock' : (esActividad ? 'spark' : 'book'))) + '</span>'
           + '<div class="item-h"><h3>' + esc(elemento.titulo) + '</h3><p>' + esc(esActividad ? 'Actividad · ' + (elemento.ejercicios || 0) + ' ejercicios · ' + (elemento.minutos || 0) + ' min' : (elemento.proveedor || '')) + '</p></div></div>'
@@ -1244,7 +1298,7 @@
               : (esRecurso ? '<span class="tag">Recurso externo</span>' : '<span class="tag">+' + num(elemento.recompensa || 0) + ' Pz</span>' + (elemento.pmb != null ? '<span class="tag tag-cyan">Beca hasta ' + elemento.pmb + '%</span>' : '')))
           + (intento ? '<span class="tag">Nota ' + intento.mejorPorcentaje + '%</span>' : '')
           + '</div>'
-          + '<p class="fine">' + (bloqueado ? 'Se abre al completar: ' + esc(nombreReq(elemento.requisitos)) : (hecho ? 'Completado' : 'Disponible ahora')) + '</p>'
+          + '<p class="fine">' + (esRecurso ? esc(elemento.descripcion || 'Enlace de apoyo') : (bloqueado ? 'Se abre al completar: ' + esc(nombreReq(elemento.requisitos)) : (hecho ? 'Completado' : 'Disponible ahora'))) + '</p>'
           + '<div class="gate-act" style="justify-content:flex-start">'
           + (esActividad && !bloqueado ? '<button class="btn ' + (hecho ? 'btn-ghost' : 'btn-primary') + ' btn-sm" type="button" data-action="lr-abrir" data-actividad="' + esc(elemento.actividadId) + '" data-camino="' + esc(camino.id) + '" data-elemento="' + esc(elemento.id) + '">' + (hecho ? 'Volver a hacerla' : 'Hacer la actividad') + '</button>' : '')
           + (esRecurso && elemento.url ? '<a class="btn btn-ghost btn-sm" href="' + esc(elemento.url) + '" target="_blank" rel="noopener">Abrir en la DGT</a>' : '')
@@ -1652,7 +1706,7 @@
       case 'cv-guardar': cvGuardar(); break;
       case 'cv-limpiar': cvLimpiar(); break;
       case 'cv-imprimir': window.print(); break;
-      case 'toggle-side': toggleSide(); break;
+      case 'toggle-side': alternarCajon(); break;
       case 'tema': alternarTema(); break;
     }
   });
@@ -1720,19 +1774,54 @@
     pintarIconoTema();
   }
 
-  /* ── Menú lateral en móvil ────────────────────────────────────────── */
-  function toggleSide(force) {
-    var side = document.getElementById('side');
-    var bd = document.getElementById('sideBackdrop');
-    if (!side) return;
-    var abrir = typeof force === 'boolean' ? force : !side.classList.contains('is-open');
-    side.classList.toggle('is-open', abrir);
-    if (bd) bd.classList.toggle('is-open', abrir);
+  /* ── Menú de plataforma: desplegable de usuario y cajón en móvil ──── */
+  function cerrarMenus() {
+    var panel = document.getElementById('userPanel');
+    var boton = document.querySelector('[data-action="menu-usuario"]');
+    if (panel) panel.hidden = true;
+    if (boton) boton.setAttribute('aria-expanded', 'false');
+    var mas = document.getElementById('masPanel');
+    var botonMas = document.querySelector('[data-action="menu-mas"]');
+    if (mas) mas.hidden = true;
+    if (botonMas) botonMas.setAttribute('aria-expanded', 'false');
+    var cajon = document.getElementById('navDrawer');
+    var nav = document.getElementById('navToggle');
+    if (cajon) cajon.hidden = true;
+    if (nav) nav.setAttribute('aria-expanded', 'false');
+  }
+  function alternarMenu(idPanel, accion) {
+    var panel = document.getElementById(idPanel);
+    var boton = document.querySelector('[data-action="' + accion + '"]');
+    if (!panel) return;
+    var abrir = panel.hidden;
+    cerrarMenus();
+    panel.hidden = !abrir;
+    if (boton) boton.setAttribute('aria-expanded', String(abrir));
+  }
+  function alternarPanel() { alternarMenu('userPanel', 'menu-usuario'); }
+  function alternarMas() { alternarMenu('masPanel', 'menu-mas'); }
+  function alternarCajon() {
+    var cajon = document.getElementById('navDrawer');
+    var boton = document.getElementById('navToggle');
+    if (!cajon) return;
+    var abrir = cajon.hidden;
+    cerrarMenus();
+    cajon.hidden = !abrir;
+    if (boton) boton.setAttribute('aria-expanded', String(abrir));
   }
   document.addEventListener('click', function (ev) {
-    if (ev.target.closest('#sideToggle')) { toggleSide(); return; }
-    if (ev.target.closest('#sideBackdrop')) { toggleSide(false); return; }
-    if (ev.target.closest('#side a')) { toggleSide(false); }
+    if (ev.target.closest('#navToggle')) { alternarCajon(); return; }
+    if (ev.target.closest('[data-action="menu-usuario"]')) { alternarPanel(); return; }
+    if (ev.target.closest('[data-action="menu-mas"]')) { alternarMas(); return; }
+    if (ev.target.closest('#navDrawer a')) { cerrarMenus(); return; }
+    // Cualquier clic fuera cierra los desplegables.
+    if (!ev.target.closest('.usermenu') && !ev.target.closest('.moremenu')) {
+      var abierto = document.querySelector('.usermenu-panel:not([hidden])');
+      if (abierto) cerrarMenus();
+    }
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') cerrarMenus();
   });
 
   /* ── Render ───────────────────────────────────────────────────────── */
