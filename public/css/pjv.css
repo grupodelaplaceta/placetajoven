@@ -36,16 +36,18 @@
   --ambar:#B45309;
   --rojo:#BE123C;
 
-  --fondo:#0B0616;
-  --fondo-2:#120A24;
-  --fondo-3:#180E2E;
-  --superficie:rgba(255,255,255,.045);
-  --superficie-2:rgba(255,255,255,.075);
-  --linea:rgba(168,140,255,.18);
-  --linea-2:rgba(168,140,255,.3);
-  --txt:#F3EFFC;
-  --txt-2:#C3B9DD;
-  --txt-3:#8F84AC;
+  /* Superficies: base CLARA; el oscuro se reserva a barra lateral,
+     bloques de marca y elementos de código. */
+  --fondo:#FFFFFF;
+  --fondo-2:#F6F4FC;
+  --fondo-3:#EDE9F8;
+  --superficie:#FFFFFF;
+  --superficie-2:#FAF8FE;
+  --linea:#E6E1F3;
+  --linea-2:#D3CAEA;
+  --txt:#1B1428;
+  --txt-2:#544B6B;
+  --txt-3:#7E7595;
   --txt-inv:#FFFFFF;
 
   /* Sombras */
@@ -67,7 +69,7 @@
   --hdr-h:72px;
   --ease:cubic-bezier(.22,.68,.32,1);
 
-  color-scheme:dark;
+  color-scheme:light;
 }
 
 /* Tokens de acento del modo oscuro permanente */

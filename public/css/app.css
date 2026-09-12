@@ -15,59 +15,53 @@ body.pj-app{
   background:var(--app-fondo);
   min-height:100vh;
 }
-[data-tema="oscuro"] body.pj-app,
-[data-tema="oscuro"] .pj-app{
-  background:
-    radial-gradient(80% 55% at 12% -10%,rgba(124,58,237,.22),transparent 62%),
-    var(--fondo);
-}
 
 /* ── Shell ───────────────────────────────────────────────────────────── */
 .shell{display:flex;min-height:100vh}
 
 /* ── Barra lateral ───────────────────────────────────────────────────── */
+/* La barra lateral es la superficie oscura de marca: el contenido va claro. */
 .side{
   position:fixed;inset:0 auto 0 0;width:var(--side-w);z-index:1200;
   display:flex;flex-direction:column;
-  background:var(--superficie);
-  border-right:1px solid var(--linea);
+  background:linear-gradient(180deg,#2A0750 0%,#1C005F 58%,#160540 100%);
+  border-right:0;color:#EDE7FD;
   transition:transform .3s var(--ease);
 }
 .side-brand{
   display:flex;align-items:center;gap:.65rem;
   height:var(--top-h);padding:0 1.05rem;flex:none;
-  border-bottom:1px solid var(--linea);text-decoration:none;
+  border-bottom:1px solid rgba(255,255,255,.14);text-decoration:none;
 }
 .side-brand img{height:36px;width:auto}
-.side-brand b{display:block;font-family:var(--display);font-size:1.12rem;font-weight:400;letter-spacing:.02em;text-transform:uppercase;line-height:1.1}
-.side-brand span{display:block;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3);font-weight:700}
+.side-brand b{display:block;font-family:var(--display);font-size:1.12rem;font-weight:400;letter-spacing:.02em;text-transform:uppercase;line-height:1.1;color:#fff}
+.side-brand span{display:block;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:#C4B5FD;font-weight:700}
 
 .side-nav{flex:1;overflow-y:auto;padding:.85rem .65rem;display:grid;gap:.1rem;align-content:start}
 .side-group{
-  font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--txt-3);
+  font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:#A99BD0;
   font-weight:800;padding:.85rem .8rem .3rem;
 }
 .side-item{
   display:flex;align-items:center;gap:.65rem;
   padding:.6rem .75rem;border-radius:10px;text-decoration:none;
-  color:var(--txt-2);font-weight:600;font-size:.89rem;
+  color:#D8CFF2;font-weight:600;font-size:.89rem;
   transition:background .15s var(--ease),color .15s var(--ease);
 }
-.side-item svg{width:18px;height:18px;flex:none;opacity:.8}
-.side-item:hover{background:var(--fondo-3);color:var(--marca)}
-[data-tema="oscuro"] .side-item:hover{color:#fff}
-.side-item.is-on{background:var(--institucional);color:#fff}
+.side-item svg{width:18px;height:18px;flex:none;opacity:.85}
+.side-item:hover{background:rgba(255,255,255,.09);color:#fff}
+.side-item.is-on{background:rgba(255,255,255,.16);color:#fff}
 .side-item.is-on svg{opacity:1}
 .side-item .soon{
   margin-left:auto;font-size:.58rem;font-weight:800;letter-spacing:.07em;
-  text-transform:uppercase;color:var(--ambar);
-  background:rgba(180,83,9,.1);border:1px solid rgba(180,83,9,.26);
+  text-transform:uppercase;color:#FDE68A;
+  background:rgba(253,230,138,.14);border:1px solid rgba(253,230,138,.3);
   padding:.1rem .35rem;border-radius:99px;
 }
-.side-foot{padding:.85rem;border-top:1px solid var(--linea);display:grid;gap:.4rem}
-.side-foot a{font-size:.81rem;color:var(--txt-3);text-decoration:none}
-.side-foot a:hover{color:var(--violeta)}
-.side-foot .fine{font-size:.76rem;color:var(--txt-3)}
+.side-foot{padding:.85rem;border-top:1px solid rgba(255,255,255,.14);display:grid;gap:.4rem}
+.side-foot a{font-size:.81rem;color:#B9A9E4;text-decoration:none}
+.side-foot a:hover{color:#fff}
+.side-foot .fine{font-size:.76rem;color:#9E8FC9}
 
 .side-backdrop{
   position:fixed;inset:0;z-index:1150;background:rgba(27,20,40,.42);
@@ -360,7 +354,7 @@ a.row:hover{background:var(--fondo-2)}
 
 /* ── Inicio: dos datos y accesos, sin saturar ─────────────────────────── */
 .home-top{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:.8rem;margin-bottom:1rem}
-.home-card{border-radius:var(--r);border:1px solid var(--linea);background:var(--superficie);padding:1.1rem;display:grid;gap:.4rem;align-content:start}
+.home-card{border-radius:var(--r);border:1px solid var(--linea);background:var(--superficie);box-shadow:var(--sh-xs);padding:1.1rem;display:grid;gap:.4rem;align-content:start}
 .home-k{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--txt-3);font-weight:800}
 .home-num{font-family:var(--mono);font-size:2.1rem;line-height:1.1;color:var(--txt)}
 .home-num small{font-family:var(--font);font-size:.8rem;color:var(--txt-3);font-weight:600}
