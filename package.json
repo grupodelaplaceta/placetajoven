@@ -4,7 +4,8 @@
   "private": true,
   "description": "Placeta Joven — web y API (joven.laplaceta.org). Persistencia en Supabase.",
   "scripts": {
-    "test": "node --test tests/core.test.js"
+    "test": "node --test tests/core.test.js",
+    "test:server": "node scripts/local-test-server.js"
   },
   "engines": {
     "node": ">=18"
