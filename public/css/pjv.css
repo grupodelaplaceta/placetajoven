@@ -550,6 +550,17 @@ body.nav-open{overflow:hidden}
 .colab-panel .mini-ico{background:rgba(255,255,255,.12);color:#fff;border-color:transparent}
 .colab-panel .mini-txt b{color:#fff}
 .colab-panel .mini-txt span{color:#C9BFE6}
+.partners{margin-top:clamp(2rem,4vw,3rem);padding-top:1.35rem;border-top:1px solid rgba(255,255,255,.18)}
+.partners-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:.85rem}
+.partners-head .panel-title{margin:0 0 .2rem;color:#fff;font-weight:800}
+.partners-note{margin:0;color:#C9BFE6;font-size:.82rem;max-width:58ch}
+.partners-count{flex:none;color:#E9E1FF;font:600 .76rem var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.partner-carousel{overflow:hidden;border:1px solid rgba(255,255,255,.16);border-radius:var(--r);background:rgba(0,0,0,.14)}
+.partner-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.partner-track::-webkit-scrollbar{display:none}
+.partner-slide{min-width:100%;min-height:112px;display:grid;place-items:center;scroll-snap-align:start;padding:1rem 2rem;text-decoration:none}
+.partner-slide img{width:min(220px,70vw);height:64px;object-fit:contain;opacity:.92;transition:opacity .2s var(--ease),transform .2s var(--ease)}
+.partner-slide:hover img{opacity:1;transform:scale(1.03)}
 
 /* ── 09. Preguntas frecuentes ────────────────────────────────────────── */
 .faq{display:grid;gap:.6rem}
@@ -655,4 +666,5 @@ body.nav-open{overflow:hidden}
   .hero-facts{padding:1.25rem}
   .pnl-head{align-items:flex-start;flex-wrap:wrap}
   .pnl-head .pnl-act{width:100%;margin-left:0}
+  .partners-head{align-items:flex-start;flex-direction:column;gap:.45rem}
 }
