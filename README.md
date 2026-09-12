@@ -19,10 +19,7 @@ Proyecto **sostenible y sin ánimo de lucro**: la cuota es simbólica (1,95 €/
 
 - **Bebas Neue** para títulos (identidad de la marca) + **Plus Jakarta Sans** para texto
   + **JetBrains Mono** para datos (Pz, códigos de keys).
-- **Tema claro por defecto** (blanco), con **tema oscuro opcional** que el usuario elige
-  desde el botón de tema (cabecera en escritorio y menú en móvil). Se guarda en
-  `localStorage.pjv_tema` y se aplica en `<html data-tema="claro|oscuro">` antes de pintar
-  (sin parpadeo).
+- **Tema oscuro permanente** en la web pública y el espacio privado.
 
 ---
 
@@ -60,9 +57,8 @@ public/
 
 ### Landing pública
 
-Secciones: hero · pilares · qué es (proyecto sostenible) · cómo funciona
-(formación → Pz → keys) · formación · empleo y futuro · beneficios · rutas ·
-comunidad · colabora (estudios indie) · seguridad · preguntas frecuentes · cierre.
+Secciones: hero · tarifas · formación · beneficios actuales · colaboraciones ·
+preguntas frecuentes · cierre.
 
 ### Webapp
 
@@ -115,8 +111,8 @@ Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas com
 - Cada key tiene un estado trazable: `DISPONIBLE → RESERVADA → ASIGNADA → ENTREGADA`.
 - Una key entregada no vuelve al inventario y no puede entregarse dos veces.
 - Límite: **una key por título y usuario**.
-- El catálogo se sirve desde `/api/recompensas`. Si Supabase no está configurado,
-  la API devuelve un catálogo **de ejemplo** con `demo: true` (nombres inventados).
+- El catálogo se sirve desde `/api/recompensas`. Si Supabase no está configurado o
+  falla, la API devuelve un error explícito; no inventa títulos ni colaboraciones.
 
 ## Acceso con PlacetaID
 
@@ -132,6 +128,7 @@ Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas com
 | Método | Ruta | Función |
 |---|---|---|
 | GET | `/api/status` | Estado del usuario (control de edad 16–30) + sus keys |
+| GET | `/api/planes` | Tarifas públicas, sin sesión |
 | POST | `/api/alta` | Checkout para darse de alta (`{ plan }`) |
 | POST | `/api/renovar` | Checkout para renovar |
 | POST | `/api/cancelar` | Cancelar (mantiene las ventajas hasta fin de período) |
@@ -142,6 +139,23 @@ Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas com
 | POST | `/api/webhook` | Webhook de Lemon Squeezy (verifica la firma `X-Signature`) |
 
 Lógica pura testeada: `npm test` (`tests/core.test.js`).
+
+## Acceso interior de pruebas
+
+Para revisar la webapp sin pasar por el pago, habilita únicamente en local o en
+un Preview de Vercel:
+
+```env
+PLACETAJOVEN_TEST_MODE=1
+PLACETAJOVEN_TEST_KEY=<clave-larga-y-aleatoria>
+PLACETAJOVEN_TEST_DIP=TEST-PLACETA-JOVEN
+PLACETAJOVEN_TEST_EDAD=25
+```
+
+Después abre `/test-login.html` y usa la clave configurada. El acceso crea una
+sesión sintética activa y no escribe suscripciones, pagos ni datos de usuarios.
+El modo se bloquea automáticamente cuando `VERCEL_ENV=production` o
+`NODE_ENV=production`. No uses un DNI real como identidad de pruebas.
 
 ## Pagos (Lemon Squeezy)
 

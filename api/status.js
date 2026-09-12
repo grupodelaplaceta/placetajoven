@@ -75,6 +75,24 @@ module.exports = async (req, res) => {
       });
     }
 
+    if (u.registro.test === true) {
+      return json(res, 200, {
+        permitido: true,
+        bloqueado: false,
+        edad: u.registro.edad,
+        estado: 'ACTIVO',
+        plan: 'anual',
+        planInfo: planInfo('anual'),
+        planes: planesPublicos(),
+        expiresAt: null,
+        sigueVigente: true,
+        requiereAlta: false,
+        pendienteCaducada: false,
+        keys: [],
+        test: true
+      });
+    }
+
     const doc = docVigente(await store.get(dip));
 
     if (!doc || !doc.status) {

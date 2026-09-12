@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Acceso de pruebas · Placeta Joven</title>
+  <link rel="stylesheet" href="css/pjv.css?v=20260912d" />
+</head>
+<body class="pj-page">
+  <main class="gate">
+    <section class="gate-card">
+      <p class="eyebrow">Entorno de pruebas</p>
+      <h1>Entrar al interior</h1>
+      <p>Usa la clave configurada para este entorno. Este acceso no funciona en producción.</p>
+      <form id="testForm" class="gate-act">
+        <label class="sr-only" for="testKey">Clave de pruebas</label>
+        <input id="testKey" type="password" autocomplete="off" required placeholder="Clave de pruebas" />
+        <button class="btn btn-primary" type="submit">Entrar</button>
+      </form>
+      <p id="testMessage" class="fine" role="status"></p>
+    </section>
+  </main>
+  <script src="js/placetaid.js?v=20260912d"></script>
+  <script>
+    document.getElementById('testForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+      var message = document.getElementById('testMessage');
+      message.textContent = 'Comprobando…';
+      try {
+        var response = await fetch('/api/test-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: document.getElementById('testKey').value })
+        });
+        var data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'No disponible');
+        window.PlacetaJovenAuth.storeSession(data.token, data.user);
+        window.location.href = 'mi.html';
+      } catch (error) {
+        message.textContent = 'Este acceso no está habilitado o la clave no es válida.';
+      }
+    });
+  </script>
+</body>
+</html>

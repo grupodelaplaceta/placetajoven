@@ -7,6 +7,7 @@
   "routes": [
     { "src": "/api/status", "dest": "/api/status.js" },
     { "src": "/api/planes", "dest": "/api/planes.js" },
+    { "src": "/api/test-login", "dest": "/api/test-login.js" },
     { "src": "/api/alta", "dest": "/api/alta.js" },
     { "src": "/api/renovar", "dest": "/api/renovar.js" },
     { "src": "/api/cancelar", "dest": "/api/cancelar.js" },
