@@ -995,21 +995,8 @@
   }
 
   function pageBecas() {
-    var opciones = [];
-    App.caminos.forEach(function (camino) { (camino.etapas || []).forEach(function (etapa) { (etapa.elementos || []).forEach(function (elemento) { opciones.push({ camino: camino, elemento: elemento }); }); }); });
     var historial = App.becas || [];
-    var html = '<div class="page">' + pageHead('Becas', 'Pide ayuda para un elemento formativo. La Junta revisa tu situación y deja el resultado explicado.', '<span class="tag tag-cyan">Solicitud clara</span>')
-      + '<section class="pnl"><div class="pnl-head"><span class="card-ico mint">' + ico('gift') + '</span><div><h2>Solicitar una beca</h2><p>Los Pz, las keys y la actividad no cambian tu necesidad económica.</p></div></div>'
-      + '<form id="becaForm" class="grid g-2"><label>Elemento formativo<select id="becaElemento" required>' + opciones.map(function (o) { return '<option value="' + esc(o.camino.id + '|' + o.elemento.id) + '">' + esc(o.elemento.titulo + ' · ' + o.camino.nombre) + '</option>'; }).join('') + '</select></label>'
-      + '<label>Personas en la unidad<input id="becaPersonas" type="number" min="1" value="1" required /></label>'
-      + '<label>Renta por persona (0–40)<input id="becaRenta" type="number" min="0" max="40" value="0" required /></label>'
-      + '<label>Situación laboral (0–15)<input id="becaLaboral" type="number" min="0" max="15" value="0" required /></label>'
-      + '<label>Personas dependientes (0–15)<input id="becaDependientes" type="number" min="0" max="15" value="0" required /></label>'
-      + '<label>Vulnerabilidad económica (0–15)<input id="becaVulnerabilidad" type="number" min="0" max="15" value="0" required /></label>'
-      + '<label>Patrimonio y recursos (0–10)<input id="becaPatrimonio" type="number" min="0" max="10" value="0" required /></label>'
-      + '<label>Gastos esenciales (0–5)<input id="becaGastos" type="number" min="0" max="5" value="0" required /></label>'
-      + '<label class="grid-span-2">Documentación o contexto<input id="becaDocs" type="text" placeholder="Ej. certificado de desempleo, alquiler…" /></label>'
-      + '<div class="gate-act grid-span-2" style="justify-content:flex-start"><button class="btn btn-primary" type="submit">Enviar solicitud</button></div></form></section>'
+    var html = '<div class="page">' + pageHead('Becas', 'Solicítalas desde el elemento formativo. RSP aporta tus valores y aquí guardamos el expediente.', '<span class="tag tag-cyan">Solicitud clara</span>')
       + '<section class="pnl"><div class="pnl-head"><span class="card-ico">' + ico('file') + '</span><div><h2>Mi historial</h2><p>Verás qué se ha aceptado o denegado y por qué.</p></div></div>'
       + (historial.length ? historial.map(function (b) { return '<article class="row"><span class="row-ico ' + (b.estado === 'ACEPTADA' ? 'ok' : (b.estado === 'DENEGADA' ? 'warn' : 'cyan')) + '">' + ico(b.estado === 'ACEPTADA' ? 'check' : 'file') + '</span><div class="row-txt"><b>' + esc(b.elemento) + '</b><span>' + esc(b.estado) + ' · INB ' + b.inb + ' · beca aplicada ' + b.porcentajeAplicado + '%</span><span>' + (b.motivo ? esc(b.motivo) : 'Pendiente de revisión') + '</span></div></article>'; }).join('') : '<div class="empty"><b>Aún no tienes solicitudes</b><p>Cuando envíes una, quedará guardada con todos sus datos.</p></div>') + '</section></div>';
     return html;
@@ -1055,7 +1042,7 @@
       etapa.elementos.forEach(function (elemento) {
         var estado = estados.filter(function (item) { return item.id === elemento.id; })[0] || { estado: 'BLOQUEADO' };
         var bloqueado = estado.estado === 'BLOQUEADO';
-        html += '<article class="item pathway-element ' + (bloqueado ? 'is-locked' : '') + '"><div class="item-top"><span class="item-cover ' + (estado.estado === 'COMPLETADO' ? 'mint' : '') + '">' + ico(estado.estado === 'COMPLETADO' ? 'check' : (bloqueado ? 'lock' : 'book')) + '</span><div class="item-h"><h3>' + esc(elemento.titulo) + '</h3><p>' + esc(elemento.proveedor || '') + '</p></div></div><div class="item-meta"><span class="tag">' + esc(elemento.tipo || 'elemento') + '</span><span class="tag">+' + num(elemento.recompensa || 0) + ' Pz</span>' + (elemento.pmb != null ? '<span class="tag tag-cyan">Beca hasta ' + elemento.pmb + '%</span>' : '') + '</div><p class="fine">' + (bloqueado ? 'Completa primero: ' + esc((elemento.requisitos || []).join(', ')) : (estado.estado === 'COMPLETADO' ? 'Completado' : 'Disponible ahora')) + '</p>' + (elemento.convalidable && !bloqueado ? '<button class="btn btn-ghost btn-sm" type="button" data-action="solicitar-convalidacion" data-camino="' + esc(camino.id) + '">Convalidar este elemento</button>' : '') + '</article>';
+        html += '<article class="item pathway-element ' + (bloqueado ? 'is-locked' : '') + '"><div class="item-top"><span class="item-cover ' + (estado.estado === 'COMPLETADO' ? 'mint' : '') + '">' + ico(estado.estado === 'COMPLETADO' ? 'check' : (bloqueado ? 'lock' : 'book')) + '</span><div class="item-h"><h3>' + esc(elemento.titulo) + '</h3><p>' + esc(elemento.proveedor || '') + '</p></div></div><div class="item-meta"><span class="tag">' + esc(elemento.tipo || 'elemento') + '</span><span class="tag">+' + num(elemento.recompensa || 0) + ' Pz</span>' + (elemento.pmb != null ? '<span class="tag tag-cyan">Beca hasta ' + elemento.pmb + '%</span>' : '') + '</div><p class="fine">' + (bloqueado ? 'Completa primero: ' + esc((elemento.requisitos || []).join(', ')) : (estado.estado === 'COMPLETADO' ? 'Completado' : 'Disponible ahora')) + '</p><div class="gate-act" style="justify-content:flex-start">' + (!bloqueado && estado.estado !== 'COMPLETADO' && (elemento.matricula || elemento.gestion) ? '<button class="btn btn-primary btn-sm" type="button" data-action="abrir-beca" data-camino="' + esc(camino.id) + '" data-elemento="' + esc(elemento.id) + '">Acceder con beca</button>' : '') + (elemento.convalidable && !bloqueado ? '<button class="btn btn-ghost btn-sm" type="button" data-action="solicitar-convalidacion" data-camino="' + esc(camino.id) + '">Convalidar</button>' : '') + '</div></article>';
       });
       html += '</div></section>';
     });
@@ -1300,6 +1287,21 @@
     });
   }
 
+  function accionBeca(btn) {
+    var caminoId = tAttr(btn, 'data-camino');
+    var elementoId = tAttr(btn, 'data-elemento');
+    btn.disabled = true;
+    btn.textContent = 'Calculando…';
+    api('becas?accion=calcular&caminoId=' + encodeURIComponent(caminoId) + '&elementoId=' + encodeURIComponent(elementoId)).then(function (data) {
+      var r = data.resultado;
+      var texto = 'Beca reconocida: ' + r.porcentajeReconocido + '%\n' + 'Máximo del elemento: ' + r.pmb + '%\n' + 'Beca aplicada: ' + r.porcentajeAplicado + '%\n\nPrecio elegible: ' + r.precioElegible + ' Pz\nBeca: -' + r.becaPz + ' Pz\nAportación: ' + r.aportacionPz + ' Pz\n\n¿Quieres enviar la solicitud?';
+      if (!window.confirm(texto)) return;
+      return api('becas', { method: 'POST', body: JSON.stringify({ caminoId: caminoId, elementoId: elementoId }) }).then(function () { window.location.href = 'becas.html'; });
+    }).catch(function (error) { pintarError(error); }).finally(function () { btn.disabled = false; btn.textContent = 'Acceder con beca'; });
+  }
+
+  function tAttr(element, name) { return element.getAttribute(name) || ''; }
+
   function accionSolicitarBeca() {
     var seleccion = String(document.getElementById('becaElemento').value || '').split('|');
     return api('becas', { method: 'POST', body: JSON.stringify({
@@ -1356,6 +1358,7 @@
       case 'abrir-camino': App.caminoSeleccionado = App.caminos.filter(function (item) { return item.id === t.getAttribute('data-camino'); })[0] || null; render(); break;
       case 'cerrar-camino': App.caminoSeleccionado = null; render(); break;
       case 'cuenta-joven': accionCuentaJoven(t); break;
+      case 'abrir-beca': accionBeca(t); break;
       case 'interes-proteccion': api('protecciones', { method: 'POST', body: JSON.stringify({ proteccionId: t.getAttribute('data-id') }) }).then(function () { t.textContent = 'Interés registrado'; t.disabled = true; }).catch(function (e) { pintarError(e); }); break;
       case 'filtrar-recompensa':
         App.filtro = t.getAttribute('data-cat');

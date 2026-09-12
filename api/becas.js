@@ -27,7 +27,10 @@ module.exports = async (req, res) => {
   if (!u) return;
   const dip = String(u.registro.dip || '').trim().toUpperCase();
   try {
-    if (req.method === 'GET') return json(res, 200, { ok: true, becas: await becas.historial(dip), baremo: becas.BAREMO });
+    if (req.method === 'GET') {
+      if (req.query.accion === 'calcular') return json(res, 200, { ok: true, resultado: await becas.previsualizar(dip, req.query) });
+      return json(res, 200, { ok: true, becas: await becas.historial(dip), baremo: becas.BAREMO });
+    }
     return json(res, 201, { ok: true, beca: await becas.solicitar(dip, body) });
   } catch (error) { return json(res, error.status || 500, { error: error.message || 'internal' }); }
 };

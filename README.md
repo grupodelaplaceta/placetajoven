@@ -186,6 +186,9 @@ certificados.
 Las becas se registran en la API propia con expediente completo: indicadores,
 INB, nivel reconocido, PMB del elemento, porcentaje aplicado, importes,
 documentación, estado y motivo de resolución. Una denegación exige motivo.
+El botón «Acceder con beca» consulta automáticamente a RSP mediante
+`RSP_API_URL`/`RSP_API_KEY`; sin esa conexión no permite calcular ni enviar una
+solicitud con valores manuales.
 
 ## Protecciones
 
