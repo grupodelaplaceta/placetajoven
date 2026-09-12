@@ -31,6 +31,7 @@
 
   var App = {
     st: null,            // respuesta de /api/status
+    planes: [],          // tarifas públicas
     recompensas: [],     // catálogo
     demo: false,         // el catálogo viene de ejemplo (sin Supabase)
     filtro: 'todos',
@@ -292,7 +293,21 @@
       + '<p>Entra para ver tu espacio. Si tienes entre 16 y 30 años podrás participar en Placeta Joven; si no, el acceso al programa queda bloqueado.</p>'
       + '<div class="gate-act"><a class="btn btn-primary btn-lg" href="' + esc(url) + '">'
       + 'Acceder con PlacetaID' + ico('arrow') + '</a></div>'
+      + planesHtml(App.planes)
       + '<p class="fine" style="margin-top:1.2rem">Placeta Joven es opcional: puedes seguir usando La Placeta sin participar en el programa.</p>');
+  }
+
+  function planesHtml(source) {
+    var planes = (Array.isArray(source) ? source : []).filter(function (p) { return p && p.id; });
+    if (!planes.length) return '';
+    return '<h2 style="margin-top:1.8rem">Tarifas</h2><div class="plan-cards">' + planes.map(function (p) {
+      var anual = p.id === 'anual';
+      return '<article class="plan-card' + (p.destacado ? ' feat' : '') + '">'
+        + '<h3>' + esc(p.etiqueta) + (p.destacado ? ' <span class="tag tag-mint">Oferta</span>' : '') + '</h3>'
+        + '<p class="p">' + esc(p.precioLabel || 'Consultar') + '</p>'
+        + '<span>' + esc(p.ahorroLabel || (anual ? 'Tarifa anual del programa.' : 'Tarifa mensual del programa.')) + '</span>'
+        + '</article>';
+    }).join('') + '</div>';
   }
 
   function pintarBloqueado(st) {
@@ -1321,6 +1336,15 @@
     try {
       st = await api('status');
     } catch (e) {
+      if (e && e.status === 401) {
+        try { AUTH.clearSession(); } catch (clearError) { /* ignore */ }
+        try {
+          var publicPlans = await api('planes');
+          App.planes = Array.isArray(publicPlans.planes) ? publicPlans.planes : [];
+        } catch (plansError) { App.planes = []; }
+        pintarSinSesion();
+        return;
+      }
       pintarError(e);
       return;
     }
@@ -1353,8 +1377,14 @@
     var ses = null;
     try { ses = AUTH ? AUTH.getSession() : null; } catch (e) { ses = null; }
     if (!ses || !ses.token) {
-      if (BOOT) BOOT.remove();
-      pintarSinSesion();
+      api('planes').then(function (data) {
+        App.planes = Array.isArray(data.planes) ? data.planes : [];
+      }).catch(function () {
+        App.planes = [];
+      }).then(function () {
+        if (BOOT) BOOT.remove();
+        pintarSinSesion();
+      });
       return;
     }
     boot();
