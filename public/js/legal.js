@@ -72,4 +72,30 @@
   }
 
   load();
+
+  /* ── Tema claro / oscuro ────────────────────────────────────────────
+     El atributo data-tema lo fija un script en el <head> antes de pintar;
+     aquí solo sincronizamos el icono del botón y atendemos el cambio. */
+  var ICO_LUNA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>';
+  var ICO_SOL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>';
+
+  function temaActual() {
+    return document.documentElement.getAttribute('data-tema') === 'oscuro' ? 'oscuro' : 'claro';
+  }
+  function pintarIconoTema() {
+    var t = temaActual();
+    var b = document.querySelector('[data-action="tema"]');
+    if (!b) return;
+    b.innerHTML = t === 'oscuro' ? ICO_SOL : ICO_LUNA;
+    b.setAttribute('aria-pressed', String(t === 'oscuro'));
+    b.setAttribute('title', t === 'oscuro' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro');
+  }
+  pintarIconoTema();
+  document.addEventListener('click', function (ev) {
+    if (!ev.target.closest('[data-action="tema"]')) return;
+    var nuevo = temaActual() === 'oscuro' ? 'claro' : 'oscuro';
+    document.documentElement.setAttribute('data-tema', nuevo);
+    try { localStorage.setItem('pjv_tema', nuevo); } catch (e) { /* ignore */ }
+    pintarIconoTema();
+  });
 })();

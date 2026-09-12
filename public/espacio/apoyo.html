@@ -3,36 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Placeta Joven · Apoyo Indie</title>
-  <meta name="description" content="Apoyo Indie: juegos de estudios independientes y tus keys en Placeta Joven." />
+  <title>Placeta Joven · Redirigiendo…</title>
   <meta name="robots" content="noindex" />
-  <meta name="theme-color" content="#2A0750" />
+  <meta name="theme-color" content="#1C005F" />
   <link rel="icon" type="image/png" href="../img/jovenlogo.png" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('pjv_tema');
+        document.documentElement.setAttribute('data-tema', t === 'oscuro' ? 'oscuro' : 'claro');
+      } catch (e) { document.documentElement.setAttribute('data-tema', 'claro'); }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/mi.css?v=20260907l" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/pjv.css?v=20260912b" />
+  <link rel="stylesheet" href="../css/app.css?v=20260912b" />
 </head>
-<body data-page="apoyo">
-  <header class="mi-top">
-    <div class="mi-top-in">
-      <a href="../index.html"><img src="../img/jovenlogo.png" alt="Placeta Joven" /></a>
-      <a class="back" href="inicio.html">← Mi espacio</a>
-    </div>
-  </header>
-
-  <main class="mi-main" id="app"></main>
-
-  <footer class="mi-foot">
-    <nav>
-      <a href="inicio.html">Mi espacio</a>
-      <a href="academia.html">Academia Joven</a>
-      <a href="apoyo.html">Apoyo Indie</a>
-    </nav>
-    <p>© 2026 Grupo de La Placeta · <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a></p>
-  </footer>
-
-  <script src="../js/placetaid.js?v=20260907d"></script>
-  <script src="../js/espacio.js?v=20260907l"></script>
+<body class="pj-app" data-page="beneficios">
+  <div class="boot">
+    <img src="../img/jovenlogo.png" alt="Placeta Joven" />
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Apoyo Indie se ha movido a otra sección de tu espacio…</p>
+    <p><a class="btn btn-ghost btn-sm" href="beneficios.html">Ir ahora</a></p>
+  </div>
+  <script>window.location.replace('beneficios.html' + window.location.search + window.location.hash);</script>
 </body>
 </html>

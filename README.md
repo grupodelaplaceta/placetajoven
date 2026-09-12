@@ -1,159 +1,164 @@
-# Placeta Joven — Web pública (joven.laplaceta.org)
+# Placeta Joven — joven.laplaceta.org
 
-Web pública del programa **Placeta Joven**: el programa opcional de pago para
-jóvenes (16–30) dentro de La Placeta. Logo oficial: `jovenlogo.png`.
-Tipografías **Bebas Neue** + **Plus Jakarta Sans**.
+Landing pública **+** webapp del programa **Placeta Joven**: el espacio de La Placeta
+para jóvenes de **16 a 30 años**. Formación oficial (Cisco NetAcad vía PlacetaEDU),
+proyectos, keys de juegos indie y beneficios que se consiguen participando.
+
+Proyecto **sostenible y sin ánimo de lucro**: la cuota es simbólica (1,95 €/mes ·
+10 €/año) y los ingresos se reinvierten en la entidad y en sus proyectos.
+
+---
 
 ## Stack
-- Web estática (HTML/CSS/JS) — sin framework ni build.
+
+- Web estática (HTML/CSS/JS), **sin framework ni build**.
 - Desplegable en Vercel → `joven.laplaceta.org` (mismo patrón que `junior.laplaceta.org`).
+- Funciones serverless en `/api` (Node) para PlacetaID, suscripción y recompensas.
+
+## Tipografía y temas
+
+- **Bebas Neue** para títulos (identidad de la marca) + **Plus Jakarta Sans** para texto
+  + **JetBrains Mono** para datos (Pz, códigos de keys).
+- **Tema claro por defecto** (blanco), con **tema oscuro opcional** que el usuario elige
+  desde el botón de tema (cabecera en escritorio y menú en móvil). Se guarda en
+  `localStorage.pjv_tema` y se aplica en `<html data-tema="claro|oscuro">` antes de pintar
+  (sin parpadeo).
+
+---
 
 ## Estructura
+
 ```
-jovenlogo.png        → logo oficial (fuente)
+jovenlogo.png              → logo oficial (fuente)
 public/
-  index.html         → página única (hero + qué incluye + cómo funciona + planes + colabora + FAQ)
-  css/styles.css     → estilos (tokens, componentes, secciones)
-  js/main.js         → menú móvil, animaciones de entrada
-  img/jovenlogo.png  → logo oficial servido (favicon + marca)
+  index.html               → landing pública (una sola página con secciones)
+  css/
+    pjv.css                → design system (tokens, componentes, secciones)
+    app.css                → shell de la webapp (barra lateral + cabecera + contenido)
+    legal.css              → páginas legales
+  js/
+    placetaid.js           → cliente PlacetaID (sesión en cookie de 7 días)
+    landing.js             → cabecera, menú, tema, animaciones y aviso de sesión
+    app.js                 → motor de la webapp (sesión, estado y las 7 secciones)
+    legal.js               → carga el documento legal desde el BOLP
+  espacio/
+    inicio.html            → Inicio (saldo, progreso, para ti, membresía, noticias)
+    formacion.html         → Formación (Cisco NetAcad vía PlacetaEDU, becas, historial)
+    empleo.html            → Empleo y futuro (CV, recursos, orientación) · en preparación
+    beneficios.html        → Beneficios (keys, catálogo en Pz, estados de la key)
+    miplaceta.html         → Mi Placeta (saldo, movimientos, becas, membresía)
+    rutas.html             → Rutas (9 objetivos con sus pasos) · en preparación
+    comunidad.html         → Comunidad (actividades, proyectos, encuestas) · en preparación
+    academia.html          → redirección a formacion.html (enlaces antiguos)
+    apoyo.html             → redirección a beneficios.html (enlaces antiguos)
+  mi.html                  → entrada tras PlacetaID → redirige a espacio/inicio.html
+  terminos.html            → términos y condiciones (texto servido por el BOLP)
+  privacidad.html          → política de privacidad (texto servido por el BOLP)
+  auth/callback.html       → retorno de PlacetaID
+.legacy/                   → versiones anteriores (no se despliegan; ver .gitignore)
 ```
+
+### Landing pública
+
+Secciones: hero · pilares · qué es (proyecto sostenible) · cómo funciona
+(formación → Pz → keys) · formación · empleo y futuro · beneficios · rutas ·
+comunidad · colabora (estudios indie) · seguridad · preguntas frecuentes · cierre.
+
+### Webapp
+
+Cada página declara su vista con `<body data-page="…">` y **`js/app.js` hace todo lo
+demás**: comprueba la sesión de PlacetaID, resuelve el estado del programa y pinta la
+puerta o el espacio completo.
+
+Puertas (estados sin suscripción activa):
+
+| Situación | Qué ve el usuario |
+|---|---|
+| Sin sesión | «Identifícate con PlacetaID» |
+| Edad fuera de 16–30 | «Todavía no es tu momento» + La Placeta sigue abierta |
+| Sin suscripción / expirada / cancelada | «Elige tu plan» (mensual / anual) |
+| Pago pendiente | «Pago en proceso» + verificar el pago (nunca cobra dos veces) |
+| Suspendida | «Suscripción suspendida» + regularizar |
+
+---
 
 ## Ventajas actuales (solo lo real, nada inventado)
-1. **Formación Cisco NetAcad** — cursos oficiales de Cisco Networking Academy
-   a través de PlacetaEDU.
-2. **Cursos con descuento en Pz** — cursos propios de La Placeta que se pagan
-   en Placetas con precio reducido para Placeta Joven.
-3. **Keys de juegos indie** — claves de estudios independientes que colaboran
-   con el proyecto (sin mínimos, no se revenden).
-4. **Cashback 12% · Cuenta Joven** — conectando una cuenta de Banco de La
-   Placeta y convirtiéndola en Cuenta Joven: 12 % de cashback en gastos
-   (impuestos excluidos).
 
-El programa se ampliará con más ventajas cuando haya colaboradores reales.
+1. **Formación Cisco NetAcad** — cursos oficiales de Cisco Networking Academy a través
+   de **PlacetaEDU**, con recompensa en Pz al completar y **becas** sobre la matrícula.
+2. **Cuenta Joven · 12 % de cashback** — convirtiendo una cuenta de **Banco de La
+   Placeta** en **Cuenta Joven**, con las condiciones de ese tipo de cuenta.
+3. **Keys de juegos indie** — claves de estudios independientes que colaboran con el
+   programa (una key por usuario y título, sin reventa).
+4. **Cursos con precio reducido** — cursos propios de La Placeta pagados en Placetas.
 
-## Contenido de la página
-- Mensaje principal: «Más ventajas. Más experiencias. Más Placeta.» con
-  precios 10 €/año · 1,95 €/mes.
-- Aclaración siempre visible: *Placeta Joven es opcional. Puedes utilizar
-  La Placeta sin contratar este programa.*
-- Cómo funciona: PlacetaID → plan → pago → activación automática (+ estados).
-- Planes mensual / anual · Colabora (estudios indie y proyectos) · FAQ.
-- Soporte: **joven@laplaceta.org**.
+Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas como
+*En preparación* en toda la interfaz: no se anuncia nada que todavía no funcione.
 
-## Oferta anual
-- La oferta anual de beneficios se llama **«Drop Joven '26»** y está **incluida en ambos
-  planes** (mensual 1,95 €/mes y anual 10 €/año): formación Cisco, descuentos, keys
-  indie y cashback.
-- El plan anual destaca porque sale **más rentable a fin de cuenta**: 10 €/año frente a
-  23,40 € pagando mes a mes (ahorras un 57 %).
+## Placetas (Pz) y el saldo
 
-## Acceso
-- El acceso/contratación se hace a través de la **pasarela PlacetaID (plid26)**
-  en `https://id.laplaceta.org`. Todos los CTAs «Acceder con PlacetaID» /
-  «Quiero Placeta Joven» apuntan ahí.
-- **Requisito**: `joven.laplaceta.org` debe estar dado de alta como
-  **solicitante** en plid26 (con `client_id`/apiKey y `redirect_uri` =
-  `https://joven.laplaceta.org/auth/callback.html`). Detalles y payload exacto
-  en `docs/flujo-placetajoven.md` (sección 0).
-- Al entrar, el sistema comprueba la **edad (16–30)** con la fecha de
-  nacimiento de PlacetaID: si no se tiene la edad, se **bloquea** el acceso a
-  Placeta Joven. Con la edad permitida se ve el **estado** de la suscripción y
-  se puede **dar de alta**, **renovar** o **cancelar**.
+- **Placeta Joven no crea Pz.** Las Placetas viven en la **Cuenta Joven** del titular en
+  **Banco de La Placeta**.
+- La plataforma **consulta el saldo** y **registra las operaciones que el usuario
+  autoriza**; nunca emite Pz ni permite comprarlas con dinero real.
+- Las Pz se obtienen realizando actividades del ecosistema (entre ellas las educativas
+  de PlacetaEDU).
+- Mientras la API del banco no esté conectada, la interfaz muestra el saldo como
+  *pendiente de conexión* y explica dónde consultarlo. **No se muestran cifras
+  inventadas**: si algún día `/api/status` devuelve `saldo`, la interfaz lo pinta sola.
+- El precio en Pz de cada recompensa se calcula con los **índices y tasas del programa**
+  (precio de referencia, antigüedad, lanzamiento o beta, categoría, edad recomendada,
+  disponibilidad, valor educativo y campañas activas).
 
-## Repositorio
-- Repo de este proyecto: `https://github.com/grupodelaplaceta/placetajoven.git`
-  (rama `main`).
+## Keys y recompensas
+
+- Cada key tiene un estado trazable: `DISPONIBLE → RESERVADA → ASIGNADA → ENTREGADA`.
+- Una key entregada no vuelve al inventario y no puede entregarse dos veces.
+- Límite: **una key por título y usuario**.
+- El catálogo se sirve desde `/api/recompensas`. Si Supabase no está configurado,
+  la API devuelve un catálogo **de ejemplo** con `demo: true` (nombres inventados).
+
+## Acceso con PlacetaID
+
+- El acceso se hace con la pasarela **PlacetaID (plid26)** en `https://id.laplaceta.org`.
+- Requisito: `joven.laplaceta.org` debe estar dado de alta como **solicitante** en plid26
+  (`client_id` = `placetajoven-web`, `redirect_uri` =
+  `https://joven.laplaceta.org/auth/callback.html`). Detalles en
+  `docs/flujo-placetajoven.md`.
+- La edad (16–30) se comprueba con la fecha de nacimiento de PlacetaID.
+
+## API (funciones Vercel)
+
+| Método | Ruta | Función |
+|---|---|---|
+| GET | `/api/status` | Estado del usuario (control de edad 16–30) + sus keys |
+| POST | `/api/alta` | Checkout para darse de alta (`{ plan }`) |
+| POST | `/api/renovar` | Checkout para renovar |
+| POST | `/api/cancelar` | Cancelar (mantiene las ventajas hasta fin de período) |
+| POST | `/api/verificar` | Reconcilia un pago ya hecho (evita el doble cobro) |
+| GET | `/api/recompensas` | Catálogo de recompensas |
+| POST | `/api/recompensas` | Canjear una recompensa (`{ recompensaId }`) |
+| POST | `/api/keys` | Marcar una key como canjeada (`{ keyId, accion }`) |
+| POST | `/api/webhook` | Webhook de Lemon Squeezy (verifica la firma `X-Signature`) |
+
+Lógica pura testeada: `npm test` (`tests/core.test.js`).
 
 ## Pagos (Lemon Squeezy)
-- Proveedor de pago: **Lemon Squeezy** (cuota en euros).
+
 - Plan mensual → producto **1342686** (1,95 €/mes).
 - Plan anual → producto **1343043** (10 €/año).
-- Detalle de integración (checkout, webhook, entidad `placeta_joven`,
-  estados y seguridad): ver `docs/flujo-placetajoven.md`.
 - IDs y precios centralizados en `config/placetajoven.json`.
-- Credenciales (nunca en git): `LS_API_KEY`, `LS_WEBHOOK_SECRET`,
-  `LS_STORE_ID`.
-
-## Diseño
-- El logo oficial (`jovenlogo.png`, fondo transparente) se muestra siempre
-  **sobre morado oscuro** y sin caja blanca en el hero, cabecera y cierre.
+- Credenciales (nunca en git): `LS_API_KEY`, `LS_WEBHOOK_SECRET`, `LS_STORE_ID`,
+  `LS_VARIANT_MENSUAL`, `LS_VARIANT_ANUAL`, `SUPABASE_URL`,
+  `SUPABASE_SERVICE_ROLE_KEY`, `PLACETAID_BASE_URL` (ver `.env.example`).
 
 ## Despliegue (Vercel)
-- Importar el repo / carpeta; Framework `Other` / `Static`; Output `/`.
-- `vercel.json` ya enruta `/` → `public/index.html`.
 
-## API (funciones Vercel) — ya implementada
-- `GET  /api/status`     → estado del usuario (control de edad 16–30 vía PlacetaID).
-- `POST /api/alta`       → checkout de Lemon Squeezy para darse de alta.
-- `POST /api/renovar`    → checkout para renovar.
-- `POST /api/cancelar`   → cancelar (mantiene las ventajas hasta fin de período).
-- `POST /api/webhook`    → webhook de Lemon Squeezy (verifica firma `X-Signature`).
-- `POST /api/verificar`  → reconcilia el pago: busca en Lemon Squeezy una
-  suscripción activa por email y activa la cuenta si el usuario ya pagó (caso
-  «sigue en PENDIENTE aunque pagué»). Nunca hace pagar dos veces.
-- `GET  /api/recompensas`→ catálogo de recompensas disponibles (ver abajo).
-- `POST /api/recompensas`→ canjear una recompensa (entrega la key al socio).
-- Panel de usuario: espacio multipágina en `public/espacio/`:
-  - `espacio/inicio.html`   → Mi espacio (suscripción, noticias, destacados).
-  - `espacio/academia.html` → Academia Joven (cursos Cisco NetAcad en PlacetaEDU).
-  - `espacio/apoyo.html`    → Apoyo Indie (juegos y keys).
-  - `mi.html` (entrada tras PlacetaID) redirige a `espacio/inicio.html`.
-  - Motor compartido: `public/js/espacio.js` (sesión/estado + contenido por página).
-- Lógica pura testeada: `npm test` (`tests/core.test.js`).
-- Config necesaria en producción: variables de `.env.example`
-  (SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY, LS_API_KEY, LS_STORE_ID,
-  LS_WEBHOOK_SECRET, LS_VARIANT_MENSUAL/ANUAL, PLACETAID_BASE_URL).
-  Tablas Supabase: ejecuta `sql/placeta_joven.sql`.
+- Framework `Other` / `Static`; `vercel.json` enruta `/` → `public/index.html`,
+  `/entrar` → `public/espacio/inicio.html`, `/mi`, `/espacio/*`, `/terminos`,
+  `/privacidad` y las funciones de `/api`.
+- Tablas Supabase: ejecutar `sql/placeta_joven.sql`.
 
-## Recompensas disponibles (catálogo con Placetas · Pz)
-- Sección «Recompensas disponibles» dentro del espacio joven (`mi.html`): tarjetas
-  del catálogo con filtros (**Todos · Videojuegos · Formación · Experiencias · Otros**)
-  y una ficha por recompensa (imagen, desarrolladora, descripción, plataforma, edad
-  recomendada, Pz necesarios, disponibilidad, condiciones y botón «Conseguir recompensa»).
-- Datos en Supabase (tabla `placeta_joven_recompensas`, creada por
-  `sql/placeta_joven.sql`). La API lee con la service role key y solo expone campos
-  públicos (ver `lib/recompensas.js` y `api/recompensas.js`).
-- El seed contiene **solo ejemplos** («Videojuego Ejemplo 1–3», nombres inventados):
-  todavía no hay ninguna colaboración confirmada. Si la tabla no existe o Supabase no
-  está configurado, la API devuelve el mismo catálogo de ejemplo con `demo: true`
-  para que la maqueta funcione sin base de datos.
+## Repositorio
 
-## Canje de recompensas (cómo se almacenan y entregan las keys)
-- **Pool de keys**: tabla `placeta_joven_keypool` (una fila = una key en stock de una
-  recompensa). Solo la API la lee con la service role key: los códigos nunca llegan al
-  navegador salvo al socio que la consigue (ver `lib/keypool.js`). `estado` =
-  `disponible` | `asignada`; al asignar se marca con el `placeta_id` y no se reasigna.
-- **Cientos de keys por título (500 de un solo uso)**: cada key es una fila del pool y se
-  entrega a un único socio (una key por usuario y título). Para cargarlas en bloque:
-  `node scripts/load-keys.js <recompensaId> keys.txt [plataforma]` (una key por línea;
-  idempotente: reimportar no duplica). El catálogo muestra el stock real (vista
-  `placeta_joven_keypool_stock`) y pasa a **Agotado** cuando no quedan keys.
-- **Academia Joven** (`espacio/academia.html`): los cursos disponibles son los de
-  Cisco Networking Academy a través de PlacetaEDU y la matrícula se gestiona desde
-  Placeta Joven. Ser Placeta Joven suma **+20 puntos de acceso** para conseguir
-  plaza en los cursos.
-- **Pendiente abandonado**: un `PENDIENTE` sin confirmar caduca a las **2 horas**
-  (`pendienteCaducada` en `lib/placetajoven.js`) y deja al usuario elegir plan de
-  nuevo; mientras está reciente puede «Comprobar» o «Pagar de nuevo».
-- **Si ya pagó pero sigue PENDIENTE**: en «Pago en proceso» hay un botón
-  **«Ya he pagado · Verificar pago»** (y se intenta automáticamente al volver con
-  `?pago=ok`) que llama a `POST /api/verificar`, busca la suscripción activa en
-  Lemon Squeezy por email (`lib/checkout.js` → `buscarActivaPorEmail`) y activa la
-  cuenta con `activarDoc` (nunca cobra dos veces).
-- **Canje** (`POST /api/recompensas`): comprueba edad 16–30, suscripción activa o
-  cancelada con vigencia, recompensa canjeable y **una key por usuario y título**
-  (ledger `doc.recompensas`). Al canjear: toma una key del pool, la guarda en
-  `doc.keys` del socio (aparece en «Keys de juegos indie» con origen «Recompensa · N Pz»)
-  y registra el coste en Pz en el ledger. Ver `lib/recompensas.js` (`yaConseguida`,
-  `anadirKey`) y `api/recompensas.js`.
-- **Placetas (Pz)**: el coste se registra pero **no se descuenta saldo** todavía (no
-  existe wallet Pz en el ecosistema). Cuando exista el saldo real se añadirá la
-  comprobación y el débito en el punto de canje.
-- **Activación**: el canje está **desactivado por defecto** (`RECOMPENSAS_CANJEO=0`).
-  Al tener colaboraciones reales y cargar códigos reales en el keypool, pon
-  `RECOMPENSAS_CANJEO=1` en Vercel.
-
-## Pendiente para fases siguientes
-- Gestión de ventajas (`joven_benefits`) y panel de administración (RSP).
-- Desplegar plid26 con el solicitante de Placeta Joven para validar el login.
-- Verificación/débito real del saldo de Placetas (Pz) al canjear (ecosistema Banco/PlacetaID).
+- `https://github.com/grupodelaplaceta/placetajoven.git` (rama `main`).

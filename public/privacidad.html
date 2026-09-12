@@ -6,16 +6,27 @@
   <title>Política de Privacidad · Placeta Joven</title>
   <meta name="description" content="Política de privacidad de Placeta Joven, el programa opcional de ventajas para jóvenes del Grupo de La Placeta. Publicada en el Boletín Oficial de La Placeta (BOLP)." />
   <link rel="icon" type="image/png" href="img/jovenlogo.png" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('pjv_tema');
+        document.documentElement.setAttribute('data-tema', t === 'oscuro' ? 'oscuro' : 'claro');
+      } catch (e) { document.documentElement.setAttribute('data-tema', 'claro'); }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/legal.css?v=20260907a" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/legal.css?v=20260912b" />
 </head>
 <body data-codigo="PJOV-PRV-001">
   <header class="legal-top">
     <div class="legal-top-in">
       <img src="img/jovenlogo.png" alt="Placeta Joven" />
-      <a class="back" href="index.html">← Volver</a>
+      <div class="legal-acciones">
+        <button class="tema" type="button" data-action="tema" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema"></button>
+        <a class="back" href="index.html">← Volver</a>
+      </div>
     </div>
   </header>
 

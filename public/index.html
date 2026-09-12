@@ -3,398 +3,741 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Placeta Joven · Programa de ventajas para jóvenes de La Placeta</title>
-  <meta name="description" content="Placeta Joven, el programa opcional de pago para jóvenes de 16 a 30 años de La Placeta: formación Cisco NetAcad vía PlacetaEDU, cursos con descuento en Placetas, keys de juegos indie y cashback con la Cuenta Joven de Banco de La Placeta." />
-  <meta name="theme-color" content="#2A0750" />
-  <meta property="og:title" content="Placeta Joven · Programa de ventajas para jóvenes de La Placeta" />
-  <meta property="og:description" content="Programa opcional de pago para jóvenes de 16 a 30 años. 10 €/año · 1,95 €/mes." />
+  <title>Placeta Joven · Tu formación. Tus proyectos. Tus oportunidades.</title>
+  <meta name="description" content="Placeta Joven es el espacio de La Placeta para jóvenes de 16 a 30 años: formación oficial de Cisco Networking Academy vía PlacetaEDU, proyectos, keys de juegos indie y beneficios que se consiguen participando. Proyecto sostenible sin ánimo de lucro." />
+  <meta name="theme-color" content="#1C005F" />
+  <meta property="og:title" content="Placeta Joven · Tu formación. Tus proyectos. Tus oportunidades." />
+  <meta property="og:description" content="Formación, proyectos y beneficios para jóvenes de 16 a 30 años. Acceso con PlacetaID." />
   <meta property="og:type" content="website" />
   <link rel="icon" type="image/png" href="img/jovenlogo.png" />
+  <script>
+    /* Tema: claro por defecto; oscuro solo si el usuario lo ha elegido. */
+    (function () {
+      try {
+        var t = localStorage.getItem('pjv_tema');
+        document.documentElement.setAttribute('data-tema', t === 'oscuro' ? 'oscuro' : 'claro');
+      } catch (e) { document.documentElement.setAttribute('data-tema', 'claro'); }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css?v=20260907b" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/pjv.css?v=20260912b" />
 </head>
-<body class="pjv-home">
+<body class="pj-page">
 
-  <a class="pjv-skip" href="#main">Saltar al contenido</a>
+<a class="skip" href="#main">Saltar al contenido</a>
 
-  <!-- ══════════ Barra superior ══════════ -->
-  <header class="pjv-top" id="top">
-    <div class="pjv-top-inner">
-      <a class="pjv-brand" href="#top" aria-label="Placeta Joven — inicio">
-        <img class="pjv-logo" src="img/jovenlogo.png" alt="Placeta Joven" />
-      </a>
-      <button class="pjv-burger" id="pjv-nav-btn" type="button" aria-controls="pjv-nav" aria-expanded="false" aria-label="Abrir menú">
-        <span></span><span></span><span></span>
+<!-- ══════════ Iconos SVG (sprite compartido) ══════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-grad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-3.5"/><path d="M22 10v6"/>
+    </symbol>
+    <symbol id="i-brief" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M2 13h20"/>
+    </symbol>
+    <symbol id="i-pad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 11h4M8 9v4"/><path d="M15.5 12h.01M17.5 10.5h.01"/>
+      <path d="M17.32 5H6.68a4 4 0 0 0-3.98 3.59C2.6 9.4 2 14.5 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.4-1.4a2 2 0 0 1 1.4-.6h4.3a2 2 0 0 1 1.4.6L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.5-.6-6.6-.7-7.4A4 4 0 0 0 17.32 5Z"/>
+    </symbol>
+    <symbol id="i-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19h6a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7h5.5"/>
+    </symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </symbol>
+    <symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="7.5" cy="15.5" r="4.5"/><path d="m11 12 9-9"/><path d="m17 4 3 3"/><path d="m14 7 3 3"/>
+    </symbol>
+    <symbol id="i-coin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M15.2 9.4c-.7-.9-1.9-1.4-3.1-1.4-1.5 0-2.8.9-2.8 2.3s1.3 2.2 2.8 2.6c1.5.5 3 1 3 2.5s-1.3 2.5-3 2.5c-1.3 0-2.5-.6-3.2-1.6"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/>
+    </symbol>
+    <symbol id="i-id" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="11" r="2.2"/><path d="M5.5 17c.6-1.6 2-2.4 3.5-2.4S12 15.4 12.5 17"/><path d="M15 9h4M15 13h4"/>
+    </symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3l2.2 4.8 5.3.8-3.9 3.8.9 5.2-4.5-2.4-4.5 2.4.9-5.2L4.5 8.6l5.3-.8L12 3Z"/>
+    </symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20.8 6.6a5 5 0 0 0-7.1 0L12 8.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 22l8.8-8.3a5 5 0 0 0 0-7.1Z"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m4 12.5 5 5L20 6.5"/>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>
+    </symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/>
+    </symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <path d="M18 6 6 18M6 6l12 12"/>
+    </symbol>
+    <symbol id="i-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+    </symbol>
+    <symbol id="i-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ══════════ Cabecera ══════════ -->
+<header class="hdr" id="top">
+  <div class="hdr-in">
+    <a class="brand" href="index.html" aria-label="Placeta Joven — inicio">
+      <img src="img/jovenlogo.png" alt="" />
+      <span class="brand-txt"><b>Placeta Joven</b><span>Grupo de La Placeta</span></span>
+    </a>
+    <nav class="hdr-nav" aria-label="Principal">
+      <a href="#formacion">Formación</a>
+      <a href="#oportunidades">Oportunidades</a>
+      <a href="#beneficios">Beneficios</a>
+      <a href="#rutas">Rutas</a>
+      <a href="#comunidad">Comunidad</a>
+      <a href="#colabora">Colabora</a>
+    </nav>
+    <div class="hdr-actions">
+      <button class="icon-btn" type="button" data-action="tema" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema">
+        <svg class="ico" aria-hidden="true"><use href="#i-luna" data-tema-ico/></svg>
       </button>
-      <nav class="pjv-nav" id="pjv-nav" aria-label="Principal">
-        <div class="pjv-nav-head">
-          <img class="pjv-nav-logo" src="img/jovenlogo.png" alt="Placeta Joven" />
-          <button class="pjv-nav-close" id="pjv-nav-close" type="button" aria-label="Cerrar menú">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
-          </button>
-        </div>
-        <div class="pjv-nav-links">
-          <a href="#ventajas">Ventajas</a>
-          <a href="#como">Cómo funciona</a>
-          <a href="#planes">Planes</a>
-          <a href="#colabora">Colabora</a>
-          <a href="#faq">Preguntas</a>
-          <a class="pjv-btn pjv-btn-accent" href="https://id.laplaceta.org/">Acceder con PlacetaID</a>
-        </div>
-        <div class="pjv-nav-foot">
-          <p class="pjv-nav-price">10&nbsp;€/año · 1,95&nbsp;€/mes</p>
-          <a href="mailto:joven@laplaceta.org">Soporte · joven@laplaceta.org</a>
-        </div>
-      </nav>
+      <a class="btn btn-ghost btn-sm" href="mi.html">Mi espacio</a>
+      <a class="btn btn-primary btn-sm" href="https://id.laplaceta.org/" data-login>Entrar<svg class="ico"><use href="#i-arrow"/></svg></a>
     </div>
-  </header>
+    <button class="burger" id="burger" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="drawer">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
 
-  <!-- Fondo del menú móvil (solo móvil) -->
-  <div class="pjv-backdrop" id="pjv-backdrop" aria-hidden="true"></div>
+<div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
 
-  <main id="main">
+<aside class="drawer" id="drawer" aria-label="Menú">
+  <div class="drawer-head">
+    <img src="img/jovenlogo.png" alt="Placeta Joven" />
+    <button class="drawer-close" id="drawerClose" type="button" aria-label="Cerrar menú">
+      <svg class="ico"><use href="#i-x"/></svg>
+    </button>
+  </div>
+  <nav class="drawer-nav" aria-label="Secciones">
+    <a href="#que-es">Qué es Placeta Joven</a>
+    <a href="#como">Cómo funciona</a>
+    <a href="#formacion">Formación</a>
+    <a href="#oportunidades">Oportunidades</a>
+    <a href="#beneficios">Beneficios</a>
+    <a href="#rutas">Rutas</a>
+    <a href="#comunidad">Comunidad</a>
+    <a href="#colabora">Colabora</a>
+    <a href="#seguridad">Seguridad</a>
+    <a href="#faq">Preguntas frecuentes</a>
+  </nav>
+  <div class="drawer-foot">
+    <a class="btn btn-primary btn-block" href="https://id.laplaceta.org/" data-login>Entrar con PlacetaID</a>
+    <a class="btn btn-ghost btn-block" href="mi.html">Mi espacio</a>
+    <button class="btn btn-ghost btn-block" type="button" data-action="tema">
+      <svg class="ico" aria-hidden="true"><use href="#i-luna" data-tema-ico></use></svg> Cambiar tema
+    </button>
+    <p>Soporte · <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a></p>
+  </div>
+</aside>
 
-    <!-- ══════════ HERO ══════════ -->
-    <section class="pjv-hero">
-      <div class="pjv-hero-shapes" aria-hidden="true">
-        <span class="pjv-shape pjv-shape-a"></span>
-        <span class="pjv-shape pjv-shape-b"></span>
-      </div>
-      <div class="pjv-container pjv-hero-grid">
-        <div class="pjv-hero-copy">
-          <h1 class="pjv-title-xl">Más ventajas.<br />Más experiencias.<br /><em>Más Placeta.</em></h1>
-          <div class="pjv-price-row" aria-label="Precios de Placeta Joven">
-            <span class="pjv-price-chip"><b>10&nbsp;€</b>/año</span>
-            <span class="pjv-price-sep" aria-hidden="true">·</span>
-            <span class="pjv-price-chip"><b>1,95&nbsp;€</b>/mes</span>
+<main id="main">
+
+  <!-- ══════════ HERO ══════════ -->
+  <section class="hero grid-bg">
+    <span class="glow glow-v glow-a" aria-hidden="true"></span>
+    <span class="glow glow-c glow-b" aria-hidden="true"></span>
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Programa joven · Grupo de La Placeta</p>
+          <h1>Tu formación.<br />Tus proyectos.<br /><span class="g-text">Tus oportunidades.</span></h1>
+          <p class="hero-lead">Un espacio de La Placeta para aprender, participar y descubrir nuevas oportunidades. Formación oficial, proyectos reales y beneficios que se consiguen implicándose.</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary btn-lg" href="https://id.laplaceta.org/" data-login>Entrar en Placeta Joven<svg class="ico"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost btn-lg" href="#como">Ver cómo funciona</a>
           </div>
-          <div class="pjv-cta-row">
-            <a class="pjv-btn pjv-btn-accent pjv-btn-lg" href="https://id.laplaceta.org/">Quiero Placeta Joven</a>
-            <a class="pjv-btn pjv-btn-ghost pjv-btn-lg" href="#ventajas">Ver qué incluye</a>
+          <div class="chip-row" style="margin-bottom:1.3rem">
+            <span class="chip"><i></i> De 16 a 30 años</span>
+            <span class="chip"><i></i> Acceso con PlacetaID</span>
+            <span class="chip"><i></i> Sin ánimo de lucro</span>
+            <span class="chip"><i></i> Cuenta Joven · 12 % cashback</span>
           </div>
-          <p class="pjv-note"><span>La Placeta es para todos.</span> Placeta Joven es una opción para quien quiere más ventajas.</p>
+          <p class="hero-note">
+            <svg class="ico"><use href="#i-spark"/></svg>
+            <span>Placeta Joven es la <b>modalidad para jóvenes</b> dentro de La Placeta. Las actividades generales del Grupo siguen abiertas a más personas: participar aquí es una opción, no un requisito.</span>
+          </p>
         </div>
 
-        <div class="pjv-hero-art">
-          <img class="pjv-hero-logo" src="img/jovenlogo.png" alt="Logotipo Placeta Joven" />
-          <span class="pjv-chip pjv-chip-a"><i aria-hidden="true">🎓</i> Cursos Cisco NetAcad</span>
-          <span class="pjv-chip pjv-chip-b"><i aria-hidden="true">Pz</i> Cursos con descuento</span>
-          <span class="pjv-chip pjv-chip-c"><i aria-hidden="true">12%</i> Cashback · Cuenta Joven</span>
-          <span class="pjv-chip pjv-chip-d"><i aria-hidden="true">🎮</i> Keys de juegos indie</span>
-        </div>
-      </div>
+        <div class="hero-art">
+          <div class="panel" role="img" aria-label="Vista previa del espacio joven: saldo en Placetas, curso en progreso y actividad reciente">
+            <div class="panel-top">
+              <span class="panel-dots"><i></i><i></i><i></i></span>
+              <p class="panel-title">Vista previa · Mi espacio</p>
+            </div>
+            <div class="panel-body">
+              <div class="balance">
+                <small>Saldo disponible</small>
+                <b>1.250 Pz</b>
+                <span>Placetas · saldo de tu <b>Cuenta Joven</b> en Banco de La Placeta</span>
+              </div>
 
-      <div class="pjv-hero-strip">
-        <div class="pjv-container">
-          <p><span class="pjv-strip-ico" aria-hidden="true">✓</span> <b>Placeta Joven es opcional.</b> Puedes utilizar La Placeta sin contratar este programa. <a href="#faq">Saber más</a></p>
-        </div>
-      </div>
-    </section>
+              <div class="mini">
+                <span class="mini-ico"><svg class="ico"><use href="#i-shield"/></svg></span>
+                <div class="mini-txt">
+                  <b>Introducción a la ciberseguridad</b>
+                  <span>PlacetaEDU · Cisco Networking Academy</span>
+                  <div class="bar"><i style="width:82%"></i></div>
+                  <div class="bar-meta"><span>82 % completado</span><span>+100 Pz +20 bonus</span></div>
+                </div>
+              </div>
 
-    <!-- ══════════ QUÉ INCLUYE (VENTAJAS REALES) ══════════ -->
-    <section class="pjv-section pjv-soft" id="ventajas">
-      <div class="pjv-container">
-        <div class="pjv-sec-head">
-          <p class="pjv-kicker">Qué incluye</p>
-          <h2 class="pjv-title">Las ventajas de Placeta Joven</h2>
-          <p>De momento esto es lo que ofrece el programa. Iremos sumando más ventajas a medida que se incorporen colaboradores.</p>
-        </div>
+              <div class="mini">
+                <span class="mini-ico"><svg class="ico"><use href="#i-pad"/></svg></span>
+                <div class="mini-txt"><b>Luminaria</b><span>Enthariel Games · 420 Pz · 1 key por usuario</span></div>
+              </div>
 
-        <div class="pjv-grid pjv-grid-4">
-          <article class="pjv-card">
-            <span class="pjv-card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-3.5"/><path d="M22 10v6"/></svg></span>
-            <h3>Formación Cisco NetAcad</h3>
-            <p>Cursos oficiales de <b>Cisco Networking Academy</b> a través de <b>PlacetaEDU</b>:
-            redes, ciberseguridad, IoT y más, con material oficial y seguimiento.</p>
-          </article>
-          <article class="pjv-card">
-            <span class="pjv-card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12.6 2.6 21 11a2 2 0 0 1 0 2.8l-7.2 7.2a2 2 0 0 1-2.8 0L3 12.4V4a1 1 0 0 1 1-1h8.4a2 2 0 0 1 1.2.6Z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg></span>
-            <h3>Cursos con descuento en Pz</h3>
-            <p>Cursos propios de La Placeta que pagas con <b>Placetas (Pz)</b>. Si tienes
-            Placeta Joven, el precio es menor.</p>
-          </article>
-          <article class="pjv-card">
-            <span class="pjv-card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h4M8 9v4"/><path d="M15.5 12h.01M17.5 10.5h.01"/><path d="M17.32 5H6.68a4 4 0 0 0-3.98 3.59C2.6 9.4 2 14.5 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.4-1.4a2 2 0 0 1 1.4-.6h4.3a2 2 0 0 1 1.4.6L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.5-.6-6.6-.7-7.4A4 4 0 0 0 17.32 5Z"/></svg></span>
-            <h3>Keys de juegos indie</h3>
-            <p>Claves de videojuegos de <b>estudios independientes</b> que colaboran con el
-            proyecto. Las recibes cuando hay disponibilidad.</p>
-          </article>
-          <article class="pjv-card">
-            <span class="pjv-card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span>
-            <h3>Cashback · Cuenta Joven</h3>
-            <p>Conecta tu cuenta de <b>Banco de La Placeta</b> y conviértela en <b>Cuenta Joven</b>:
-            un <b>12&nbsp;% de cashback</b> en tus gastos (impuestos excluidos).</p>
-          </article>
-        </div>
-
-        <p class="pjv-fine">Esta es la lista actual del programa. No prometemos más de lo que hay: iremos ampliándola con cada colaborador que se sume.</p>
-      </div>
-    </section>
-
-    <!-- ══════════ CÓMO FUNCIONA ══════════ -->
-    <section class="pjv-section" id="como">
-      <div class="pjv-container">
-        <div class="pjv-sec-head">
-          <p class="pjv-kicker">Cómo funciona</p>
-          <h2 class="pjv-title">De tu PlacetaID a tus ventajas</h2>
-          <p>No necesitas crear una cuenta nueva. Entras con tu PlacetaID y, si tienes la edad, ves el estado de tu Placeta Joven.</p>
-        </div>
-
-        <ol class="pjv-steps">
-          <li class="pjv-step">
-            <span class="pjv-step-num">01</span>
-            <h3>Entra con tu PlacetaID</h3>
-            <p>Inicia sesión con tu PlacetaID. Si tienes entre 16 y 30 años podrás ver Placeta Joven; si no tienes la edad, el acceso queda bloqueado.</p>
-          </li>
-          <li class="pjv-step">
-            <span class="pjv-step-num">02</span>
-            <h3>Mira tu estado</h3>
-            <p>Si ya tienes el programa, ves tu suscripción (plan y vigencia) y puedes renovarla o cancelarla. Si no, puedes darte de alta.</p>
-          </li>
-          <li class="pjv-step">
-            <span class="pjv-step-num">03</span>
-            <h3>Elige y paga</h3>
-            <p>Plan mensual o anual. El pago se hace en euros con Lemon Squeezy desde tu cuenta.</p>
-          </li>
-          <li class="pjv-step">
-            <span class="pjv-step-num">04</span>
-            <h3>Activación automática</h3>
-            <p>Al confirmarse el pago, el backend activa o renueva tu Placeta Joven y ya puedes usar tus ventajas.</p>
-          </li>
-        </ol>
-
-        <div class="pjv-status">
-          <p class="pjv-status-label">Tu programa puede tener estos estados:</p>
-          <div class="pjv-status-chips">
-            <span class="pjv-status-chip">Pendiente</span>
-            <span class="pjv-status-chip pjv-status-ok">✓ Activo</span>
-            <span class="pjv-status-chip">Suspendido</span>
-            <span class="pjv-status-chip">Cancelado</span>
-            <span class="pjv-status-chip">Expirado</span>
+              <div class="mini">
+                <span class="mini-ico"><svg class="ico"><use href="#i-coin"/></svg></span>
+                <div class="mini-txt"><b>Actividad reciente</b><span>+120 Pz curso completado · −420 Pz recompensa</span></div>
+              </div>
+            </div>
+            <span class="float-chip float-a"><span>Pz</span> Formación → recompensa</span>
+            <span class="float-chip float-b"><svg class="ico" style="width:14px;height:14px"><use href="#i-key"/></svg> Keys de estudios indie</span>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- ══════════ PLANES ══════════ -->
-    <section class="pjv-section pjv-soft" id="planes">
-      <div class="pjv-container">
-        <div class="pjv-sec-head">
-          <p class="pjv-kicker">Planes</p>
-          <h2 class="pjv-title">Elige tu plan</h2>
-          <p>La cuota se paga en euros. Los dos planes (mensual y anual) incluyen la misma oferta anual de beneficios «Drop Joven '26»; la diferencia está en cómo prefieres pagar.</p>
-        </div>
-
-        <div class="pjv-plans">
-          <article class="pjv-plan">
-            <div class="pjv-plan-head">
-              <h3 class="pjv-plan-name">Plan mensual</h3>
-              <p class="pjv-plan-price"><b>1,95&nbsp;€</b><span>/mes</span></p>
-              <p class="pjv-plan-meta">Pagar mes a mes sale por <b>23,40&nbsp;€</b> al año.</p>
-            </div>
-            <ul class="pjv-list">
-              <li>Todas las ventajas «Drop Joven '26» mientras esté activo</li>
-              <li>Sin permanencia: puedes dejar de pagarlo cuando quieras</li>
-              <li>Renovación mensual</li>
-            </ul>
-            <a class="pjv-btn pjv-btn-outline pjv-btn-block" href="https://id.laplaceta.org/">Elegir mensual</a>
-          </article>
-
-          <article class="pjv-plan pjv-plan-feat">
-            <span class="pjv-plan-badge">La más rentable</span>
-            <div class="pjv-plan-head">
-              <h3 class="pjv-plan-name">Plan anual</h3>
-              <p class="pjv-plan-sub">Un año entero de programa</p>
-              <p class="pjv-plan-price"><b>10&nbsp;€</b><span>/año</span></p>
-              <p class="pjv-plan-save">A fin de cuenta sale más barato: ahorras un <b>57&nbsp;%</b> frente al mensual (−13,40&nbsp;€/año).</p>
-            </div>
-            <ul class="pjv-list pjv-list-light">
-              <li>Un año completo de acceso al programa</li>
-              <li>Todas las ventajas «Drop Joven '26», todo el año</li>
-              <li>Ahorro frente al plan mensual</li>
-            </ul>
-            <a class="pjv-btn pjv-btn-accent pjv-btn-block" href="https://id.laplaceta.org/">Quiero el plan anual</a>
-          </article>
-        </div>
-
-        <p class="pjv-fine pjv-fine-center">«Drop Joven '26» es la oferta anual de beneficios del programa y está incluida en los dos planes. El plan anual sale más barato a fin de cuenta: <b>10&nbsp;€/año</b> frente a <b>23,40&nbsp;€</b> pagando mes a mes (ahorras un 57&nbsp;%).<br />Las condiciones económicas podrán adaptarse en el futuro a la evolución del programa.</p>
-      </div>
-    </section>
-
-    <!-- ══════════ COLABORA ══════════ -->
-    <section class="pjv-section pjv-dark" id="colabora">
-      <div class="pjv-container">
-        <div class="pjv-sec-head">
-          <p class="pjv-kicker pjv-kicker-light">Colabora</p>
-          <h2 class="pjv-title">Haz crecer el programa</h2>
-          <p>Placeta Joven se construye con la ayuda de estudios de videojuegos, creadores,
-          proyectos, asociaciones y comercios locales. Cada colaborador decide qué aporta.</p>
-        </div>
-
-        <div class="pjv-colab">
-          <div class="pjv-colab-intro">
-            <p><b>Si tienes un estudio de videojuegos independiente</b>, puedes ceder keys,
-            demos o acceso anticipado de tus juegos a la comunidad. No hay mínimos y las claves
-            no se revenden: la idea es dar a conocer tu trabajo.</p>
-            <ul class="pjv-list pjv-list-light">
-              <li>Publicamos tu juego y tu web oficial junto a la ventaja</li>
-              <li>Sin coste para ti y sin número mínimo de keys</li>
-              <li>También colaboramos con proyectos, creadores y comercios locales</li>
-            </ul>
-          </div>
-          <div class="pjv-cta-row pjv-colab-cta">
-            <a class="pjv-btn pjv-btn-accent pjv-btn-lg" href="https://www.laplaceta.org/colabora" target="_blank" rel="noopener">Quiero colaborar</a>
-          </div>
-          <p class="pjv-colab-mail">¿Prefieres hablar directamente? Escríbenos a <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a></p>
-        </div>
-      </div>
-    </section>
-
-    <!-- ══════════ FAQ ══════════ -->
-    <section class="pjv-section" id="faq">
-      <div class="pjv-container pjv-narrow">
-        <div class="pjv-sec-head">
-          <p class="pjv-kicker">Preguntas frecuentes</p>
-          <h2 class="pjv-title">Resolvemos tus dudas</h2>
-        </div>
-
-        <div class="pjv-faq">
-          <details class="pjv-faq-item" open>
-            <summary>¿Necesito Placeta Joven para usar La Placeta?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>No. La Placeta es para todos. Puedes usar los servicios generales, participar en
-              actividades abiertas y usar tus Placetas (Pz) sin contratar Placeta Joven. El programa
-              solo añade las ventajas que se describen en esta página.</p>
-            </div>
-          </details>
-          <details class="pjv-faq-item">
-            <summary>¿Quién puede contratarlo?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>Está dirigido inicialmente a jóvenes de 16 a 30 años (ambos incluidos). La edad está
-              vinculada a tu PlacetaID. Al entrar, el sistema la comprueba: si no tienes la edad
-              permitida, el acceso a Placeta Joven se bloquea.</p>
-            </div>
-          </details>
-          <details class="pjv-faq-item">
-            <summary>¿Qué incluye Placeta Joven ahora mismo?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>Hoy incluye: cursos de Cisco NetAcad a través de PlacetaEDU, cursos propios con
-              descuento pagados en Placetas (Pz), keys de juegos de estudios independientes y un
-              12&nbsp;% de cashback si conviertes tu cuenta de Banco de La Placeta en Cuenta Joven.
-              No incluimos ventajas que todavía no existen: la lista crecerá con los colaboradores.</p>
-            </div>
-          </details>
-          <details class="pjv-faq-item">
-            <summary>¿Cómo funciona el 12&nbsp;% de cashback de la Cuenta Joven?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>Si tienes una cuenta en Banco de La Placeta puedes convertirla en Cuenta Joven.
-              A partir de entonces recibes un 12&nbsp;% de cashback por las transacciones que hagas
-              desde o hacia esa cuenta. El cashback se aplica a gastos, <b>no a impuestos</b>.</p>
-            </div>
-          </details>
-          <details class="pjv-faq-item">
-            <summary>¿Cómo se paga y cuándo se activa?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>El pago se hace en euros con <b>Lemon Squeezy</b>. Entras con tu PlacetaID, eliges el
-              plan mensual o anual y pagas. Lemon Squeezy avisa al backend y este activa o renueva tu
-              Placeta Joven automáticamente. No se crea ninguna cuenta independiente.</p>
-            </div>
-          </details>
-          <details class="pjv-faq-item">
-            <summary>¿Qué veo al entrar con mi PlacetaID?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>Si tienes entre 16 y 30 años, al entrar ves el estado de tu Placeta Joven: si no lo
-              tienes puedes darte de alta; si ya lo tienes ves tu plan y su vigencia y puedes
-              renovarlo o cancelarlo. Si no tienes la edad permitida, el acceso queda bloqueado.</p>
-            </div>
-          </details>
-          <details class="pjv-faq-item">
-            <summary>¿Qué pasa si dejo de pagarlo?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>Si lo cancelas o caduca, pierdes el acceso a las ventajas del programa, pero
-              conservas sin problema tu acceso general a La Placeta y a tus Placetas (Pz).</p>
-            </div>
-          </details>
-          <details class="pjv-faq-item">
-            <summary>¿Puedo colaborar como estudio o proyecto?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>Sí. Puedes aportar keys, demos, descuentos, productos o cualquier colaboración que
-              consideres adecuada. Cada colaborador pone sus condiciones y nosotros las publicamos
-              y damos a conocer.</p>
-            </div>
-          </details>
-          <details class="pjv-faq-item">
-            <summary>¿Qué es el «Drop Joven '26»?<span class="pjv-faq-chev" aria-hidden="true"></span></summary>
-            <div class="pjv-faq-body">
-              <p>«Drop Joven '26» es el nombre de la oferta anual de beneficios del programa
-              (formación, descuentos, keys y cashback) para la edición '26. Está incluida tanto
-              si pagas el plan mensual como el anual. El plan anual sale más rentable a fin de
-              cuenta: 10&nbsp;€/año frente a 23,40&nbsp;€ pagando mes a mes, así que ahorras un
-              <b>57&nbsp;%</b> (−13,40&nbsp;€).</p>
-            </div>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <!-- ══════════ CTA FINAL ══════════ -->
-    <section class="pjv-final">
-      <div class="pjv-container pjv-final-inner">
-        <img class="pjv-final-logo" src="img/jovenlogo.png" alt="Placeta Joven" />
-        <h2 class="pjv-title-xl">Placeta Joven</h2>
-        <p class="pjv-final-sub">Más ventajas. Más experiencias. Más Placeta.<br />Un programa opcional para jóvenes dentro de La Placeta.</p>
-        <div class="pjv-price-row" aria-label="Precios de Placeta Joven">
-          <span class="pjv-price-chip"><b>10&nbsp;€</b>/año</span>
-          <span class="pjv-price-sep" aria-hidden="true">·</span>
-          <span class="pjv-price-chip"><b>1,95&nbsp;€</b>/mes</span>
-        </div>
-        <a class="pjv-btn pjv-btn-accent pjv-btn-lg" href="https://id.laplaceta.org/">Quiero Placeta Joven</a>
-        <p class="pjv-final-note">La Placeta es para todos. Placeta Joven es para quienes quieren disfrutar de más ventajas.</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- ══════════ PIE ══════════ -->
-  <footer class="pjv-footer">
-    <div class="pjv-container">
-      <div class="pjv-footer-grid">
-        <div class="pjv-footer-brand">
-          <img class="pjv-logo pjv-logo-footer" src="img/jovenlogo.png" alt="Placeta Joven" />
-          <p>Programa opcional de ventajas para jóvenes dentro del Grupo de La Placeta.</p>
-        </div>
-        <div class="pjv-footer-col">
-          <h4>La Placeta</h4>
-          <a href="https://www.laplaceta.org/" target="_blank" rel="noopener">Web oficial</a>
-          <a href="https://junior.laplaceta.org/" target="_blank" rel="noopener">Placeta Junior</a>
-          <a href="https://www.laplaceta.org/proyectos/placetaedu" target="_blank" rel="noopener">PlacetaEDU</a>
-          <a href="https://www.laplaceta.org/tramites/alta-placetid" target="_blank" rel="noopener">Alta PlacetaID</a>
-        </div>
-        <div class="pjv-footer-col">
-          <h4>Programa</h4>
-          <a href="https://id.laplaceta.org/">Acceder con PlacetaID</a>
-          <a href="mi.html">Mi Placeta Joven</a>
-          <a href="#ventajas">Qué incluye</a>
-          <a href="#planes">Planes</a>
-          <a href="#faq">Preguntas frecuentes</a>
-        </div>
-        <div class="pjv-footer-col">
-          <h4>Legal</h4>
-          <a href="terminos.html">Términos y condiciones</a>
-          <a href="privacidad.html">Política de privacidad</a>
-          <a href="https://bop.laplaceta.org/" target="_blank" rel="noopener">Boletín Oficial (BOLP)</a>
-        </div>
-      </div>
-      <div class="pjv-footer-bottom">
-        <p>Placeta Joven es opcional. Puedes utilizar La Placeta sin contratar este programa.</p>
-        <p class="pjv-copy">Soporte: <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a></p>
-        <p class="pjv-copy">© 2026 Grupo de La Placeta.</p>
       </div>
     </div>
-  </footer>
+  </section>
 
-  <script src="js/placetaid.js?v=20260907b"></script>
-  <script src="js/main.js?v=20260907b"></script>
+  <!-- ══════════ Pilares ══════════ -->
+  <div class="strip">
+    <div class="wrap strip-in">
+      <span>Formación</span><span>Oportunidades</span><span>Proyectos</span><span>Beneficios</span><span>Comunidad</span>
+    </div>
+  </div>
+
+  <!-- ══════════ QUÉ ES ══════════ -->
+  <section class="sec grid-bg" id="que-es">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">El proyecto</p>
+        <h2>Un proyecto sostenible, <span class="g-text">no un negocio</span></h2>
+        <p>Placeta Joven tiene un <b>coste simbólico</b> para quien lo usa. Ese importe nos permite generar progresivamente los recursos necesarios para mantener el programa, cubrir sus costes y, con el tiempo, desarrollar nuevas iniciativas y beneficios para la comunidad.</p>
+      </div>
+
+      <div class="bento bento-3">
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-coin"/></svg></span>
+          <h3>Coste simbólico</h3>
+          <p>No buscamos lucrarnos con el programa. La cuota existe para sostenerlo y para que pueda seguir creciendo sin depender solo de financiación externa.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-heart"/></svg></span>
+          <h3>Todo se reinvierte</h3>
+          <p>Los ingresos se destinan a la propia entidad y a la continuidad, mejora y ampliación de sus proyectos: más oportunidades, actividades, contenidos y beneficios.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-spark"/></svg></span>
+          <h3>Colaboración flexible</h3>
+          <p>Cada entidad tiene sus circunstancias. Adaptamos la fórmula: aportación de keys, campañas concretas, acciones de promoción o colaboraciones especiales.</p>
+        </article>
+      </div>
+
+      <div class="bento bento-2" style="margin-top:1rem">
+        <article class="card card-feature">
+          <span class="tag tag-cyan">Importante</span>
+          <h3 style="margin-top:.9rem">Placeta Joven no crea Placetas</h3>
+          <p>Las Placetas (Pz) viven en tu <b>Cuenta Joven de Banco de La Placeta</b>. Esta plataforma <b>consulta el saldo y registra los movimientos que tú autorizas</b>: nunca emite Pz ni permite comprarlas con dinero real.</p>
+          <ul class="card-list">
+            <li>Las Pz se consiguen realizando actividades dentro del ecosistema.</li>
+            <li>Entre ellas, las actividades educativas de PlacetaEDU.</li>
+            <li>Con Pz puedes acceder a recompensas como keys de juegos.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-users"/></svg></span>
+          <h3>Un sistema pensado para todos</h3>
+          <p>Cualquier joven puede utilizar los servicios y espacios de La Placeta aunque no participe en el programa de recompensas: la participación es <b>opcional</b>.</p>
+          <p style="margin-top:.8rem">Nuestro objetivo es proteger el programa para que se mantenga en el tiempo y beneficie al mayor número posible de personas.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ CÓMO FUNCIONA ══════════ -->
+  <section class="sec" id="como">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Cómo funciona</p>
+        <h2>Tu participación genera Pz. <span class="g-text">Tus Pz abren beneficios.</span></h2>
+        <p>No se trata de regalar videojuegos por estudiar. Se trata de que tu formación y tu participación tengan un valor dentro del ecosistema y puedas decidir en qué lo aprovechas.</p>
+      </div>
+
+      <ol class="flow">
+        <li class="flow-node">
+          <i>01</i><b>Te formas</b>
+          <span>Cursos de Cisco NetAcad vía PlacetaEDU y actividades propias de La Placeta.</span>
+        </li>
+        <li class="flow-node">
+          <i>02</i><b>Completas</b>
+          <span>Acreditas el curso y registramos la finalización.</span>
+        </li>
+        <li class="flow-node is-key">
+          <i>03</i><b>+ Pz</b>
+          <span>Recibes la recompensa y el bonus que correspondan por esa formación.</span>
+        </li>
+        <li class="flow-node">
+          <i>04</i><b>Acumulas</b>
+          <span>Tu saldo vive en Banco de La Placeta. Placeta Joven solo lo consulta.</span>
+        </li>
+        <li class="flow-node is-key">
+          <i>05</i><b>Canjeas</b>
+          <span>Usas tus Pz en recompensas: keys de juegos indie, cursos y más.</span>
+        </li>
+      </ol>
+
+      <div class="bento bento-3" style="margin-top:1.2rem">
+        <article class="card">
+          <h3>Formación con recompensa</h3>
+          <p>El precio y la recompensa están <b>separados</b>: primero pagas la matrícula y, al completar, obtienes Pz. Así el esfuerzo siempre tiene retorno.</p>
+        </article>
+        <article class="card">
+          <h3>Acceso sin dinero real</h3>
+          <p>Las Pz no pueden obtenerse mediante recargas de dinero real ni mecanismos equivalentes de compra directa. Se ganan participando.</p>
+        </article>
+        <article class="card">
+          <h3>Una key por título</h3>
+          <p>Cada usuario puede obtener una única key de cada juego. Las recompensas llegan al mayor número posible de jóvenes y no se acumulan copias.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FORMACIÓN ══════════ -->
+  <section class="sec" id="formacion">
+    <div class="wrap">
+      <div class="split">
+        <div>
+          <p class="eyebrow">Formación</p>
+          <h2>Aprende con <span class="g-text">formación oficial</span></h2>
+          <p class="lead">Cursos de <b>Cisco Networking Academy</b> a través de <b>PlacetaEDU</b>, actividades propias de La Placeta y rutas formativas con evaluaciones y certificados.</p>
+          <ul class="card-list" style="margin-top:1.2rem">
+            <li><b>Cursos Cisco NetAcad</b> — redes, ciberseguridad, IoT, fundamentos de TI y programación.</li>
+            <li><b>Rutas formativas</b> — itinerarios ordenados por objetivo, no cursos sueltos.</li>
+            <li><b>Evaluaciones y certificados</b> — acredita lo que has completado.</li>
+            <li><b>Historial de formación</b> — todo lo que has hecho, en un solo sitio.</li>
+            <li><b>Becas PlacetaEDU</b> — reducen el precio de la matrícula y no el de la recompensa.</li>
+          </ul>
+          <div class="hero-cta" style="margin-top:1.5rem">
+            <a class="btn btn-primary" href="https://id.laplaceta.org/" data-login>Ver formaciones<svg class="ico"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost" href="#beneficios">Ver beneficios</a>
+          </div>
+        </div>
+
+        <div class="bento bento-2">
+          <article class="tile">
+            <div class="tile-top">
+              <div>
+                <h4>Introducción a la ciberseguridad</h4>
+                <p class="tile-sub">PlacetaEDU · Cisco NetAcad</p>
+              </div>
+              <span class="tag tag-cyan">Inicial</span>
+            </div>
+            <div class="tile-price">350 <small>Pz totales</small></div>
+            <div class="tile-rows">
+              <div><span>Matrícula</span><b>300 Pz</b></div>
+              <div><span>Gastos de gestión</span><b>50 Pz</b></div>
+              <div class="ok"><span>Recompensa al completar</span><b>+75 Pz</b></div>
+              <div class="ok"><span>Bonus</span><b>+20 Pz</b></div>
+              <div class="cut"><span>Beca máxima</span><b>50 %</b></div>
+            </div>
+          </article>
+
+          <article class="tile">
+            <div class="tile-top">
+              <div>
+                <h4>Cómo funciona una beca</h4>
+                <p class="tile-sub">Becas PlacetaEDU</p>
+              </div>
+              <span class="tag tag-amber">Ejemplo</span>
+            </div>
+            <div class="tile-price">300 <small>Pz a pagar</small></div>
+            <div class="tile-rows">
+              <div><span>Precio original</span><b>500 Pz</b></div>
+              <div class="cut"><span>Beca concedida (40 %)</span><b>−200 Pz</b></div>
+              <div><span>Asume la Junta</span><b>200 Pz</b></div>
+              <div class="ok"><span>Al completar recibes</span><b>+120 Pz</b></div>
+            </div>
+            <p class="tile-sub" style="margin:0">La beca <b>reduce el precio</b>; nunca añade Pz al saldo. La recompensa por completar se mantiene.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ OPORTUNIDADES ══════════ -->
+  <section class="sec" id="oportunidades" style="background:linear-gradient(180deg,transparent,rgba(124,58,237,.07),transparent)">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Empleo y futuro <span class="tag" style="margin-left:.5rem">En preparación</span></p>
+        <h2>De lo que aprendes a <span class="g-text">lo que puedes hacer</span></h2>
+        <p>Estamos construyendo el área de empleo y proyectos. Este es el itinerario que queremos cubrir, paso a paso y sin prometer lo que todavía no existe.</p>
+      </div>
+
+      <div class="bento bento-3">
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-book"/></svg></span>
+          <h3>Mi primer currículum</h3>
+          <p>Generador y gestor de CV: construye tu currículum desde cero y mantenlo actualizado con lo que vas consiguiendo.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-brief"/></svg></span>
+          <h3>Buscar trabajo</h3>
+          <p>Recursos para buscar empleo, preparar entrevistas y entender qué piden las empresas y los proyectos reales.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-users"/></svg></span>
+          <h3>Orientación</h3>
+          <p>Orientación profesional para decidir por dónde seguir: qué formación encaja con lo que quieres hacer.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-spark"/></svg></span>
+          <h3>Proyectos</h3>
+          <p>Espacio para tus ideas y proyectos propios dentro de La Placeta, con el acompañamiento de la comunidad.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-heart"/></svg></span>
+          <h3>Voluntariado</h3>
+          <p>Participa en las iniciativas de La Placeta y suma experiencia real mientras aportas a la comunidad.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-cal"/></svg></span>
+          <h3>Prácticas</h3>
+          <p>Cuando existan colaboraciones con empresas y estudios, las publicaremos aquí con sus condiciones.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ BENEFICIOS ══════════ -->
+  <section class="sec" id="beneficios">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Beneficios</p>
+        <h2>Recompensas que <span class="g-text">llegan de verdad</span></h2>
+        <p>Sin promesas infladas: publicamos los beneficios que existen y los vamos ampliando con cada colaboración que se confirma.</p>
+      </div>
+
+      <div class="bento bento-2">
+        <article class="card card-wide card-feature">
+          <span class="card-ico"><svg class="ico"><use href="#i-pad"/></svg></span>
+          <h3>Keys de juegos de estudios independientes</h3>
+          <p>Estudios y desarrolladoras independientes ceden keys para el sistema de recompensas. Los usuarios las consiguen con Pz y las canjean en su plataforma.</p>
+          <ul class="card-list">
+            <li><b>Una key por título y usuario</b>, para que lleguen al mayor número de jóvenes.</li>
+            <li>Cada key tiene un <b>estado trazable</b>: disponible, reservada, asignada y entregada.</li>
+            <li>Una key entregada <b>no vuelve al inventario</b> y no puede entregarse dos veces.</li>
+            <li>El precio en Pz se calcula con los <b>índices y tasas del programa</b>, no a criterio arbitrario.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-coin"/></svg></span>
+          <h3>Cuenta Joven · 12 % de cashback</h3>
+          <p>Si conviertes tu cuenta de <b>Banco de La Placeta</b> en <b>Cuenta Joven</b>, recibes un <b>12 % de cashback</b> en tus operaciones, con las condiciones de este tipo de cuenta. Es ahí donde vive tu saldo de Placetas.</p>
+        </article>
+
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-grad"/></svg></span>
+          <h3>Cursos con precio reducido</h3>
+          <p>Los cursos propios de La Placeta se pagan en Pz. Si participas en Placeta Joven, el precio es menor y las becas pueden cubrir parte de la matrícula.</p>
+        </article>
+
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-heart"/></svg></span>
+          <h3>Actividades especiales</h3>
+          <p>Campañas puntuales, convocatorias y acciones concretas con colaboradores. Cada una con sus condiciones publicadas.</p>
+        </article>
+
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-users"/></svg></span>
+          <h3>Regalos entre jugadores</h3>
+          <p>Estamos estudiando un sistema para que puedas usar tus Pz en adquirir un juego y regalárselo a alguien que todavía no lo tenga. Es una <b>propuesta en estudio</b> y podría no estar en el lanzamiento.</p>
+        </article>
+      </div>
+
+      <div class="bento bento-3" style="margin-top:1rem">
+        <article class="card">
+          <h3>¿Cómo se decide el precio en Pz?</h3>
+          <p>No es una conversión directa de euros. Valoramos precio de referencia, antigüedad, si es un lanzamiento o una beta, categoría, edad recomendada, disponibilidad, valor educativo y campañas activas.</p>
+        </article>
+        <article class="card">
+          <h3>Transparencia contigo</h3>
+          <p>Cada recompensa muestra su disponibilidad y sus condiciones antes de canjear. Nada se asigna sin confirmación por tu parte.</p>
+        </article>
+        <article class="card">
+          <h3>Transparencia con los estudios</h3>
+          <p>Los colaboradores pueden recibir información del desarrollo de su campaña: keys entregadas y, cuando sea posible, datos agregados. Nunca datos personales identificables.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ RUTAS ══════════ -->
+  <section class="sec" id="rutas">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Rutas <span class="tag" style="margin-left:.5rem">En preparación</span></p>
+        <h2>¿Qué quieres conseguir?</h2>
+        <p>En lugar de un catálogo suelto de cursos, organizamos todo en rutas: cada una reúne pasos, actividades, formaciones, evaluaciones y recompensas.</p>
+      </div>
+
+      <div class="routes">
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">🚀</span><span><b>Empezar mi primer proyecto</b><span>De la idea al primer resultado</span></span></a>
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">💻</span><span><b>Aprender tecnología</b><span>Fundamentos y bases sólidas</span></span></a>
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">🌐</span><span><b>Entrar en el mundo digital</b><span>Competencias digitales básicas</span></span></a>
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">📄</span><span><b>Preparar mi primer CV</b><span>Empleo y búsqueda de trabajo</span></span></a>
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">🎓</span><span><b>Mejorar mi formación</b><span>Itinerarios y certificaciones</span></span></a>
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">🎮</span><span><b>Crear videojuegos</b><span>Diseño y desarrollo</span></span></a>
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">🤖</span><span><b>Aprender IA</b><span>Fundamentos y aplicaciones</span></span></a>
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">🔐</span><span><b>Aprender ciberseguridad</b><span>Protección y buenas prácticas</span></span></a>
+        <a class="route" href="https://id.laplaceta.org/" data-login><span class="route-ico">📊</span><span><b>Gestión y emprendimiento</b><span>Proyectos y organización</span></span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ COMUNIDAD ══════════ -->
+  <section class="sec" id="comunidad" style="background:linear-gradient(180deg,transparent,rgba(34,211,238,.06),transparent)">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Comunidad <span class="tag" style="margin-left:.5rem">En preparación</span></p>
+        <h2>No estás solo en esto</h2>
+        <p>Actividades, eventos, proyectos y convocatorias de La Placeta. Un sitio donde enterarte de lo que pasa y apuntarte a lo que te interese.</p>
+      </div>
+
+      <div class="bento bento-4">
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-cal"/></svg></span>
+          <h3>Actividades y eventos</h3>
+          <p>Agenda de lo que ocurre en La Placeta, con inscripción desde tu espacio.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-spark"/></svg></span>
+          <h3>Proyectos</h3>
+          <p>Iniciativas abiertas en las que puedes participar o proponer las tuyas.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-users"/></svg></span>
+          <h3>Encuestas y participación</h3>
+          <p>Tu opinión decide qué se construye después en el programa.</p>
+        </article>
+        <article class="card">
+          <span class="card-ico"><svg class="ico"><use href="#i-book"/></svg></span>
+          <h3>Noticias</h3>
+          <p>Novedades del programa, colaboraciones nuevas y convocatorias abiertas.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ COLABORA ══════════ -->
+  <section class="sec" id="colabora">
+    <div class="wrap">
+      <div class="colab">
+        <div class="colab-grid">
+          <div>
+            <p class="eyebrow">Colabora</p>
+            <h2>Construimos esto con <span class="g-text">quien hace los videojuegos</span></h2>
+            <p class="lead">Estamos dando los primeros pasos y queremos hacerlo contando con desarrolladoras, estudios independientes y publishers que quieran formar parte de Placeta Joven.</p>
+            <p style="color:var(--txt-2)">Nos interesan especialmente estudios pequeños con proyectos interesantes que tengan más dificultades para alcanzar la visibilidad de los grandes lanzamientos. No buscamos simplemente conseguir productos: buscamos <b>colaboraciones a largo plazo que tengan sentido para ambas partes</b>.</p>
+            <ul class="card-list" style="margin-top:1rem">
+              <li>Vuestros juegos llegan directamente a una comunidad joven interesada en tecnología, entretenimiento digital y videojuegos.</li>
+              <li>Las keys entran como una de las recompensas que los usuarios pueden conseguir.</li>
+              <li>Daos a conocer entre jugadores que quizá todavía no conocían vuestro título.</li>
+              <li>Sin cantidad mínima: unas pocas keys para una campaña concreta ya aportan valor.</li>
+            </ul>
+            <div class="hero-cta" style="margin-top:1.6rem">
+              <a class="btn btn-primary btn-lg" href="mailto:joven@laplaceta.org?subject=Colaboraci%C3%B3n%20con%20Placeta%20Joven">Propón una colaboración<svg class="ico"><use href="#i-arrow"/></svg></a>
+              <a class="btn btn-ghost btn-lg" href="mailto:joven@laplaceta.org">joven@laplaceta.org</a>
+            </div>
+          </div>
+
+          <div class="colab-panel">
+            <p class="panel-title" style="margin:0 0 .3rem">Qué registramos de cada lote</p>
+            <div class="mini"><span class="mini-ico"><svg class="ico"><use href="#i-pad"/></svg></span><div class="mini-txt"><b>Juego y desarrollador</b><span>Con vuestros datos y enlaces oficiales</span></div></div>
+            <div class="mini"><span class="mini-ico"><svg class="ico"><use href="#i-key"/></svg></span><div class="mini-txt"><b>Nº de keys y plataforma</b><span>Estado individual de cada key</span></div></div>
+            <div class="mini"><span class="mini-ico"><svg class="ico"><use href="#i-shield"/></svg></span><div class="mini-txt"><b>Edad recomendada y condiciones</b><span>Cada título con sus propias normas</span></div></div>
+            <div class="mini"><span class="mini-ico"><svg class="ico"><use href="#i-check"/></svg></span><div class="mini-txt"><b>Uso de nombre, imágenes y logotipo</b><span>Solo si lo autorizáis expresamente</span></div></div>
+            <div class="mini"><span class="mini-ico"><svg class="ico"><use href="#i-users"/></svg></span><div class="mini-txt"><b>Datos agregados de campaña</b><span>Keys entregadas y estadísticas sin datos personales</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ SEGURIDAD ══════════ -->
+  <section class="sec" id="seguridad">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Seguridad</p>
+        <h2>Un programa sostenible, justo y <span class="g-text">accesible para todos</span></h2>
+        <p>El principal reto es evitar que una misma persona obtenga múltiples keys o cree cuentas de forma masiva para aprovecharse del carácter económico del programa. La Junta ha acordado estas medidas:</p>
+      </div>
+
+      <div class="sec-list">
+        <article class="sec-item">
+          <span class="sec-item-n">01</span>
+          <div>
+            <h4>Verificación de identidad y prevención de multicuentas</h4>
+            <p>Las cuentas Placeta Joven se registran mediante un documento de identidad que <b>no se almacena</b>: se genera una huella criptográfica irreversible que permite detectar si una misma persona intenta crear varias cuentas. Se aplica a todas las cuentas Joven, participen o no en el programa de recompensas.</p>
+          </div>
+        </article>
+        <article class="sec-item">
+          <span class="sec-item-n">02</span>
+          <div>
+            <h4>Inicio de sesión con PlacetaID Móvil</h4>
+            <p>Al iniciar sesión recibes una solicitud en tu dispositivo y debes autorizarla personalmente con verificación biométrica. Así reducimos los accesos no autorizados y dificultamos el uso compartido o fraudulento de cuentas.</p>
+          </div>
+        </article>
+        <article class="sec-item">
+          <span class="sec-item-n">03</span>
+          <div>
+            <h4>Las keys se obtienen con Placetas</h4>
+            <p>Las Pz no se compran con dinero real: se consiguen realizando actividades dentro del ecosistema, incluidas las educativas de PlacetaEDU. Esto dificulta considerablemente la adquisición masiva de keys con fines de acumulación o reventa.</p>
+          </div>
+        </article>
+        <article class="sec-item">
+          <span class="sec-item-n">04</span>
+          <div>
+            <h4>Una key por título y usuario</h4>
+            <p>Cada usuario puede obtener una única key de cada juego incluido en el programa, para que las recompensas lleguen al mayor número posible de jóvenes.</p>
+          </div>
+        </article>
+        <article class="sec-item">
+          <span class="sec-item-n">05</span>
+          <div>
+            <h4>Detección y prevención del uso fraudulento</h4>
+            <p>Trabajamos en sistemas de detección automática de comportamientos anómalos. El objetivo no es limitar el uso normal, sino actuar ante indicios de multicuentas, acumulación indebida o utilización fraudulenta de keys. Cuando corresponde, contactamos con el usuario para aclarar o regularizar la situación.</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="lead" style="margin-top:1.6rem;max-width:70ch">Valoramos cada licencia y colaboración como lo que es: un recurso que debemos proteger y aprovechar de forma responsable para que llegue a tantos jóvenes como sea posible.</p>
+    </div>
+  </section>
+
+  <!-- ══════════ FAQ ══════════ -->
+  <section class="sec" id="faq">
+    <div class="wrap-narrow">
+      <div class="sec-head center">
+        <p class="eyebrow">Preguntas frecuentes</p>
+        <h2>Resolvemos tus dudas</h2>
+      </div>
+
+      <div class="faq">
+        <details open>
+          <summary>¿Necesito Placeta Joven para usar La Placeta?</summary>
+          <div class="faq-body"><p>No. La Placeta es para todos. Puedes usar los servicios generales, participar en actividades abiertas y usar tus Placetas sin participar en el programa de recompensas. Placeta Joven solo añade las ventajas descritas en esta página.</p></div>
+        </details>
+        <details>
+          <summary>¿Quién puede entrar?</summary>
+          <div class="faq-body"><p>Está dirigido a jóvenes de 16 a 30 años (ambos incluidos). La edad se comprueba con tu PlacetaID: si no cumples el requisito, el acceso a Placeta Joven queda bloqueado, aunque conservas el acceso general a La Placeta.</p></div>
+        </details>
+        <details>
+          <summary>¿Cuánto cuesta?</summary>
+          <div class="faq-body"><p>Tiene un coste simbólico de <b>1,95 €/mes</b> o <b>10 €/año</b>. El importe se destina a mantener el programa y a seguir ampliando sus beneficios. No es un objetivo de lucro: los ingresos se reinvierten en la entidad y en sus proyectos.</p></div>
+        </details>
+        <details>
+          <summary>¿Qué incluye ahora mismo?</summary>
+          <div class="faq-body"><p>Formación de Cisco NetAcad a través de PlacetaEDU, cursos propios con precio reducido pagados en Pz, keys de juegos de estudios independientes y becas sobre la matrícula. Las áreas de Empleo, Rutas y Comunidad están <b>en preparación</b>: no anunciamos nada que todavía no exista.</p></div>
+        </details>
+        <details>
+          <summary>¿Placeta Joven me da Placetas?</summary>
+          <div class="faq-body"><p>No. Placeta Joven <b>no crea Pz</b>. Tu saldo vive en tu <b>Cuenta Joven de Banco de La Placeta</b> —un tipo de cuenta con <b>12 % de cashback</b> y sus propias condiciones— y se gana realizando actividades del ecosistema, como las formativas de PlacetaEDU. Esta plataforma consulta tu saldo y registra las operaciones que autorizas.</p></div>
+        </details>
+        <details>
+          <summary>¿Puedo conseguir dos veces la misma key?</summary>
+          <div class="faq-body"><p>No. Cada usuario puede obtener una única key de cada título. Cada key tiene un estado trazable (disponible, reservada, asignada y entregada) y queda vinculada a la operación que la consumió, así que no puede entregarse dos veces ni volver al inventario.</p></div>
+        </details>
+        <details>
+          <summary>¿Cómo se calcula el precio en Pz de un juego?</summary>
+          <div class="faq-body"><p>No es una conversión directa del precio en euros. Valoramos precio de referencia, antigüedad, si es un lanzamiento o una beta, categoría, edad recomendada, disponibilidad, valor educativo y campañas activas. Por eso dos juegos del mismo precio pueden costar Pz distintos.</p></div>
+        </details>
+        <details>
+          <summary>¿Cómo colaboro si tengo un estudio?</summary>
+          <div class="faq-body"><p>Escríbenos a <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a>. No hay un modelo cerrado ni un mínimo de keys: estudiamos cada propuesta según vuestras necesidades, desde una aportación puntual hasta campañas o acciones de promoción conjuntas.</p></div>
+        </details>
+        <details>
+          <summary>¿Qué pasa con mis datos?</summary>
+          <div class="faq-body"><p>El documento de identidad que se usa para evitar multicuentas no se almacena: solo se conserva una huella criptográfica irreversible. A los colaboradores únicamente facilitamos datos agregados, nunca información que permita identificar directamente a un usuario. Consulta la <a href="privacidad.html">política de privacidad</a>.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ CTA FINAL ══════════ -->
+  <section class="final grid-bg">
+    <span class="glow glow-c" aria-hidden="true"></span>
+    <div class="wrap final-in">
+      <img src="img/jovenlogo.png" alt="Placeta Joven" />
+      <h2>Tu formación. Tus proyectos.<br /><span class="g-text">Tus oportunidades.</span></h2>
+      <p>Un espacio de La Placeta para aprender, participar y descubrir nuevas oportunidades.</p>
+      <a class="btn btn-primary btn-lg" href="https://id.laplaceta.org/" data-login>Entrar en Placeta Joven<svg class="ico"><use href="#i-arrow"/></svg></a>
+      <small>Acceso con PlacetaID · De 16 a 30 años · La Placeta sigue siendo para todos</small>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════ Pie ══════════ -->
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr-grid">
+      <div class="ftr-brand">
+        <img src="img/jovenlogo.png" alt="Placeta Joven" />
+        <p>La modalidad joven del Grupo de La Placeta. Un proyecto sostenible y sin ánimo de lucro: lo que aporta el programa se reinvierte en la comunidad.</p>
+      </div>
+      <div class="ftr-col">
+        <h4>La Placeta</h4>
+        <a href="https://www.laplaceta.org/" target="_blank" rel="noopener">Web oficial</a>
+        <a href="https://junior.laplaceta.org/" target="_blank" rel="noopener">Placeta Junior</a>
+        <a href="https://www.laplaceta.org/proyectos/placetaedu" target="_blank" rel="noopener">PlacetaEDU</a>
+        <a href="https://www.laplaceta.org/tramites/alta-placetid" target="_blank" rel="noopener">Alta PlacetaID</a>
+      </div>
+      <div class="ftr-col">
+        <h4>Programa</h4>
+        <a href="https://id.laplaceta.org/" data-login>Entrar con PlacetaID</a>
+        <a href="mi.html">Mi espacio</a>
+        <a href="#formacion">Formación</a>
+        <a href="#beneficios">Beneficios</a>
+        <a href="#rutas">Rutas</a>
+      </div>
+      <div class="ftr-col">
+        <h4>Información</h4>
+        <a href="#colabora">Colabora</a>
+        <a href="#seguridad">Seguridad</a>
+        <a href="#faq">Preguntas frecuentes</a>
+        <a href="terminos.html">Términos y condiciones</a>
+        <a href="privacidad.html">Política de privacidad</a>
+      </div>
+    </div>
+    <div class="ftr-bottom">
+      <p>Placeta Joven es opcional. Puedes utilizar La Placeta sin participar en el programa.</p>
+      <p>Soporte · <a href="mailto:joven@laplaceta.org" style="color:var(--violet-3)">joven@laplaceta.org</a></p>
+      <p>© 2026 Grupo de La Placeta · <a href="https://bop.laplaceta.org/" target="_blank" rel="noopener" style="color:var(--violet-3)">BOLP</a></p>
+    </div>
+  </div>
+</footer>
+
+<script src="js/placetaid.js?v=20260912b"></script>
+<script src="js/landing.js?v=20260912b"></script>
 </body>
 </html>

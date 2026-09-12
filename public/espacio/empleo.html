@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Placeta Joven · Redirigiendo…</title>
+  <title>Placeta Joven · Empleo y futuro</title>
+  <meta name="description" content="Currículum, búsqueda de trabajo, entrevistas, orientación y proyectos." />
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#1C005F" />
   <link rel="icon" type="image/png" href="../img/jovenlogo.png" />
   <script>
+    /* Tema: claro por defecto; oscuro solo si el usuario lo ha elegido. */
     (function () {
       try {
         var t = localStorage.getItem('pjv_tema');
@@ -21,13 +23,25 @@
   <link rel="stylesheet" href="../css/pjv.css?v=20260912b" />
   <link rel="stylesheet" href="../css/app.css?v=20260912b" />
 </head>
-<body class="pj-app" data-page="formacion">
-  <div class="boot">
+<body class="pj-app" data-page="empleo">
+
+  <div class="boot" id="boot">
     <img src="../img/jovenlogo.png" alt="Placeta Joven" />
     <span class="spinner" aria-hidden="true"></span>
-    <p>Academia Joven se ha movido a otra sección de tu espacio…</p>
-    <p><a class="btn btn-ghost btn-sm" href="formacion.html">Ir ahora</a></p>
+    <p>Comprobando tu sesión…</p>
   </div>
-  <script>window.location.replace('formacion.html' + window.location.search + window.location.hash);</script>
+
+  <div id="root"></div>
+
+  <noscript>
+    <div class="gate"><div class="gate-card">
+      <h1>Necesitas JavaScript</h1>
+      <p>Activa JavaScript para entrar en tu espacio de Placeta Joven. También puedes escribirnos a
+      <a href="mailto:joven@laplaceta.org">joven@laplaceta.org</a>.</p>
+    </div></div>
+  </noscript>
+
+  <script src="../js/placetaid.js?v=20260912b"></script>
+  <script src="../js/app.js?v=20260912b"></script>
 </body>
 </html>

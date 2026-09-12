@@ -7,3 +7,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# Archivos sustituidos por el rediseño (no se despliegan)
+.legacy/
