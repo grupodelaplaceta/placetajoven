@@ -35,7 +35,6 @@
     recompensas: [],     // catálogo
     caminos: [],         // caminos formativos
     caminosEstado: { caminos: {}, convalidaciones: [], recompensasPendientes: [] },
-    protecciones: [],
     becas: [],
     actividades: [],
     actividadesEstado: [],
@@ -159,13 +158,12 @@
     { id: 'rutas', label: 'Caminos', icon: 'route', href: 'rutas.html', grupo: 'Formación' },
     { id: 'becas', label: 'Becas', icon: 'gift', href: 'becas.html' },
     { id: 'beneficios', label: 'Beneficios', icon: 'pad', href: 'beneficios.html', grupo: 'Ventajas' },
-    { id: 'protecciones', label: 'Protecciones', icon: 'shield', href: 'protecciones.html' },
     { id: 'empleo', label: 'Empleo y futuro', icon: 'brief', href: 'empleo.html', soon: true, grupo: 'Más' },
     { id: 'comunidad', label: 'Comunidad', icon: 'users', href: 'comunidad.html', soon: true }
   ];
   var TITULOS = {
     inicio: 'Inicio', formacion: 'Caminos', empleo: 'Empleo y futuro',
-    beneficios: 'Beneficios', protecciones: 'Protecciones', becas: 'Becas', miplaceta: 'Mi Placeta', rutas: 'Caminos', comunidad: 'Comunidad'
+    beneficios: 'Beneficios', becas: 'Becas', miplaceta: 'Mi Placeta', rutas: 'Caminos', comunidad: 'Comunidad'
   };
 
   /* ── Datos de contenido (catálogos propios de la interfaz) ────────── */
@@ -856,15 +854,6 @@
     return html;
   }
 
-  function pageProtecciones() {
-    var items = App.protecciones.length ? App.protecciones : [];
-    return '<div class="page">' + pageHead('Protecciones', 'Ideas de protección para jóvenes. Solo se activarán cuando exista una aseguradora y un contrato válido.', '<span class="tag tag-amber">En preparación</span>')
-      + '<div class="alert">' + ico('alert') + '<p><b>Esto no es una póliza.</b> Aquí puedes dejar interés. No hay precio, cobertura ni contratación activa.</p></div>'
-      + '<div class="grid g-3">' + (items.length ? items.map(function (p) {
-        return '<article class="item"><div class="item-top"><span class="item-cover cyan">' + ico(p.icono || 'shield') + '</span><div class="item-h"><h3>' + esc(p.nombre) + '</h3><p>' + esc(p.resumen) + '</p></div></div><p class="fine">' + esc(p.nota) + '</p><div class="item-foot"><button class="btn btn-ghost btn-sm" type="button" data-action="interes-proteccion" data-id="' + esc(p.id) + '">Me interesa</button></div></article>';
-      }).join('') : '<div class="empty" style="grid-column:1/-1"><b>No hay propuestas publicadas</b></div>') + '</div></div>';
-  }
-
   function pageBecas() {
     var historial = App.becas || [];
     var html = '<div class="page">' + pageHead('Becas', 'Solicítalas desde el elemento formativo. RSP aporta tus valores y aquí guardamos el expediente.', '<span class="tag tag-cyan">Solicitud clara</span>')
@@ -939,6 +928,7 @@
     html += '<section class="pnl lr ' + (fb ? '' : 'lr-in') + '" key="' + r.paso + '">'
       + '<div class="lr-tipo">' + esc(TIPOS_TXT[e.tipo] || e.tipo) + '<span>' + e.puntos + ' pts</span></div>'
       + '<h2 class="lr-ask">' + esc(e.enunciado) + '</h2>'
+      + figuraEjercicio(e.imagen)
       + cuerpoEjercicio(e)
       + (fb ? '<div class="lr-fb ' + (fb.ok ? 'ok' : 'bad') + '">' + ico(fb.ok ? 'check' : 'alert') + '<span>' + (fb.ok ? '<b>¡Correcto!</b> +' + fb.obtenidos + ' puntos' : '<b>No es correcto.</b> Verás la respuesta en el repaso final.') + '</span></div>' : '')
       + '<div class="lr-act">'
@@ -1029,6 +1019,19 @@
   function teclaLibre(idx) {
     if (idx < 9) return String(idx + 1);
     return String.fromCharCode(65 + idx - 9);
+  }
+
+  /* Las figuras son dibujos nuestros: public/js/senales.js guarda el trazado y
+     su fuente. Aquí solo se pinta la que pide el ejercicio. */
+  function figuraEjercicio(imagen, mini) {
+    if (!imagen || !imagen.dibujo) return '';
+    var S = window.Senales;
+    if (!S || !S.existe(imagen.dibujo)) return '';
+    var trazo = S.svg(imagen.dibujo, imagen);
+    if (mini) return '<span class="lr-rev-fig" title="' + esc(S.leyenda(imagen.dibujo)) + '">' + trazo + '</span>';
+    return '<figure class="lr-fig">' + trazo
+      + '<figcaption><b>' + esc(S.leyenda(imagen.dibujo)) + '</b>'
+      + '<span class="lr-fuente">Fuente: ' + esc(S.fuente(imagen.dibujo)) + '</span></figcaption></figure>';
   }
 
   function puedeComprobar(e) {
@@ -1124,7 +1127,7 @@
     if (revision.length) {
       html += '<h3 class="lr-rev-title">Repaso del intento</h3><div class="lr-rev">' + revision.map(function (e) {
         var dado = textoRespuesta(e, e.dada);
-        return '<div class="lr-rev-row' + (e.ok ? ' is-ok' : '') + '"><span class="lr-rev-mark">' + ico(e.ok ? 'check' : 'x') + '</span><div class="lr-rev-txt"><b>' + esc(e.enunciado) + '</b>'
+        return '<div class="lr-rev-row' + (e.ok ? ' is-ok' : '') + '">' + figuraEjercicio(e.imagen, true) + '<span class="lr-rev-mark">' + ico(e.ok ? 'check' : 'x') + '</span><div class="lr-rev-txt"><b>' + esc(e.enunciado) + '</b>'
           + (e.ok ? '<span class="lr-rev-good">Correcto</span>' : '')
           + (!e.ok && dado ? '<span class="lr-rev-bad">Tu respuesta: ' + esc(dado) + '</span>' : '')
           + (!e.ok ? '<span class="lr-rev-good">Correcta: ' + esc(textoSolucion(e) || '—') + '</span>' : '')
@@ -1304,7 +1307,6 @@
     formacion: pageRutas,
     empleo: pageEmpleo,
     beneficios: pageBeneficios,
-    protecciones: pageProtecciones,
     becas: pageBecas,
     miplaceta: pageMiPlaceta,
     rutas: pageRutas,
@@ -1630,7 +1632,6 @@
         render();
         break;
       case 'cerrar-actividad': App.run = null; render(); break;
-      case 'interes-proteccion': api('protecciones', { method: 'POST', body: JSON.stringify({ proteccionId: t.getAttribute('data-id') }) }).then(function () { t.textContent = 'Interés registrado'; t.disabled = true; }).catch(function (e) { pintarError(e); }); break;
       case 'filtrar-recompensa':
         App.filtro = t.getAttribute('data-cat');
         actualizarCatalogo();
@@ -1784,10 +1785,6 @@
     } catch (e) {
       App.caminos = [];
     }
-    try {
-      var proteccionesRes = await api('protecciones');
-      App.protecciones = Array.isArray(proteccionesRes.protecciones) ? proteccionesRes.protecciones : [];
-    } catch (e) { App.protecciones = []; }
     try {
       var becasRes = await api('becas');
       App.becas = Array.isArray(becasRes.becas) ? becasRes.becas : [];

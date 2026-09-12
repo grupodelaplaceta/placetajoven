@@ -415,6 +415,40 @@ test('carnet: los caminos de conducir exigen el nivel de un examen real', async 
   });
 });
 
+test('carnet: cada figura existe, se dibuja en el cliente y cita su fuente', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const cliente = fs.readFileSync(path.join(__dirname, '..', 'public', 'js', 'senales.js'), 'utf8');
+
+  const usadas = new Set();
+  actividades.CATALOGO.forEach((a) => a.ejercicios.forEach((e) => {
+    if (!e.imagen) return;
+    usadas.add(e.imagen.dibujo);
+    assert.ok(actividades.FIGURAS.includes(e.imagen.dibujo), 'el motor declara la figura ' + e.imagen.dibujo);
+    assert.ok(new RegExp("['\"]?" + e.imagen.dibujo + "['\"]?\\s*:\\s*\\{").test(cliente),
+      'la interfaz sabe dibujar ' + e.imagen.dibujo);
+  }));
+  assert.ok(usadas.size >= 10, 'las actividades de carnet usan figuras de verdad');
+
+  // ninguna figura puede quedarse sin decir de dónde sale
+  const conFuente = (cliente.match(/fuente:/g) || []).length;
+  assert.ok(conFuente >= actividades.FIGURAS.length, 'cada dibujo tiene que citar su fuente');
+  // El xmlns del SVG es obligatorio y no es una descarga.
+  assert.ok(!/<image\b|url\(|\.png|\.jpe?g|\.gif|href\s*=\s*['"]http/i.test(cliente),
+    'no se descarga ninguna imagen de terceros');
+});
+
+test('carnet: las figuras llegan al catálogo público sin filtrar la respuesta', () => {
+  const publico = actividades.catalogoPublico();
+  const conFigura = publico.flatMap((a) => a.ejercicios).filter((e) => e.imagen);
+  assert.ok(conFigura.length >= 10);
+  conFigura.forEach((e) => {
+    assert.strictEqual(typeof e.imagen.dibujo, 'string');
+    assert.ok(!/solucion|esperado|correcta|respuestas/.test(JSON.stringify(e.imagen)),
+      'la figura no puede llevar la respuesta dentro');
+  });
+});
+
 test('carnet: se puede suspender y volver a intentarlo', async () => {
   sinSupabase();
   const dip = 'DIP-TEST-CARNET';
