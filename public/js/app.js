@@ -296,16 +296,46 @@
       + '<p>Estamos consultando tu PlacetaID y tu estado en el programa.</p>');
   }
 
+  function publicCatalogHtml(games) {
+    var items = Array.isArray(games) && games.length ? games.slice(0, 6).map(function (game) {
+      var imagen = game.imagen ? '<img src="' + esc(game.imagen) + '" alt="" loading="lazy">' : '<span aria-hidden="true">' + ico('pad') + '</span>';
+      return '<article class="space-game"><a class="space-game-art" href="../index.html#juegos">' + imagen + '</a>'
+        + '<div class="space-game-body"><span class="stat-k">CATÁLOGO PÚBLICO</span>'
+        + '<h3><a href="../index.html#juegos">' + esc(game.nombre || 'Juego') + '</a></h3>'
+        + '<a class="space-game-studio" href="../index.html#juegos">' + esc(game.desarrolladora || 'Estudio colaborador') + '</a>'
+        + '<p>' + esc(game.descripcion || '') + '</p>'
+        + '<div class="space-game-foot"><b>' + (game.gratis === true ? 'Gratis' : 'Acceso con login') + '</b>'
+        + '<a href="../index.html#juegos">Ver detalle ' + ico('arrow') + '</a></div></div></article>';
+    }).join('') : '<div class="empty"><span class="empty-ico">' + ico('pad') + '</span><b>Catálogo público vacío</b><p>Cuando haya colaboraciones confirmadas, aparecerán aquí los juegos y beneficios actuales.</p></div>';
+
+    return '<section class="space-section public-catalog" style="margin-top:1.4rem;max-width:1100px;">'
+      + '<div class="space-section-heading"><div><span class="stat-k">CATÁLOGO PÚBLICO</span><h2>Explora antes de entrar</h2></div>'
+      + '<a class="btn btn-ghost btn-sm" href="../index.html#juegos">Ver la web pública ' + ico('arrow') + '</a></div>'
+      + '<div class="space-game-grid">' + items + '</div></section>';
+  }
+
   function pintarSinSesion() {
     var url = '#';
     try { url = AUTH ? AUTH.buildLoginUrl() : '#'; } catch (e) { url = '#'; }
-    ROOT.innerHTML = gate(
+    var catalogo = '<div class="public-catalog-wrap">';
+    catalogo += gate(
       '<span class="gate-ico">' + ico('lock') + '</span>'
       + '<h1>Identifícate con PlacetaID</h1>'
-      + '<p>Entra para ver tu espacio. Si tienes entre 16 y 30 años podrás participar en Placeta Joven; si no, el acceso al programa queda bloqueado.</p>'
+      + '<p>El catálogo se puede explorar sin entrar, pero el acceso a la cuenta y a las claves queda bloqueado hasta que tengas sesión activa y se valide tu edad y plan.</p>'
       + '<div class="gate-act"><a class="btn btn-primary btn-lg" href="' + esc(url) + '">'
       + 'Acceder con PlacetaID' + ico('arrow') + '</a></div>'
-      + '<p class="fine" style="margin-top:1.2rem">Placeta Joven es opcional.</p>');
+      + '<p class="fine" style="margin-top:1.2rem">Placeta Joven es opcional. La Placeta sigue siendo para todos.</p>');
+    catalogo += '</div>';
+
+    fetch('/api/escaparate').then(function (response) {
+      if (!response.ok) return null;
+      return response.json();
+    }).then(function (data) {
+      var juegos = Array.isArray(data && data.juegos) ? data.juegos : [];
+      ROOT.innerHTML = catalogo + publicCatalogHtml(juegos);
+    }).catch(function () {
+      ROOT.innerHTML = catalogo + publicCatalogHtml([]);
+    });
   }
 
   function planesHtml(source) {

@@ -8,8 +8,8 @@
   --mint:#8ed6c2;
   --acid:#e7f06c;
   --coral:#f4aa79;
-  --display:"Chakra Petch",sans-serif;
-  --body:"Bricolage Grotesque",sans-serif;
+  --display:"Baruta","Super Bouncer","Chakra Petch",sans-serif;
+  --body:"Plus Jakarta Sans","Bricolage Grotesque",sans-serif;
   --mono:"JetBrains Mono",monospace;
   font-family:var(--body);
   background:var(--bg);
@@ -69,7 +69,7 @@ h1 span,h2 span{color:var(--acid)}
 .showcase-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 .showcase-state{grid-column:1/-1;margin:0;padding:28px 0;border-block:1px solid var(--line);color:var(--muted);font-size:.94rem}
 .game-card{min-width:0;border:1px solid var(--line);background:#11181d}
-.game-art{height:auto;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#27453f,#152320 65%,#31331d);color:var(--acid);font:700 2.8rem "Super Bouncer","Baruta",var(--display)}
+.game-art{height:auto;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#27453f,#152320 65%,#31331d);color:var(--acid);font:700 2.8rem var(--display)}
 .game-card:nth-child(3n+2) .game-art{background:linear-gradient(135deg,#3c2a27,#261b1f 65%,#3a3020);color:var(--coral)}
 .game-card:nth-child(3n) .game-art{background:linear-gradient(135deg,#283645,#17212a 65%,#253a32);color:var(--mint)}
 .game-art img{width:100%;height:100%;object-fit:cover}
@@ -95,7 +95,7 @@ h2{font-size:clamp(2.8rem,5.3vw,5rem)}
 .experience:hover{transform:translateY(-4px);border-color:var(--mint)}
 .experience-learning{background:#172b2a}.experience-play{background:#26271e}.experience-community{background:#242126}
 .experience-no{color:#bdc7bd;font:500 .66rem var(--mono)}
-.experience-icon{width:45px;height:45px;margin:35px 0 18px;display:grid;place-items:center;background:var(--mint);color:#16201d;font:700 1.6rem "Super Bouncer","Baruta",var(--display)}
+.experience-icon{width:45px;height:45px;margin:35px 0 18px;display:grid;place-items:center;background:var(--mint);color:#16201d;font:700 1.6rem var(--display)}
 .experience-play .experience-icon{background:var(--coral)}.experience-community .experience-icon{background:var(--acid)}
 .experience h3{font-size:2rem}
 .experience p{max-width:320px;color:#bdc7bd;font-size:.88rem;margin:13px 0 24px}
@@ -118,7 +118,7 @@ h2{font-size:clamp(2.8rem,5.3vw,5rem)}
 .fine-print{font-size:.76rem!important;margin-top:12px!important}
 .rewards-stamp{width:min(300px,70vw);aspect-ratio:1;margin:auto;position:relative;display:grid;place-items:center;text-align:center;border:1px solid #586850;border-radius:50%;transform:rotate(-8deg)}
 .stamp-orbit{position:absolute;inset:18px;border:1px dashed var(--mint);border-radius:50%}
-.stamp-main{font:700 3.3rem/.88 "Super Bouncer","Baruta",var(--display);color:var(--acid)}
+.stamp-main{font:700 3.3rem/.88 var(--display);color:var(--acid)}
 .stamp-note{position:absolute;bottom:24px;font:500 .58rem var(--mono);color:var(--mint);text-transform:uppercase}
 .cashback-line{padding:24px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:120px 1fr auto;align-items:center;gap:24px}
 .cashback-number{font:700 4rem/.9 var(--display);color:var(--mint)}
