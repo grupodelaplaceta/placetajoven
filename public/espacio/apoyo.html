@@ -6,23 +6,23 @@
   <title>Placeta Joven · Redirigiendo…</title>
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#1C005F" />
-  <link rel="icon" type="image/png" href="../img/jovenlogo.png" />
+  <link rel="icon" type="image/png" href="../img/joven.png" />
   <script>
     (function () {
       try {
-        document.documentElement.setAttribute('data-tema', 'claro');
-      } catch (e) { document.documentElement.setAttribute('data-tema', 'claro'); }
+        document.documentElement.setAttribute('data-tema', localStorage.getItem('pjv_tema') === 'claro' ? 'claro' : 'oscuro');
+      } catch (e) { document.documentElement.setAttribute('data-tema', 'oscuro'); }
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/pjv.css?v=20260912b" />
-  <link rel="stylesheet" href="../css/app.css?v=20260912b" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/pjv.css?v=20261001" />
+  <link rel="stylesheet" href="../css/app.css?v=20261001" />
 </head>
 <body class="pj-app" data-page="beneficios">
   <div class="boot">
-    <img src="../img/jovenlogo.png" alt="Placeta Joven" />
+    <img src="../img/joven.png" alt="Placeta Joven" />
     <span class="spinner" aria-hidden="true"></span>
     <p>Apoyo Indie se ha movido a otra sección de tu espacio…</p>
     <p><a class="btn btn-ghost btn-sm" href="beneficios.html">Ir ahora</a></p>

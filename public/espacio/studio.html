@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel de estudio · Placeta Joven</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#10151D" />
+  <link rel="icon" type="image/png" href="../img/joven.png" />
+  <script>document.documentElement.setAttribute('data-tema', localStorage.getItem('pjv_tema') === 'claro' ? 'claro' : 'oscuro');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/pjv.css?v=20261001" />
+  <link rel="stylesheet" href="../css/app.css?v=20261001" />
+</head>
+<body class="pj-app" data-page="studio">
+  <div class="boot" id="boot"><img src="../img/joven.png" alt="Placeta Joven" /><span class="spinner" aria-hidden="true"></span><p>Comprobando permisos…</p></div>
+  <div id="root"></div>
+  <noscript><div class="gate"><div class="gate-card"><h1>Necesitas JavaScript</h1><p>Activa JavaScript para acceder al panel.</p></div></div></noscript>
+  <script src="../js/placetaid.js?v=20260912b"></script>
+  <script src="../js/app.js?v=20261001"></script>
+</body>
+</html>

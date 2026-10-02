@@ -24,7 +24,7 @@ redirectUris:  ['https://joven.laplaceta.org/auth/callback.html',
 apiKey:        'placetajoven-web'        (client id; generar si se usa el alta admin)
 pkceRequired:  true
 permitirWebFallback: true
-logo:          'https://joven.laplaceta.org/img/jovenlogo.png'
+logo:          'https://joven.laplaceta.org/img/joven.png'
 bgColor:       '#2A0750'
 activo:        true
 ```
@@ -42,7 +42,7 @@ Headers: X-API-Key: <ADMIN_API_KEY>
     "https://joven.laplaceta.org/auth/callback.html",
     "http://localhost:3000/auth/callback.html"
   ],
-  "logo": "https://joven.laplaceta.org/img/jovenlogo.png",
+  "logo": "https://joven.laplaceta.org/img/joven.png",
   "bgColor": "#2A0750"
 }
 ```

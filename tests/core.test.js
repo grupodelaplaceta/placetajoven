@@ -120,7 +120,7 @@ test('activarDoc: variante desconocida conserva el plan del documento', () => {
 });
 
 // ── Recompensas disponibles (catálogo) ────────────────────────────────
-const { CATEGORIAS, DEMO, publica, categoriaValida } = require('../lib/recompensas');
+const { CATEGORIAS, DEMO, publica, categoriaValida, paraEscaparate, esDemo } = require('../lib/recompensas');
 
 test('recompensas: categorías esperadas', () => {
   const ids = CATEGORIAS.map((c) => c.id).sort();
@@ -153,7 +153,7 @@ test('recompensas: publica expone solo campos públicos', () => {
     id: 'x-1', categoria: 'videojuegos', nombre: 'Demo', desarrolladora: 'Estudio',
     descripcion: 'D', plataforma: 'Steam', tipoJuego: 'clave', gratis: false, url: '', genero: '', editor: '', fechaLanzamiento: '',
     edadRecomendada: '16+', pz: 500, imagen: null, galeria: [], video: '', steamUrl: '',
-    disponibilidad: 'Disponible', canjeable: false, condiciones: 'C'
+      disponibilidad: 'Disponible', canjeable: false, condiciones: 'C', promocionada: false
   });
   // No filtra columnas internas: nunca expone `data` cruda ni `orden`.
   assert.ok(!('orden' in p));
@@ -172,6 +172,53 @@ test('recompensas: categoriaValida cae a otros si no es conocida', () => {
   assert.strictEqual(categoriaValida('videojuegos'), 'videojuegos');
   assert.strictEqual(categoriaValida('formacion'), 'formacion');
   assert.strictEqual(categoriaValida('raro'), 'otros');
+});
+
+test('escaparate: solo muestra colaboraciones con stock y juegos gratis promocionados', () => {
+  const juegos = paraEscaparate([
+    { id: 'colab', categoria: 'videojuegos', tipoJuego: 'clave', stock: 2, disponibilidad: 'Disponible' },
+    { id: 'vj-ejemplo-1', categoria: 'videojuegos', tipoJuego: 'clave', stock: 2, disponibilidad: 'Disponible' },
+    { id: 'agotado', categoria: 'videojuegos', tipoJuego: 'clave', stock: 0, disponibilidad: 'Agotado' },
+    { id: 'gratis', categoria: 'videojuegos', tipoJuego: 'recomendado', gratis: true, promocionada: true, url: 'https://store.steampowered.com/app/1' },
+    { id: 'sin-aprobar', categoria: 'videojuegos', tipoJuego: 'recomendado', gratis: true, promocionada: false, url: 'https://example.org/game' },
+    { id: 'url-insegura', categoria: 'videojuegos', tipoJuego: 'recomendado', gratis: true, promocionada: true, url: 'javascript:alert(1)' }
+  ]);
+  assert.deepStrictEqual(juegos.map((j) => j.id), ['colab', 'gratis']);
+  assert.strictEqual(esDemo({ id: 'vj-ejemplo-2' }), true);
+  assert.strictEqual(esDemo({ id: 'juego-real', demo: true }), true);
+  assert.strictEqual(esDemo({ id: 'juego-real', demo: false }), false);
+});
+
+test('paneles: los roles se asignan solo por allowlist de servidor', () => {
+  const { resolverPanel } = require('../lib/panel-access');
+  const prevAdmin = process.env.PLACETAJOVEN_ADMIN_DIPS;
+  const prevStudios = process.env.PLACETAJOVEN_STUDIOS_JSON;
+  process.env.PLACETAJOVEN_ADMIN_DIPS = ' 12345678A,12345678B ';
+  process.env.PLACETAJOVEN_STUDIOS_JSON = '{"12345678C":"studio-c"}';
+  assert.deepStrictEqual(resolverPanel({ dip: '12345678A' }), { role: 'admin' });
+  assert.deepStrictEqual(resolverPanel({ dip: '12345678C' }), { role: 'studio', studioId: 'studio-c' });
+  assert.deepStrictEqual(resolverPanel({ dip: '12345678D' }), { role: 'socio' });
+  if (prevAdmin === undefined) delete process.env.PLACETAJOVEN_ADMIN_DIPS;
+  else process.env.PLACETAJOVEN_ADMIN_DIPS = prevAdmin;
+  if (prevStudios === undefined) delete process.env.PLACETAJOVEN_STUDIOS_JSON;
+  else process.env.PLACETAJOVEN_STUDIOS_JSON = prevStudios;
+});
+
+test('opiniones: espera 24 horas y la vista pública excluye identidad y código', () => {
+  const opiniones = require('../lib/opiniones');
+  const otorgada = Date.parse('2026-10-01T12:00:00.000Z');
+  const key = { id: 'private-key', otorgada: new Date(otorgada).toISOString() };
+  assert.strictEqual(opiniones.puedeOpinar(key, otorgada + opiniones.WAIT_MS - 1), false);
+  assert.strictEqual(opiniones.puedeOpinar(key, otorgada + opiniones.WAIT_MS), true);
+  const review = opiniones.publica({
+    id: 'op-1', recompensa_id: 'game-1', juego: 'Juego', placeta_id: 'PRIVATE-DIP',
+    key_id: 'PRIVATE-KEY', codigo: 'PRIVATE-CODE', estrellas: 5, texto: 'Una opinión pública y segura.',
+    created_at: '2026-10-02T12:00:00.000Z'
+  });
+  assert.deepStrictEqual(review, {
+    id: 'op-1', recompensaId: 'game-1', juego: 'Juego', estrellas: 5,
+    texto: 'Una opinión pública y segura.', fecha: '2026-10-02T12:00:00.000Z'
+  });
 });
 
 // ── Canje de recompensas (keypool + entrega al socio) ────────────────
@@ -508,6 +555,49 @@ test('carnet: se puede suspender y volver a intentarlo', async () => {
   const estado = await actividades.estado(dip2);
   assert.strictEqual(estado[0].intentos, 1);
   assert.strictEqual(estado[0].completada, false);
+});
+
+test('actividades: el límite mensual impide generar órdenes que lo superen', async () => {
+  sinSupabase();
+  const store = require('../lib/store');
+  const dip = 'DIP-TEST-MONTHLY-CAP-' + Date.now();
+  await store.set({
+    placeta_id: dip,
+    recompensasPendientes: [{ creadaEn: new Date().toISOString(), recompensaPz: 380, bonusPz: 0, estado: 'PENDIENTE_BANCO' }]
+  });
+  const actividad = actividades.actividad('ciber-fundamentos');
+  const salida = await actividades.enviarIntento(dip, actividad.id, respuestasCorrectas(actividad));
+  const guardado = await store.get(dip);
+
+  assert.strictEqual(salida.limiteMensualAlcanzado, true);
+  assert.strictEqual(salida.recompensaPendiente, 0);
+  assert.strictEqual(salida.bonusPendiente, 0);
+  assert.strictEqual(guardado.recompensasPendientes.length, 1, 'no crea una orden que rebasa el límite');
+  assert.deepStrictEqual(actividades.resumenMensual(guardado), {
+    mes: new Date().toISOString().slice(0, 7), limitePz: 400, generadasPz: 380, restantesPz: 20
+  });
+  await store.del(dip);
+});
+
+test('misión diaria: refleja una actividad aprobada y vuelve a estar pendiente al día siguiente', async () => {
+  sinSupabase();
+  const store = require('../lib/store');
+  const dip = 'DIP-TEST-MISION-' + Date.now();
+  const now = Date.now();
+  const mision = await actividades.misionDiaria(dip, now);
+  const repetida = await actividades.misionDiaria(dip, now + 60000);
+  assert.strictEqual(repetida.titulo, mision.titulo, 'el objetivo diario permanece estable al recargar');
+  assert.strictEqual(mision.completada, false);
+
+  const actividad = actividades.actividad('ciber-fundamentos');
+  const salida = await actividades.enviarIntento(dip, actividad.id, respuestasCorrectas(actividad));
+  assert.strictEqual(salida.misionDiariaCompletada, true);
+  const completada = await actividades.misionDiaria(dip, now + 120000);
+  assert.strictEqual(completada.completada, true);
+
+  const siguiente = await actividades.misionDiaria(dip, now + 86400000);
+  assert.strictEqual(siguiente.completada, false, 'la misión diaria se renueva al cambiar el día UTC');
+  await store.del(dip);
 });
 
 test('actividades: comprobar un ejercicio no revela la solución', () => {  const mal = actividades.comprobarEjercicio('sql-basico', 'e4', 'select nombre from usuarios');

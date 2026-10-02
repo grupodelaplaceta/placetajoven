@@ -17,6 +17,7 @@
     }
   },
   "edadPermitida": { "min": 16, "max": 30 },
+  "limiteMensualPz": 400,
   "estados": ["PENDIENTE", "ACTIVO", "SUSPENDIDO", "CANCELADO", "EXPIRADO"],
   "nota": "Los product IDs pertenecen a Lemon Squeezy (store de La Placeta). Usarlos al crear checkouts/links y en la documentación de integración."
 }

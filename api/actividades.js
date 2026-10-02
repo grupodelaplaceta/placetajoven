@@ -14,7 +14,13 @@ module.exports = async (req, res) => {
 
   try {
     if (req.method === 'GET') {
-      return json(res, 200, { ok: true, actividades: actividades.catalogoPublico(), estado: await actividades.estado(dip) });
+      const estado = await actividades.estado(dip);
+      return json(res, 200, {
+        ok: true,
+        actividades: actividades.catalogoPublico(),
+        estado,
+        misionDiaria: await actividades.misionDiaria(dip)
+      });
     }
     let body = {};
     try { const raw = await readBody(req); if (raw) body = JSON.parse(raw); } catch (e) { return json(res, 400, { error: 'json_invalido' }); }

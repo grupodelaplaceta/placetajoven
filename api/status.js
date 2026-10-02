@@ -5,6 +5,7 @@ const { edadOk, docVigente, pendienteCaducada } = require('../lib/placetajoven')
 const cfg = require('../config/placetajoven.json');
 const store = require('../lib/store');
 const tesoreria = require('../lib/tesoreria');
+const actividades = require('../lib/actividades');
 const { setCors, json, handleOptions, requiereUsuario } = require('./_util');
 
 const EURO = (n) => n.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
@@ -43,6 +44,7 @@ function keysPublicas(doc) {
     otorgada: k.otorgada || null,
     canjeada: k.canjeada || null,
     recompensaId: k.recompensaId || null,
+    opinionId: k.opinionId || null,
     pz: k.pz || null
   }));
 }
@@ -90,6 +92,7 @@ module.exports = async (req, res) => {
         requiereAlta: false,
         pendienteCaducada: false,
         tesoreria: await tesoreria.estado(dip),
+        limiteMensual: actividades.resumenMensual(null),
         keys: [],
         test: true
       });
@@ -109,6 +112,7 @@ module.exports = async (req, res) => {
         expiresAt: null,
         requiereAlta: true,
         pendienteCaducada: false,
+        limiteMensual: actividades.resumenMensual(null),
         keys: []
       });
     }
@@ -132,6 +136,7 @@ module.exports = async (req, res) => {
       requiereAlta: requiereAlta,
       pendienteCaducada: !!pendienteMuerta,
       tesoreria: await tesoreria.estado(dip, doc),
+      limiteMensual: actividades.resumenMensual(doc),
       keys: keysPublicas(doc)
     });
   } catch (e) {

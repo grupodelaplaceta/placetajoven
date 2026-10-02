@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Placeta Joven · Becas</title>
   <meta name="robots" content="noindex" />
-  <link rel="icon" type="image/png" href="../img/jovenlogo.png" />
-  <script>document.documentElement.setAttribute('data-tema', 'claro');</script>
-  <link rel="stylesheet" href="../css/pjv.css?v=20260912d" />
-  <link rel="stylesheet" href="../css/app.css?v=20260912d" />
+  <link rel="icon" type="image/png" href="../img/joven.png" />
+  <script>document.documentElement.setAttribute('data-tema', localStorage.getItem('pjv_tema') === 'claro' ? 'claro' : 'oscuro');</script>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/pjv.css?v=20261001" />
+  <link rel="stylesheet" href="../css/app.css?v=20261001" />
 </head>
 <body class="pj-app" data-page="becas">
-  <div class="boot" id="boot"><img src="../img/jovenlogo.png" alt="Placeta Joven" /><span class="spinner" aria-hidden="true"></span><p>Comprobando tu sesión…</p></div>
+  <div class="boot" id="boot"><img src="../img/joven.png" alt="Placeta Joven" /><span class="spinner" aria-hidden="true"></span><p>Comprobando tu sesión…</p></div>
   <div id="root"></div>
   <script src="../js/placetaid.js?v=20260912d"></script>
-  <script src="../js/app.js?v=20260912d"></script>
+  <script src="../js/app.js?v=20261001"></script>
 </body>
 </html>

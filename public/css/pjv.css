@@ -61,8 +61,8 @@
   --r-xs:8px; --r-sm:12px; --r:16px; --r-lg:22px; --r-xl:28px; --r-full:999px;
 
   /* Tipografía oficial */
-  --display:'Bebas Neue','Arial Narrow',Impact,sans-serif;
-  --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --display:'Chakra Petch','Arial Narrow',Impact,sans-serif;
+  --font:'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,Consolas,monospace;
 
   --maxw:1180px;
@@ -74,31 +74,36 @@
 
 /* Tokens de acento del modo oscuro permanente */
 [data-tema="oscuro"]{
-  --fondo:#0B0616;
-  --fondo-2:#120A24;
-  --fondo-3:#180E2E;
-  --superficie:rgba(255,255,255,.045);
-  --superficie-2:rgba(255,255,255,.075);
-  --linea:rgba(168,140,255,.18);
-  --linea-2:rgba(168,140,255,.3);
+  --marca:#192C2B;
+  --marca-suave:#263933;
+  --fondo:#10151D;
+  --fondo-2:#141B1F;
+  --fondo-3:#1C2828;
+  --superficie:#171F27;
+  --superficie-2:#1C2828;
+  --linea:rgba(142,214,194,.19);
+  --linea-2:rgba(142,214,194,.34);
 
-  --txt:#F3EFFC;
-  --txt-2:#C3B9DD;
-  --txt-3:#8F84AC;
+  --txt:#F1F2E7;
+  --txt-2:#C3CCC5;
+  --txt-3:#A6B1AA;
 
-  --violeta:#A855F7;
-  --violeta-claro:#C084FC;
-  --violeta-suave:#C4B5FD;
-  --violeta-tenue:rgba(168,85,247,.16);
-  --cian:#22D3EE;
-  --verde:#34D399;
-  --ambar:#FBBF24;
-  --rojo:#FB7185;
+  --violeta:#326B59;
+  --violeta-claro:#8ED6C2;
+  --violeta-suave:#80BDAA;
+  --violeta-tenue:rgba(142,214,194,.13);
+  --cian:#F4AA79;
+  --verde:#8ED6C2;
+  --ambar:#E7F06C;
+  --rojo:#FF8970;
 
-  --sh-sm:0 2px 10px rgba(0,0,0,.5);
-  --sh-md:0 18px 40px -20px rgba(0,0,0,.8);
-  --sh-lg:0 34px 74px -30px rgba(0,0,0,.9);
-  --sh-btn:0 10px 26px -12px rgba(124,58,237,.7);
+  --r-xs:4px; --r-sm:6px; --r:8px; --r-lg:8px; --r-xl:8px;
+  --display:"Chakra Petch",sans-serif;
+  --font:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --sh-sm:0 2px 10px rgba(0,0,0,.28);
+  --sh-md:0 18px 40px -20px rgba(0,0,0,.55);
+  --sh-lg:0 34px 74px -30px rgba(0,0,0,.68);
+  --sh-btn:0 10px 26px -12px rgba(50,107,89,.7);
 
   color-scheme:dark;
 }
@@ -159,7 +164,7 @@ h1 em,h2 em{font-style:normal;color:var(--violeta)}
 .pricing .sec-head{margin-bottom:1.4rem}
 .pricing-grid{max-width:700px;margin:0;gap:.65rem}
 [data-tema="oscuro"] .g-text{
-  background:linear-gradient(96deg,#DDD3FF 0%,var(--violeta-suave) 55%,var(--violeta-claro) 100%);
+  background:linear-gradient(96deg,#F1F594 0%,var(--violeta-claro) 55%,var(--cian) 100%);
   -webkit-background-clip:text;background-clip:text;
 }
 

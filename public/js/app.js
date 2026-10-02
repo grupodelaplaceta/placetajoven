@@ -38,8 +38,13 @@
     becas: [],
     actividades: [],
     actividadesEstado: [],
+    misionDiaria: null,
+    opiniones: [],
+    opinionJuego: null,
     run: null,           // actividad en curso (dentro del camino)
     demo: false,         // el catálogo viene de ejemplo (sin Supabase)
+    canjeoActivo: false,
+    panel: null,
     filtro: 'todos',
     busqueda: '',
     vista: null          // recompensa abierta en ficha
@@ -153,17 +158,15 @@
 
   /* ── Navegación ───────────────────────────────────────────────────── */
   var NAV = [
-    { id: 'inicio', label: 'Inicio', icon: 'home', href: 'inicio.html', grupo: 'Tu espacio' },
-    { id: 'miplaceta', label: 'Mi Placeta', icon: 'coin', href: 'miplaceta.html' },
-    { id: 'rutas', label: 'Caminos', icon: 'route', href: 'rutas.html', grupo: 'Formación' },
-    { id: 'becas', label: 'Becas', icon: 'gift', href: 'becas.html' },
-    { id: 'beneficios', label: 'Beneficios', icon: 'pad', href: 'beneficios.html', grupo: 'Ventajas' },
-    { id: 'empleo', label: 'Empleo y futuro', icon: 'brief', href: 'empleo.html', soon: true, grupo: 'Más' },
-    { id: 'comunidad', label: 'Comunidad', icon: 'users', href: 'comunidad.html', soon: true }
+    { id: 'inicio', label: 'Inicio', icon: 'home', href: 'inicio.html' },
+    { id: 'beneficios', label: 'Tienda', icon: 'pad', href: 'beneficios.html' },
+    { id: 'misiones', label: 'Misiones', icon: 'spark', href: 'misiones.html' },
+    { id: 'rutas', label: 'Cursos', icon: 'grad', href: 'rutas.html' }
   ];
   var TITULOS = {
-    inicio: 'Inicio', formacion: 'Caminos', empleo: 'Empleo y futuro',
-    beneficios: 'Beneficios', becas: 'Becas', miplaceta: 'Mi Placeta', rutas: 'Caminos', comunidad: 'Comunidad'
+    inicio: 'Inicio', formacion: 'Cursos', rutas: 'Cursos', misiones: 'Misiones',
+    beneficios: 'Tienda', juego: 'Juego', estudio: 'Desarrolladora',
+    miplaceta: 'Mi Placeta', admin: 'Administración', studio: 'Panel de estudio'
   };
 
   /* ── Datos de contenido (catálogos propios de la interfaz) ────────── */
@@ -205,6 +208,12 @@
         + '<span>' + esc(n.label) + '</span>'
         + (n.soon ? '<i class="soon">Pronto</i>' : '') + '</a>';
     });
+    if (soloPronto !== true && App.panel && App.panel.role === 'admin') {
+      items += '<a class="' + clase + '-item' + (PAGE === 'admin' ? ' is-on' : '') + '" href="admin.html"' + (PAGE === 'admin' ? ' aria-current="page"' : '') + '>' + ico('shield') + '<span>Administración</span></a>';
+    }
+    if (soloPronto !== true && App.panel && App.panel.role === 'studio') {
+      items += '<a class="' + clase + '-item' + (PAGE === 'studio' ? ' is-on' : '') + '" href="studio.html"' + (PAGE === 'studio' ? ' aria-current="page"' : '') + '>' + ico('pad') + '<span>Panel de estudio</span></a>';
+    }
     return items;
   }
 
@@ -216,14 +225,8 @@
     return '<header class="topbar" id="topbar">'
       + '<div class="topbar-in">'
       + '<a class="brand" href="inicio.html" aria-label="Placeta Joven">'
-      + '<img src="../img/jovenlogo.png" alt="" />'
-      + '<span class="brand-txt"><b>Placeta Joven</b><span>' + esc(TITULOS[PAGE] || 'Inicio') + '</span></span></a>'
-      + '<nav class="topnav" aria-label="Secciones">' + navItems('topnav', false)
-      + '<div class="moremenu">'
-      + '<button class="topnav-item" type="button" data-action="menu-mas" aria-expanded="false" aria-controls="masPanel">'
-      + ico('spark') + '<span>Más</span>' + ico('down') + '</button>'
-      + '<div class="usermenu-panel" id="masPanel" hidden>' + navItems('usermenu', true) + '</div>'
-      + '</div></nav>'
+      + '<img src="../img/joven.png" alt="Placeta Joven" /></a>'
+      + '<nav class="topnav" aria-label="Secciones">' + navItems('topnav', false) + '</nav>'
       + '<div class="topbar-r">'
       + '<span class="pz-pill" title="' + (saldo === null ? 'Tu Cuenta Joven de Banco de La Placeta guarda el saldo en Placetas' : 'Saldo de tu Cuenta Joven · Banco de La Placeta') + '">'
       + ico('coin') + (saldo === null ? '—' : num(saldo)) + '<small>PZ</small></span>'
@@ -234,8 +237,6 @@
       + ico('down') + '</button>'
       + '<div class="usermenu-panel" id="userPanel" hidden>'
       + '<a href="miplaceta.html">' + ico('coin') + 'Mi Placeta</a>'
-      + '<a href="rutas.html">' + ico('route') + 'Mis caminos</a>'
-      + '<a href="becas.html">' + ico('gift') + 'Mis becas</a>'
       + '<a href="../index.html">' + ico('home') + 'Web pública</a>'
       + '<a href="mailto:joven@laplaceta.org">' + ico('file') + 'Ayuda</a>'
       + '<button type="button" data-action="logout" class="is-danger">' + ico('out') + 'Cerrar sesión</button>'
@@ -261,6 +262,20 @@
     if (!App.st) return null;
     if (Array.isArray(App.st.movimientos)) return App.st.movimientos;
     return null;
+  }
+
+  function limiteMensualHtml() {
+    var limite = App.st && App.st.limiteMensual;
+    if (!limite) return '';
+    var maximo = Number(limite.limitePz || 0);
+    var generado = Number(limite.generadasPz || 0);
+    var porcentaje = maximo > 0 ? Math.min(100, Math.round(generado / maximo * 100)) : 0;
+    return '<section class="pnl monthly-cap"><div class="pnl-head"><span class="card-ico amber">' + ico('coin') + '</span>'
+      + '<div><h2>Límite mensual de recompensas</h2><p>Progreso del motor de actividades · ' + esc(limite.mes || '') + '</p></div>'
+      + '<b class="monthly-cap-total">' + num(generado) + ' / ' + num(maximo) + ' Pz</b></div>'
+      + '<div class="pbar"><i style="width:' + porcentaje + '%"></i></div>'
+      + '<p class="fine">' + (limite.restantesPz > 0 ? 'Te quedan ' + num(limite.restantesPz) + ' Pz de margen este mes.' : 'Has alcanzado el límite de este mes.')
+      + ' Las recompensas generadas quedan pendientes de confirmación por el Banco.</p></section>';
   }
 
   function shellHtml(contenido) {
@@ -386,65 +401,136 @@
   /* ═══════════════════ CONTENIDO DE CADA PÁGINA ═══════════════════ */
 
   /* ── Inicio ───────────────────────────────────────────────────────── */
+  function tarjetaJuego(r) {
+    var libre = r.gratis === true || r.tipoJuego === 'recomendado';
+    var portada = r.imagen
+      ? '<img src="' + esc(r.imagen) + '" alt="" loading="lazy">'
+      : '<span aria-hidden="true">' + ico('pad') + '</span>';
+    return '<article class="space-game"><a class="space-game-art" href="juego.html?id=' + encodeURIComponent(r.id) + '">' + portada + '</a>'
+      + '<div class="space-game-body"><span class="stat-k">' + (libre ? 'JUEGO GRATUITO' : 'COLABORACIÓN INDIE') + '</span>'
+      + '<h3><a href="juego.html?id=' + encodeURIComponent(r.id) + '">' + esc(r.nombre) + '</a></h3>'
+      + '<a class="space-game-studio" href="estudio.html?desarrolladora=' + encodeURIComponent(r.desarrolladora || '') + '">' + esc(r.desarrolladora || 'Estudio independiente') + '</a>'
+      + '<p>' + esc(r.descripcion || '') + '</p><div class="space-game-foot"><b>' + (libre ? 'Gratis' : (Number(r.pz) > 0 ? num(r.pz) + ' Pz' : 'Ver condiciones')) + '</b>'
+      + '<a href="juego.html?id=' + encodeURIComponent(r.id) + '">Ver juego ' + ico('arrow') + '</a></div></div></article>';
+  }
+
+  function tarjetaMisionDiaria() {
+    var mision = App.misionDiaria;
+    if (!mision) {
+      return '<section class="daily-mission"><span class="stat-k">MISIÓN DE HOY</span><h2>Completa una actividad formativa</h2>'
+        + '<p>Las misiones se conectan con actividades reales de tus cursos.</p><a class="btn btn-primary" href="misiones.html">Ver misiones</a></section>';
+    }
+    return '<section class="daily-mission"><div><span class="stat-k">MISIÓN DE HOY · ' + esc(mision.fecha || '') + '</span>'
+      + '<h2>' + esc(mision.titulo) + '</h2><p>' + esc(mision.descripcion) + '</p></div>'
+      + (mision.completada
+        ? '<span class="tag tag-mint">Completada hoy</span>'
+        : '<a class="btn btn-primary" href="misiones.html">Ver misión ' + ico('arrow') + '</a>')
+      + '</section>';
+  }
+
   function pageInicio() {
     var st = App.st || {};
     var nombre = nombreUsuario();
     var prim = (nombre || 'Joven').split(/\s+/)[0];
     var saldo = saldoPz();
     var keys = st.keys || [];
-    var activa = st.estado === 'ACTIVO';
+    var games = App.recompensas.filter(function (game) { return game.categoria === 'videojuegos'; }).slice(0, 3);
 
-    var progresos = (App.caminosEstado.progreso || []).slice().sort(function (a, b) { return b.porcentaje - a.porcentaje; });
-    var progreso = progresos[0];
-    var caminoActual = progreso ? App.caminos.filter(function (c) { return c.id === progreso.caminoId; })[0] : null;
-    var becasPendientes = (App.becas || []).filter(function (b) { return b.estado === 'PENDIENTE'; });
-
-    var html = ''
-      + '<div class="page page-home">'
-      + '<div class="page-head"><div class="page-head-txt">'
-      + '<h1>Hola, ' + esc(prim) + '</h1>'
-      + '<p>' + (activa ? 'Esto es lo que tienes ahora.' : 'Tu programa no está activo.') + '</p>'
-      + '</div></div>';
-
-    /* Dos datos y una acción: el resto vive en sus secciones */
-    html += '<div class="home-top">'
-      + '<div class="home-card">'
-      + '<span class="home-k">Saldo</span>'
-      + '<b class="home-num">' + (saldo === null ? '—' : num(saldo)) + ' <small>Pz</small></b>'
-      + '<a class="home-link" href="miplaceta.html">Movimientos y Cuenta Joven ' + ico('arrow') + '</a>'
-      + '</div>'
-      + '<div class="home-card">'
-      + '<span class="home-k">Tu camino</span>'
-      + (caminoActual
-        ? '<b class="home-title">' + esc(caminoActual.nombre) + '</b>'
-          + '<div class="pbar"><i style="width:' + (progreso.porcentaje || 0) + '%"></i></div>'
-          + '<div class="pbar-meta"><span>' + progreso.completados + ' de ' + progreso.total + '</span><b>' + (progreso.porcentaje || 0) + ' %</b></div>'
-          + '<a class="btn btn-primary btn-sm" href="rutas.html?camino=' + encodeURIComponent(caminoActual.id) + '">Continuar</a>'
-        : '<b class="home-title">Elige un camino</b>'
-          + '<p class="fine">Todavía no has empezado ninguno.</p>'
-          + '<a class="btn btn-primary btn-sm" href="rutas.html">Ver caminos</a>')
-      + '</div>'
-      + '</div>';
-
-    /* Accesos directos: cuatro filas, sin duplicar información */
-    html += '<section class="pnl home-links">'
-      + '<div class="pnl-head"><span class="card-ico">' + ico('spark') + '</span>'
-      + '<div><h2>Para ti</h2><p>Solo lo que puedes usar ahora.</p></div></div>'
-      + '<a class="row" href="rutas.html"><span class="row-ico">' + ico('route') + '</span>'
-      + '<div class="row-txt"><b>Caminos formativos</b><span>' + (App.caminos.length ? App.caminos.length + ' caminos disponibles' : 'Elige tu objetivo') + '</span></div>'
-      + '<span class="row-go">' + ico('arrow') + '</span></a>'
-      + '<a class="row" href="beneficios.html"><span class="row-ico cyan">' + ico('pad') + '</span>'
-      + '<div class="row-txt"><b>Beneficios y claves</b><span>' + (App.recompensas.length ? App.recompensas.length + ' en el catálogo' : 'Catálogo de estudios indie') + '</span></div>'
-      + '<span class="row-go">' + ico('arrow') + '</span></a>'
-      + '<a class="row" href="becas.html"><span class="row-ico mint">' + ico('gift') + '</span>'
-      + '<div class="row-txt"><b>Becas</b><span>' + (becasPendientes.length ? becasPendientes.length + ' solicitud pendiente' : 'Pide beca desde cualquier elemento') + '</span></div>'
-      + '<span class="row-go">' + ico('arrow') + '</span></a>'
-      + '<a class="row" href="miplaceta.html"><span class="row-ico">' + ico('key') + '</span>'
-      + '<div class="row-txt"><b>Mis claves</b><span>' + (keys.length ? keys.length + ' conseguidas' : 'Todavía no tienes ninguna') + '</span></div>'
-      + '<span class="row-go">' + ico('arrow') + '</span></a>'
+    return '<div class="page page-home">'
+      + '<section class="space-hero"><div class="space-hero-copy"><span class="stat-k">PLACETA JOVEN · TU ESPACIO</span>'
+      + '<h1>Hola, ' + esc(prim) + '.<br><span>¿Qué descubres hoy?</span></h1>'
+      + '<p>Una tienda de juegos independientes, actividades y cursos reales. Todo lo que ves aquí viene de colaboraciones y contenidos verificados.</p>'
+      + '<div class="gate-act" style="justify-content:flex-start"><a class="btn btn-primary" href="beneficios.html">Explorar la tienda ' + ico('arrow') + '</a>'
+      + '<a class="btn btn-ghost" href="rutas.html">Ver cursos</a></div></div>'
+      + '<div class="space-hero-account"><span class="stat-k">TU CUENTA JOVEN</span>'
+      + '<b>' + (saldo === null ? '—' : num(saldo)) + ' <small>Pz</small></b>'
+      + '<p>' + (saldo === null ? 'Saldo pendiente de conexión con Banco de La Placeta.' : 'Saldo consultado a Banco de La Placeta.') + '</p>'
+      + '<span class="space-cashback">12 % cashback en operaciones elegibles</span>'
+      + '<a href="miplaceta.html">Mi Placeta ' + ico('arrow') + '</a></div></section>'
+      + tarjetaMisionDiaria()
+      + limiteMensualHtml()
+      + '<section class="space-section"><div class="space-section-heading"><div><span class="stat-k">SELECCIÓN ACTUAL</span><h2>Juegos por descubrir</h2></div><a class="btn btn-ghost btn-sm" href="beneficios.html">Ver tienda ' + ico('arrow') + '</a></div>'
+      + (games.length ? '<div class="space-game-grid">' + games.map(tarjetaJuego).join('') + '</div>'
+        : '<div class="empty"><span class="empty-ico">' + ico('pad') + '</span><b>Aún no hay juegos publicados</b><p>Los títulos aparecerán cuando haya colaboración confirmada y stock verificable. No mostramos ejemplos como juegos reales.</p></div>')
       + '</section>'
+      + '<section class="space-quick-links"><a href="misiones.html"><span>' + ico('spark') + '</span><b>Misiones</b><small>Tu actividad de hoy</small></a>'
+      + '<a href="rutas.html"><span>' + ico('grad') + '</span><b>Cursos</b><small>Continúa tu formación</small></a>'
+      + '<a href="miplaceta.html"><span>' + ico('coin') + '</span><b>Mi Placeta</b><small>' + num(keys.length) + ' keys en tu cuenta</small></a></section>'
       + '</div>';
-    return html;
+  }
+
+  function pageMisiones() {
+    var mission = App.misionDiaria;
+    var actividades = App.actividades || [];
+    var estados = App.actividadesEstado || [];
+    var contenido = actividades.length ? actividades.map(function (item) {
+      var estado = estados.filter(function (x) { return x.actividadId === item.id; })[0];
+      var premio = Number(item.economia && item.economia.recompensaPz || 0) + Number(item.economia && item.economia.bonusPz || 0);
+      return '<article class="space-activity"><div><span class="stat-k">' + esc(item.categoria || 'ACTIVIDAD') + '</span>'
+        + '<h3>' + esc(item.titulo) + '</h3><p>' + esc(item.descripcion || '') + '</p>'
+        + '<span class="space-activity-reward">' + (estado && estado.completada ? 'Completada' : 'Hasta ' + num(premio) + ' Pz · orden pendiente del Banco') + '</span></div>'
+        + '<a class="btn btn-ghost btn-sm" href="rutas.html">Abrir en Cursos ' + ico('arrow') + '</a></article>';
+    }).join('') : '<div class="empty"><b>No hay actividades conectadas ahora</b><p>Las actividades aparecerán cuando estén disponibles en el catálogo formativo.</p></div>';
+
+    return '<div class="page page-misiones">'
+      + pageHead('Misiones', 'Pequeños pasos para aprender haciendo. Las actividades y sus recompensas vienen del motor formativo de Placeta Joven.')
+      + '<section class="daily-mission-page"><div><span class="stat-k">MISIÓN DE HOY · ' + esc(mission && mission.fecha || '') + '</span>'
+      + '<h2>' + esc(mission && mission.titulo || 'Completa una actividad formativa') + '</h2>'
+      + '<p>' + esc(mission && mission.descripcion || 'Supera una actividad dentro de tus cursos para avanzar y optar a su recompensa.') + '</p></div>'
+      + (mission && mission.completada ? '<span class="tag tag-mint">Completada hoy</span>' : '<a class="btn btn-primary" href="rutas.html">Ir a Cursos ' + ico('arrow') + '</a>')
+      + '</section>'
+      + limiteMensualHtml()
+      + '<section class="space-section"><div class="space-section-heading"><div><span class="stat-k">ACTIVIDADES</span><h2>Aprende practicando</h2></div><a class="btn btn-ghost btn-sm" href="rutas.html">Ver cursos ' + ico('arrow') + '</a></div>'
+      + '<div class="space-activities-grid">' + contenido + '</div></section></div>';
+  }
+
+  function pageJuego() {
+    var id = new URLSearchParams(window.location.search).get('id') || '';
+    var game = App.recompensas.filter(function (item) { return String(item.id) === id; })[0];
+    if (!game) return '<div class="page">' + pageHead('Juego no disponible', 'No encontramos esta ficha o ya no está publicada.', '<a class="btn btn-ghost btn-sm" href="beneficios.html">Volver a la tienda</a>') + '</div>';
+
+    var libre = game.gratis === true || game.tipoJuego === 'recomendado';
+    var key = ((App.st && App.st.keys) || []).filter(function (item) { return item.recompensaId === game.id; })[0];
+    var yaOpino = key && key.opinionId;
+    var fechaDisponible = key && key.otorgada ? Date.parse(key.otorgada) + 86400000 : 0;
+    var horasEspera = fechaDisponible > Date.now() ? Math.ceil((fechaDisponible - Date.now()) / 3600000) : 0;
+    var formulario = '';
+    if (!key) formulario = '<p class="fine">Las opiniones se abren 24 horas después de recibir una key de este juego.</p>';
+    else if (yaOpino) formulario = '<p class="alert ok">' + ico('check') + '<span>Tu opinión ya está publicada.</span></p>';
+    else if (horasEspera) formulario = '<p class="fine">Podrás opinar dentro de ' + horasEspera + ' h, al cumplirse 24 horas desde que recibiste la key.</p>';
+    else formulario = '<div class="field"><label for="opinion-estrellas">Tu valoración</label><select id="opinion-estrellas"><option value="5">5 · Me encantó</option><option value="4">4 · Me gustó</option><option value="3">3 · Normal</option><option value="2">2 · No era para mí</option><option value="1">1 · No me gustó</option></select></div>'
+      + '<div class="field"><label for="opinion-texto">Tu opinión pública (80–2000 caracteres)</label><textarea id="opinion-texto" minlength="80" maxlength="2000"></textarea></div>'
+      + '<p class="fine">Se publicará sin tu nombre, PlacetaID ni código. Recibirás 40 Pz como orden pendiente si queda margen mensual.</p>'
+      + '<button class="btn btn-primary" type="button" data-action="publicar-opinion" data-key="' + esc(key.id) + '">Publicar opinión</button>';
+
+    return '<div class="page"><a class="back-link" href="beneficios.html">← Tienda</a>'
+      + '<section class="game-detail"><div class="game-detail-art">' + (game.imagen ? '<img src="' + esc(game.imagen) + '" alt="" />' : '<span>' + ico('pad') + '</span>') + '</div>'
+      + '<div class="game-detail-copy"><span class="stat-k">' + (libre ? 'JUEGO GRATUITO' : 'COLABORACIÓN INDEPENDIENTE') + '</span>'
+      + '<h1>' + esc(game.nombre) + '</h1><a class="space-game-studio" href="estudio.html?desarrolladora=' + encodeURIComponent(game.desarrolladora || '') + '">' + esc(game.desarrolladora || 'Estudio independiente') + '</a>'
+      + '<p>' + esc(game.descripcion || '') + '</p><div class="game-detail-meta">'
+      + (game.plataforma ? '<span class="tag">' + esc(game.plataforma) + '</span>' : '')
+      + (game.edadRecomendada ? '<span class="tag">' + esc(game.edadRecomendada) + '</span>' : '')
+      + '<span class="tag">' + (libre ? 'Gratis' : (Number(game.pz) > 0 ? num(game.pz) + ' Pz' : 'Ver condiciones')) + '</span></div>'
+      + (libre && game.url ? '<a class="btn btn-primary" href="' + esc(game.url) + '" target="_blank" rel="noopener">Visitar página oficial ' + ico('out') + '</a>'
+        : '<p class="alert warn">' + ico('alert') + '<span>La tienda es informativa hasta que el Banco confirme el cargo a Cuenta Joven.</span></p>')
+      + (game.condiciones ? '<p class="fine">' + esc(game.condiciones) + '</p>' : '') + '</div></section>'
+      + '<section class="pnl review-section"><div class="pnl-head"><span class="card-ico mint">' + ico('heart') + '</span><div><h2>Opiniones de la comunidad</h2><p>Publicadas 24 horas después de recibir una key.</p></div></div>'
+      + (key ? '<div class="review-compose">' + formulario + '</div>' : formulario)
+      + '<div id="opiniones-lista" class="public-reviews"><p class="fine">Cargando opiniones…</p></div></section></div>';
+  }
+
+  function pageEstudio() {
+    var nombre = new URLSearchParams(window.location.search).get('desarrolladora') || '';
+    var games = App.recompensas.filter(function (item) {
+      return String(item.desarrolladora || '').toLowerCase() === nombre.toLowerCase();
+    });
+    if (!nombre || !games.length) return '<div class="page">' + pageHead('Estudio no disponible', 'No encontramos un perfil activo para esta desarrolladora.', '<a class="btn btn-ghost btn-sm" href="beneficios.html">Volver a la tienda</a>') + '</div>';
+    return '<div class="page"><a class="back-link" href="beneficios.html">← Tienda</a>'
+      + '<section class="developer-profile"><span class="stat-k">ESTUDIO INDEPENDIENTE</span><h1>' + esc(nombre) + '</h1>'
+      + '<p>Este perfil reúne las colaboraciones y recomendaciones publicadas por el estudio en Placeta Joven.</p>'
+      + '<a class="btn btn-ghost btn-sm" href="mailto:joven@laplaceta.org?subject=Colaboraci%C3%B3n%20indie">Proponer una colaboración</a></section>'
+      + '<section class="space-section"><div class="space-section-heading"><h2>Juegos publicados</h2></div><div class="space-game-grid">'
+      + games.map(tarjetaJuego).join('') + '</div></section></div>';
   }
 
   /* ── Empleo y futuro ──────────────────────────────────────────────── */
@@ -525,9 +611,13 @@
     ];
 
     var html = '<div class="page">'
-      + pageHead('Beneficios',
-        'Recompensas reales: keys de juegos de estudios independientes, cursos con precio reducido en Placetas y actividades concretas. Sin promesas infladas.',
+      + pageHead('Tienda',
+        'Juegos y beneficios publicados con sus condiciones. Las colaboraciones aparecen cuando están confirmadas.',
         '<span class="chip"><i></i> ' + App.recompensas.length + ' en el catálogo</span>');
+
+    if (!App.canjeoActivo) {
+      html += '<div class="alert warn">' + ico('alert') + '<span>El catálogo se puede consultar, pero el canje está cerrado hasta que el Banco confirme el cargo a Cuenta Joven. No se descuenta saldo ni se entrega una key en esta versión.</span></div>';
+    }
 
     /* Tus keys */
     html += '<section class="pnl">'
@@ -535,6 +625,10 @@
       + '<div><h2>Tus keys</h2><p>Los juegos que has conseguido. Cada key es única y solo puede canjearse una vez.</p></div></div>'
       + '<div id="listaKeys">' + keysHtml(keys) + '</div>'
       + '</section>';
+
+    html += '<section class="pnl cashback-panel"><div class="cashback-mark">12<span>%</span></div>'
+      + '<div><h2>Cashback en Cuenta Joven</h2><p>La Cuenta Joven del Banco de La Placeta ofrece un 12 % de cashback en operaciones elegibles, sujeto a las condiciones del Banco. Placeta Joven no acredita el cashback ni modifica tu saldo.</p></div>'
+      + '<a class="btn btn-ghost btn-sm" href="miplaceta.html">Ver Mi Placeta</a></section>';
 
     /* Catálogo */
     html += '<section class="pnl">'
@@ -555,7 +649,7 @@
     html += '<section class="pnl">'
       + '<div class="pnl-head"><span class="card-ico cyan">' + ico('heart') + '</span>'
       + '<div><h2>Otros juegos recomendados</h2><p>Juegos gratuitos o de acceso libre. No se pagan con Placetas.</p></div></div>'
-      + '<div class="grid g-3">' + recomendacionesHtml() + '</div>'
+      + '<div class="grid g-3" id="gridRecomendaciones">' + recomendacionesHtml() + '</div>'
       + '</section>';
 
     /* Estado del flujo de una key */
@@ -640,13 +734,11 @@
     }
     return lista.map(function (r) {
       var conseguida = tieneConseguida(r.id);
-      var disponible = /^disponible$/i.test(String(r.disponibilidad || ''));
-      var puede = r.canjeable && !conseguida;
       var cats = { videojuegos: 'Videojuegos', formacion: 'Formación', experiencias: 'Experiencias', otros: 'Otros' };
       return '<article class="item">'
         + '<div class="item-top">' + (r.imagen ? '<img class="item-image" src="' + esc(r.imagen) + '" alt="" loading="lazy" />' : '<span class="item-cover ' + (conseguida ? 'mint' : '') + '">' + ico(r.categoria === 'videojuegos' ? 'pad' : (r.categoria === 'formacion' ? 'grad' : 'gift')) + '</span>')
-        + '<div class="item-h"><h3>' + esc(r.nombre) + '</h3>'
-        + '<p>' + esc(r.desarrolladora || 'Estudio colaborador') + (r.genero ? ' · ' + esc(r.genero) : '') + '</p></div></div>'
+        + '<div class="item-h"><h3><a class="catalog-link" href="juego.html?id=' + encodeURIComponent(r.id) + '">' + esc(r.nombre) + '</a></h3>'
+        + '<p><a class="catalog-studio-link" href="estudio.html?desarrolladora=' + encodeURIComponent(r.desarrolladora || '') + '">' + esc(r.desarrolladora || 'Estudio colaborador') + '</a>' + (r.genero ? ' · ' + esc(r.genero) : '') + '</p></div></div>'
         + '<p>' + esc(r.descripcion || '') + '</p>'
         + '<div class="item-meta">'
         + '<span class="tag">' + esc(cats[r.categoria] || 'Recompensa') + '</span>'
@@ -655,20 +747,23 @@
         + (conseguida ? '<span class="tag tag-mint">Conseguida</span>' : '')
         + (!conseguida && r.canjeable && r.stock != null ? '<span class="tag tag-amber">Quedan ' + num(r.stock) + '</span>' : '')
         + '</div>'
-        + '<div class="item-foot"><span class="item-price">' + num(r.pz) + ' <small>Pz</small></span>'
-        + '<button class="btn ' + (puede ? 'btn-primary' : 'btn-ghost') + ' btn-sm" type="button" '
-        + (puede ? 'data-action="abrir-recompensa" data-id="' + esc(r.id) + '"' : 'disabled')
-        + '>' + (conseguida ? 'Conseguida' : (puede ? 'Ver y conseguir' : esc(r.disponibilidad || 'Próximamente'))) + '</button>'
+        + '<div class="item-foot"><span class="item-price">' + (Number(r.pz) > 0 ? num(r.pz) + ' <small>Pz</small>' : esc(r.disponibilidad || 'Consultar')) + '</span>'
+        + '<a class="btn btn-ghost btn-sm" href="juego.html?id=' + encodeURIComponent(r.id) + '">Ver ficha ' + ico('arrow') + '</a>'
         + '</div></article>';
     }).join('');
   }
 
   function recomendacionesHtml() {
-    var lista = App.recompensas.filter(function (r) { return r.tipoJuego === 'recomendado' || r.gratis; });
-    if (!lista.length) return '<div class="empty" style="grid-column:1/-1"><b>Aún no hay recomendaciones publicadas</b><p>Cuando un estudio comparta un juego gratuito, aparecerá aquí con su enlace oficial.</p></div>';
+    var query = App.busqueda.trim().toLowerCase();
+    var lista = App.recompensas.filter(function (r) {
+      if (r.tipoJuego !== 'recomendado' && !r.gratis) return false;
+      if (!query) return true;
+      return String((r.nombre || '') + ' ' + (r.desarrolladora || '') + ' ' + (r.genero || '')).toLowerCase().indexOf(query) >= 0;
+    });
+    if (!lista.length) return '<div class="empty" style="grid-column:1/-1"><b>' + (query ? 'Sin juegos gratuitos para esta búsqueda' : 'Aún no hay recomendaciones publicadas') + '</b><p>' + (query ? 'Prueba con otro término o borra la búsqueda.' : 'Cuando un estudio comparta un juego gratuito que queramos destacar, aparecerá aquí con su enlace oficial.') + '</p></div>';
     return lista.map(function (r) {
       return '<article class="item"><div class="item-top">' + (r.imagen ? '<img class="item-image" src="' + esc(r.imagen) + '" alt="" loading="lazy" />' : '<span class="item-cover mint">' + ico('heart') + '</span>')
-        + '<div class="item-h"><h3>' + esc(r.nombre) + '</h3><p>' + esc(r.desarrolladora || 'Estudio colaborador') + '</p></div></div>'
+        + '<div class="item-h"><h3><a class="catalog-link" href="juego.html?id=' + encodeURIComponent(r.id) + '">' + esc(r.nombre) + '</a></h3><p><a class="catalog-studio-link" href="estudio.html?desarrolladora=' + encodeURIComponent(r.desarrolladora || '') + '">' + esc(r.desarrolladora || 'Estudio colaborador') + '</a></p></div></div>'
         + '<p>' + esc(r.descripcion || '') + '</p><div class="item-meta"><span class="tag tag-mint">Gratis</span>' + (r.plataforma ? '<span class="tag tag-cyan">' + esc(r.plataforma) + '</span>' : '') + '</div>'
         + '<div class="item-foot"><a class="btn btn-ghost btn-sm" href="' + esc(r.url || r.steamUrl || '#') + '" target="_blank" rel="noopener"' + (!r.url && !r.steamUrl ? ' aria-disabled="true"' : '') + '>Visitar juego ' + ico('out') + '</a></div></article>';
     }).join('');
@@ -679,6 +774,8 @@
   function actualizarCatalogo() {
     var g = document.getElementById('gridRecompensas');
     if (g) g.innerHTML = recompensasHtml();
+    var freeGames = document.getElementById('gridRecomendaciones');
+    if (freeGames) freeGames.innerHTML = recomendacionesHtml();
     var bar = document.getElementById('filtrosRecompensa');
     if (bar) Array.prototype.forEach.call(bar.querySelectorAll('.tab'), function (b) {
       b.classList.toggle('is-on', b.getAttribute('data-cat') === App.filtro);
@@ -703,7 +800,7 @@
 
   function detalleRecompensaHtml(r) {
     var conseguida = tieneConseguida(r.id);
-    var puede = r.canjeable && !conseguida;
+    var puede = App.canjeoActivo && r.canjeable && !conseguida;
     var estados = ['DISPONIBLE', 'RESERVADA', 'ASIGNADA', 'ENTREGADA'];
     return '<div class="pnl" style="margin-top:1.1rem;border-color:var(--line-2)">'
       + '<div class="pnl-head"><span class="card-ico">' + ico('pad') + '</span>'
@@ -741,7 +838,9 @@
               + '<a class="btn btn-ghost" href="miplaceta.html">Ver mi saldo</a>'
               + '</div>'
               + '<p class="fine" style="margin-top:.7rem">Al conseguirla se descuentan ' + num(r.pz) + ' Pz de tu saldo y se te asigna una key única. Solo puedes conseguirla una vez.</p>'
-            : '<p class="alert" style="margin-top:1rem">' + ico('alert') + '<span>Esta recompensa todavía no se puede conseguir.</span></p>'))
+            : (!App.canjeoActivo && r.canjeable
+              ? '<p class="alert" style="margin-top:1rem">' + ico('alert') + '<span>El catálogo es informativo por ahora. El canje se abrirá cuando el Banco pueda confirmar el cargo y el cashback de forma segura.</span></p>'
+              : '<p class="alert" style="margin-top:1rem">' + ico('alert') + '<span>Esta recompensa todavía no se puede conseguir.</span></p>')))
       + '</div></div></div>';
   }
 
@@ -790,7 +889,8 @@
       + '<span class="stat-sub">Marcadas como canjeadas</span></div>'
       + '<div class="stat"><span class="stat-k">Becas activas</span><span class="stat-v">0</span>'
       + '<span class="stat-sub">Sin convocatorias abiertas</span></div>'
-      + '</div>';
+      + '</div>'
+      + limiteMensualHtml();
 
     /* Saldo: explicación honesta */
     if (saldo === null) {
@@ -821,7 +921,8 @@
       + '<section class="pnl">'
       + '<div class="pnl-head"><span class="card-ico mint">' + ico('coin') + '</span>'
       + '<div><h2>Cuenta Joven</h2><p>Abrela con un contrato firmado en PlacetaID.</p></div></div>'
-      + '<p style="color:var(--txt-2);font-size:.9rem">Tu saldo de Placetas vive en Banco de La Placeta. La solicitud se revisa y se firma de forma segura.</p>'
+      + '<div class="cashback-display"><b>12<span>%</span></b><span>cashback en operaciones elegibles, según condiciones de Banco de La Placeta</span></div>'
+      + '<p style="color:var(--txt-2);font-size:.9rem">Tu saldo de Placetas vive en Banco de La Placeta. La solicitud se revisa y se firma de forma segura; el Banco confirma las operaciones.</p>'
       + '<button class="btn btn-primary btn-sm" type="button" data-action="cuenta-joven">Solicitar Cuenta Joven</button>'
       + '</section>'
 
@@ -1097,10 +1198,12 @@
     return api('actividades', { method: 'POST', body: JSON.stringify({ actividadId: r.a.id, respuestas: r.respuestas }) })
       .then(function (data) {
         r.final = data;
+        if (data.limiteMensual && App.st) App.st.limiteMensual = data.limiteMensual;
         return Promise.all([
           api('actividades').then(function (res) {
             App.actividadesEstado = res.estado || [];
             App.actividades = Array.isArray(res.actividades) ? res.actividades : App.actividades;
+            App.misionDiaria = res.misionDiaria || null;
           }),
           api('caminos').then(function (res) {
             App.caminos = Array.isArray(res.caminos) ? res.caminos : App.caminos;
@@ -1151,6 +1254,7 @@
       + '<div class="pbar" style="margin:1rem 0 .35rem"><i style="width:' + res.porcentaje + '%"></i></div>'
       + '<div class="pbar-meta"><span>Intentos usados: ' + res.intentos + ' de ' + res.limite + '</span><b>' + (res.penalizacion ? 'Penalización −' + res.penalizacion + ' puntos' : 'Sin penalización') + '</b></div>';
     if (premio) html += '<p class="alert ok" style="margin-top:1rem">' + ico('coin') + '<span><b>+' + num(premio) + ' Pz</b> enviados al Banco de La Placeta como orden pendiente. La actividad no crea Placetas por sí misma.</span></p>';
+    else if (f.limiteMensualAlcanzado) html += '<p class="alert warn" style="margin-top:1rem">' + ico('alert') + '<span>Actividad completada, pero esta recompensa superaría tu límite mensual de ' + num((f.limiteMensual && f.limiteMensual.limitePz) || 400) + ' Pz. No se ha generado ninguna orden adicional.</span></p>';
     else if (res.aprobado) html += '<p class="alert" style="margin-top:1rem">' + ico('coin') + '<span>Esta actividad ya estaba superada, así que no genera una recompensa nueva.</span></p>';
     if (revision.length) {
       html += '<h3 class="lr-rev-title">Repaso del intento</h3><div class="lr-rev">' + revision.map(function (e) {
@@ -1181,7 +1285,7 @@
     }
     if (App.caminoSeleccionado) return detalleCamino(App.caminoSeleccionado);
     var html = '<div class="page">'
-      + pageHead('Caminos formativos', 'Elige una meta. El camino ordena cursos, actividades y proyectos sin duplicarlos.', '<span class="tag tag-cyan">' + rutas.length + ' disponibles</span>');
+      + pageHead('Cursos', 'Elige una meta. El camino ordena cursos y actividades verificadas sin saltarse sus requisitos.', '<span class="tag tag-cyan">' + rutas.length + ' disponibles</span>');
 
     html += '<div class="grid g-3">' + rutas.map(tarjetaCamino).join('') + '</div>';
 
@@ -1362,6 +1466,67 @@
     return html;
   }
 
+  function paginaSinPermiso(titulo) {
+    return '<div class="page">' + pageHead(titulo, 'Esta sección requiere permisos explícitos asignados en el servidor.')
+      + '<section class="pnl"><div class="alert">' + ico('lock') + '<p>No tienes autorización para este panel. Los permisos no se pueden activar desde el navegador. Si necesitas acceso, contacta a joven@laplaceta.org.</p></div></section></div>';
+  }
+
+  function pageAdmin() {
+    var panel = App.panel || {};
+    if (panel.role !== 'admin') return paginaSinPermiso('Administración');
+    if (panel.error) {
+      return '<div class="page">' + pageHead('Administración', 'Gestión del catálogo y las colaboraciones confirmadas.')
+        + '<section class="pnl"><div class="alert">' + ico('alert') + '<p>El panel está autorizado, pero el catálogo necesita conexión con Supabase. No se han cargado ni creado datos de ejemplo.</p></div>'
+        + '<p class="fine">El límite mensual actual es ' + num(panel.limiteMensualPz || 400) + ' Pz. Para cambiarlo, actualiza PLACETAJOVEN_LIMITE_MENSUAL_PZ en el servidor.</p></section></div>';
+    }
+    var games = Array.isArray(panel.juegos) ? panel.juegos : [];
+    var active = games.filter(function (game) { return game.activa; }).length;
+    var stockKnown = games.filter(function (game) { return game.stock != null; }).length;
+    var rows = games.length ? games.map(function (game) {
+      return '<tr><td>' + esc(game.nombre) + '<br><span class="fine">' + esc(game.id) + '</span></td>'
+        + '<td>' + esc(game.desarrolladora || '—') + '</td><td>' + (game.stock == null ? 'Sin datos' : num(game.stock)) + '</td>'
+        + '<td>' + (game.activa ? 'Publicada' : 'Pausada') + '</td><td><button class="btn btn-ghost btn-sm" type="button" data-action="panel-toggle" data-id="' + esc(game.id) + '" data-activa="' + String(!game.activa) + '">' + (game.activa ? 'Pausar' : 'Activar') + '</button></td></tr>';
+    }).join('') : '<tr><td colspan="5">Todavía no hay fichas registradas.</td></tr>';
+    return '<div class="page">' + pageHead('Administración', 'Publica fichas autorizadas, controla visibilidad y revisa stock sin acceder a datos personales.')
+      + '<div class="grid g-3"><div class="stat"><span class="stat-k">Fichas del catálogo</span><span class="stat-v">' + num(games.length) + '</span><span class="stat-sub">' + num(active) + ' publicadas</span></div>'
+      + '<div class="stat"><span class="stat-k">Stocks conocidos</span><span class="stat-v">' + num(stockKnown) + '</span><span class="stat-sub">Datos agregados, sin claves</span></div>'
+      + '<div class="stat"><span class="stat-k">Límite mensual</span><span class="stat-v">' + num(panel.limiteMensualPz || 400) + ' <small>Pz</small></span><span class="stat-sub">Se ajusta en configuración del servidor</span></div></div>'
+      + '<section class="pnl"><div class="pnl-head"><span class="card-ico">' + ico('pad') + '</span><div><h2>Catálogo</h2><p>Canje ' + (panel.canjeoActivo ? 'activado' : 'cerrado hasta integrar cargos bancarios') + ' · nunca se exponen códigos de keys aquí.</p></div></div>'
+      + '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Juego</th><th>Estudio</th><th>Stock disponible</th><th>Estado</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div></section>'
+      + '<section class="pnl"><div class="pnl-head"><span class="card-ico mint">' + ico('plus') + '</span><div><h2>Publicar ficha</h2><p>Claves en colaboración o recomendación gratuita con enlace oficial.</p></div></div>'
+      + '<div class="grid g-2"><div class="field"><label for="panel-nombre">Nombre del juego</label><input id="panel-nombre" type="text" maxlength="140"></div>'
+      + '<div class="field"><label for="panel-estudio">Estudio</label><input id="panel-estudio" type="text" maxlength="140"></div>'
+      + '<div class="field"><label for="panel-url">Enlace oficial</label><input id="panel-url" type="url" placeholder="https://…"></div>'
+      + '<div class="field"><label for="panel-imagen">Imagen autorizada (opcional)</label><input id="panel-imagen" type="url" placeholder="https://…"></div>'
+      + '<div class="field"><label for="panel-pz">Precio en Pz (solo claves)</label><input id="panel-pz" type="number" min="100" max="1000" value="100"></div>'
+      + '<div class="field"><label for="panel-studio-id">ID del estudio autorizado</label><input id="panel-studio-id" type="text" maxlength="80"></div>'
+      + '<div class="field span-2"><label for="panel-descripcion">Descripción</label><textarea id="panel-descripcion" maxlength="2400"></textarea></div>'
+      + '<div class="field span-2"><label for="panel-condiciones">Condiciones (opcional)</label><textarea id="panel-condiciones" maxlength="1600"></textarea></div>'
+      + '<label class="chip"><input id="panel-gratis" type="checkbox"> Juego gratuito recomendado</label></div>'
+      + '<div class="gate-act" style="justify-content:flex-start"><button class="btn btn-primary" type="button" data-action="panel-crear">Publicar ficha</button></div></section></div>';
+  }
+
+  function pageStudio() {
+    var panel = App.panel || {};
+    if (panel.role !== 'studio') return paginaSinPermiso('Panel de estudio');
+    if (panel.error) {
+      return '<div class="page">' + pageHead('Panel de estudio', 'Gestiona únicamente las fichas y claves de tu estudio.')
+        + '<section class="pnl"><div class="alert">' + ico('alert') + '<p>El panel está autorizado, pero el catálogo necesita conexión con Supabase. No se han cargado datos ficticios.</p></div></section></div>';
+    }
+    var games = Array.isArray(panel.juegos) ? panel.juegos : [];
+    var content = games.length ? games.map(function (game) {
+      var stock = game.stock == null ? 'Sin dato de stock' : num(game.stock) + ' claves disponibles';
+      return '<section class="pnl"><div class="pnl-head"><span class="card-ico cyan">' + ico('pad') + '</span><div><h2>' + esc(game.nombre) + '</h2><p>' + esc(stock) + (game.activa ? ' · Publicada' : ' · Pausada') + '</p></div></div>'
+        + '<p>' + esc(game.descripcion || '') + '</p>'
+        + (game.gratis ? '<p class="fine">Esta ficha es una recomendación gratuita; no se pueden cargar claves.</p>'
+          : '<div class="field"><label for="panel-keys-' + esc(game.id) + '">Añadir claves, una por línea</label><textarea id="panel-keys-' + esc(game.id) + '" maxlength="30000"></textarea></div>'
+            + '<button class="btn btn-primary btn-sm" type="button" data-action="panel-claves" data-id="' + esc(game.id) + '">Añadir al inventario</button>')
+        + '</section>';
+    }).join('') : '<section class="pnl"><div class="empty"><b>Aún no hay juegos asignados</b><p>La administración debe asociar el ID de tu estudio a una ficha activa.</p></div></section>';
+    return '<div class="page">' + pageHead('Panel de estudio', 'Solo ves los juegos y el stock agregado que corresponden a tu estudio. No mostramos socios, opiniones privadas ni claves asignadas.', '<span class="tag tag-cyan">' + esc(panel.studioId || 'Estudio') + '</span>')
+      + content + '</div>';
+  }
+
   function pageHead(titulo, texto, extra) {
     return '<div class="page-head"><div class="page-head-txt">'
       + '<h1>' + esc(titulo) + '</h1><p>' + texto + '</p></div>'
@@ -1372,12 +1537,14 @@
   var PAGINAS = {
     inicio: pageInicio,
     formacion: pageRutas,
-    empleo: pageEmpleo,
     beneficios: pageBeneficios,
-    becas: pageBecas,
     miplaceta: pageMiPlaceta,
     rutas: pageRutas,
-    comunidad: pageComunidad
+    misiones: pageMisiones,
+    juego: pageJuego,
+    estudio: pageEstudio,
+    admin: pageAdmin,
+    studio: pageStudio
   };
 
   /* ═══════════════════ ACCIONES ═══════════════════ */
@@ -1579,6 +1746,97 @@
 
   function tAttr(element, name) { return element.getAttribute(name) || ''; }
 
+  function opinionesHtml(lista) {
+    if (!Array.isArray(lista) || !lista.length) return '<p class="fine">Todavía no hay opiniones públicas para este juego.</p>';
+    return lista.map(function (opinion) {
+      var rating = Math.max(1, Math.min(5, Number(opinion.estrellas) || 0));
+      return '<article class="public-review"><div><b>' + '★'.repeat(rating) + '☆'.repeat(5 - rating) + '</b><span>'
+        + esc(opinion.fecha ? fecha(opinion.fecha) : '') + '</span></div><p>' + esc(opinion.texto) + '</p><small>Socio de Placeta Joven · opinión pública</small></article>';
+    }).join('');
+  }
+
+  function cargarOpinionesJuego() {
+    var gameId = new URLSearchParams(window.location.search).get('id') || '';
+    var target = document.getElementById('opiniones-lista');
+    if (!gameId || !target) return;
+    fetch('/api/opiniones?recompensaId=' + encodeURIComponent(gameId)).then(function (response) {
+      if (!response.ok) throw new Error('opiniones_no_disponibles');
+      return response.json();
+    }).then(function (data) {
+      var panel = document.getElementById('opiniones-lista');
+      if (panel) panel.innerHTML = opinionesHtml(data.opiniones);
+    }).catch(function () {
+      var panel = document.getElementById('opiniones-lista');
+      if (panel) panel.innerHTML = '<p class="fine">Las opiniones estarán disponibles cuando se conecte el almacenamiento público.</p>';
+    });
+  }
+
+  function accionPublicarOpinion(button) {
+    var reviewText = document.getElementById('opinion-texto');
+    var text = reviewText ? reviewText.value.trim() : '';
+    var ratingField = document.getElementById('opinion-estrellas');
+    var rating = Number(ratingField && ratingField.value);
+    if (text.length < 80 || text.length > 2000) {
+      avisoApp('alert warn', ico('alert') + '<span>La opinión debe tener entre 80 y 2000 caracteres.</span>');
+      return;
+    }
+    button.disabled = true;
+    button.textContent = 'Publicando…';
+    api('opiniones', { method: 'POST', body: JSON.stringify({ keyId: tAttr(button, 'data-key'), estrellas: rating, texto: text }) })
+      .then(function (result) {
+        return api('status').then(function (status) {
+          App.st = status;
+          render();
+          avisoApp('alert ok', ico('check') + '<span>Opinión publicada. '
+            + (result.recompensaPendiente ? '+' + num(result.recompensaPendiente) + ' Pz queda como orden pendiente del Banco.' : 'Este mes no queda margen para generar su orden de Pz.') + '</span>');
+        });
+      }).catch(function (error) {
+        var messages = {
+          espera_24h: 'Podrás opinar cuando hayan pasado 24 horas desde que recibiste la key.',
+          opinion_duplicada: 'Ya se publicó una opinión para esta key.',
+          key_no_encontrada: 'No encontramos una key tuya para este juego.',
+          no_activa: 'Necesitas una suscripción activa para publicar una opinión.'
+        };
+        avisoApp('alert warn', ico('alert') + '<span>' + esc(messages[error.code] || 'No se pudo publicar la opinión. Reinténtalo cuando la conexión esté disponible.') + '</span>');
+      }).finally(function () {
+        button.disabled = false;
+        button.textContent = 'Publicar opinión';
+      });
+  }
+
+  function enviarAccionPanel(payload, button, successText) {
+    return conBoton(button, 'Guardando…', function () {
+      return api('panel', { method: 'POST', body: JSON.stringify(payload) })
+        .then(function () { return api('panel'); })
+        .then(function (panel) {
+          App.panel = panel;
+          render();
+          avisoApp('alert ok', ico('check') + '<span>' + esc(successText) + '</span>');
+        });
+    });
+  }
+
+  function accionPanelCrear(button) {
+    return enviarAccionPanel({
+      accion: 'crear',
+      nombre: document.getElementById('panel-nombre').value,
+      desarrolladora: document.getElementById('panel-estudio').value,
+      descripcion: document.getElementById('panel-descripcion').value,
+      url: document.getElementById('panel-url').value,
+      imagen: document.getElementById('panel-imagen').value,
+      pz: Number(document.getElementById('panel-pz').value),
+      studioId: document.getElementById('panel-studio-id').value,
+      condiciones: document.getElementById('panel-condiciones').value,
+      gratis: document.getElementById('panel-gratis').checked
+    }, button, 'Ficha guardada. La promoción gratuita aparecerá en portada; las claves, al confirmar stock.');
+  }
+
+  function accionPanelClaves(button) {
+    var id = tAttr(button, 'data-id');
+    var textarea = document.getElementById('panel-keys-' + id);
+    return enviarAccionPanel({ accion: 'anadir_claves', recompensaId: id, codigos: textarea ? textarea.value : '' }, button, 'Claves procesadas; el panel muestra solo el stock disponible.');
+  }
+
   /* ── Eventos (delegación) ─────────────────────────────────────────── */
   document.addEventListener('click', function (ev) {
     var t = ev.target.closest('[data-action]');
@@ -1620,6 +1878,10 @@
       case 'cerrar-camino': App.caminoSeleccionado = null; render(); break;
       case 'cuenta-joven': accionCuentaJoven(t); break;
       case 'abrir-beca': accionBeca(t); break;
+      case 'panel-toggle': enviarAccionPanel({ accion: tAttr(t, 'data-activa') === 'true' ? 'activar' : 'pausar', id: tAttr(t, 'data-id') }, t, 'Estado de publicación actualizado.'); break;
+      case 'panel-crear': accionPanelCrear(t); break;
+      case 'panel-claves': accionPanelClaves(t); break;
+      case 'publicar-opinion': accionPublicarOpinion(t); break;
       case 'lr-opcion': {
         var ej = App.run.a.ejercicios[App.run.paso];
         App.run.respuestas[ej.id] = ej.tipo === 'test' ? Number(t.getAttribute('data-idx')) : (Number(t.getAttribute('data-idx')) === 0);
@@ -1837,6 +2099,7 @@
       var det = document.getElementById('detalleRecompensa');
       if (det) det.innerHTML = detalleRecompensaHtml(App.vista);
     }
+    if (PAGE === 'juego') cargarOpinionesJuego();
     if (PAGE === 'empleo') cvPintar();
     pintarIconoTema();
     window.scrollTo(0, 0);
@@ -1865,6 +2128,15 @@
     }
     App.st = st;
 
+    if (PAGE === 'admin' || PAGE === 'studio') {
+      try { App.panel = await api('panel'); }
+      catch (panelError) { App.panel = { role: 'socio' }; }
+      render();
+      return;
+    }
+    try { App.panel = await api('panel'); }
+    catch (panelError) { App.panel = null; }
+
     if (st && st.bloqueado) { pintarBloqueado(st); return; }
     if (st && st.requiereAlta) { pintarSinSuscripcion(st); return; }
     if (!st || !st.estado) { pintarSinSuscripcion(st); return; }
@@ -1875,9 +2147,11 @@
       var res = await api('recompensas');
       App.recompensas = (res && Array.isArray(res.recompensas)) ? res.recompensas : [];
       App.demo = !!(res && res.demo);
+      App.canjeoActivo = !!(res && res.canjeoActivo);
     } catch (e) {
       App.recompensas = [];
       App.demo = false;
+      App.canjeoActivo = false;
       App.catalogError = e;
     }
     try {
@@ -1895,6 +2169,7 @@
       var actRes = await api('actividades');
       App.actividades = Array.isArray(actRes.actividades) ? actRes.actividades : [];
       App.actividadesEstado = Array.isArray(actRes.estado) ? actRes.estado : [];
+      App.misionDiaria = actRes.misionDiaria || null;
     } catch (e) { App.actividades = []; }
     render();
 

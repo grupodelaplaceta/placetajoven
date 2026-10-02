@@ -180,3 +180,24 @@ select
   count(*) as total
 from public.placeta_joven_keypool
 group by recompensa_id;
+
+-- Opiniones públicas: nunca se exponen placeta_id, key_id ni códigos.
+create table if not exists public.placeta_joven_opiniones (
+  id text primary key,
+  recompensa_id text not null,
+  juego text not null,
+  placeta_id text not null,
+  key_id text not null,
+  estrellas smallint not null check (estrellas between 1 and 5),
+  texto text not null check (char_length(texto) between 80 and 2000),
+  publicada boolean not null default true,
+  created_at timestamptz not null default now(),
+  constraint placeta_joven_opiniones_una_por_key unique (placeta_id, key_id)
+);
+
+alter table public.placeta_joven_opiniones enable row level security;
+-- No se concede lectura directa a anon/authenticated: la API de opiniones
+-- usa service_role y expone solo juego, puntuación, texto y fecha.
+
+create index if not exists placeta_joven_opiniones_recompensa_fecha
+  on public.placeta_joven_opiniones (recompensa_id, created_at desc);

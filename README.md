@@ -17,26 +17,30 @@ Proyecto **sostenible y sin ánimo de lucro**: la cuota es simbólica (1,95 €/
 
 ## Tipografía y temas
 
-- **Bebas Neue** para títulos (identidad de la marca) + **Plus Jakarta Sans** para texto
-  + **JetBrains Mono** para datos (Pz, códigos de keys).
-- **Tema oscuro permanente** en la web pública y el espacio privado.
+- **Chakra Petch** para títulos + **Bricolage Grotesque** para texto + **JetBrains Mono** para datos.
+- **Baruta** y **Super Bouncer** quedan como fuentes decorativas opcionales; sus archivos no están incluidos y el navegador usa Chakra Petch como respaldo.
+- Tema oscuro por defecto; se conserva la preferencia clara si la persona la había elegido.
 
 ---
 
 ## Estructura
 
 ```
-jovenlogo.png              → logo oficial (fuente)
+public/img/joven.png       → logotipo de Placeta Joven
 public/
-  index.html               → landing pública (una sola página con secciones)
+  plataforma.html          → portada pública y acceso a la plataforma
+  filosofia.html           → filosofía y apoyo al videojuego independiente
+  estudios.html            → información y propuesta de colaboración para estudios
   css/
+    plataforma.css         → portada pública y páginas informativas
     pjv.css                → design system (tokens, componentes, secciones)
     app.css                → shell de la webapp (barra lateral + cabecera + contenido)
     legal.css              → páginas legales
   js/
     placetaid.js           → cliente PlacetaID (sesión en cookie de 7 días)
+    plataforma.js          → escaparate público, tarifas y acceso local de pruebas
     landing.js             → cabecera, menú, tema, animaciones y aviso de sesión
-    app.js                 → motor de la webapp (sesión, estado y las 7 secciones)
+    app.js                 → motor de la webapp (sesión, estado, formación, tienda y paneles autorizados)
     legal.js               → carga el documento legal desde el BOLP
   espacio/
     inicio.html            → Inicio (saldo, progreso, para ti, membresía, noticias)
@@ -46,6 +50,11 @@ public/
     miplaceta.html         → Mi Placeta (saldo, movimientos, becas, membresía)
     rutas.html             → Rutas (9 objetivos con sus pasos) · en preparación
     comunidad.html         → Comunidad (actividades, proyectos, encuestas) · en preparación
+    misiones.html          → misión diaria basada en actividad formativa real
+    juego.html             → ficha de juego y opiniones públicas
+    estudio.html           → perfil público de una desarrolladora
+    admin.html             → panel admin (solo allowlist de servidor)
+    studio.html            → panel de estudio (solo catálogo asignado)
     academia.html          → redirección a formacion.html (enlaces antiguos)
     apoyo.html             → redirección a beneficios.html (enlaces antiguos)
   mi.html                  → entrada tras PlacetaID → redirige a espacio/inicio.html
@@ -127,7 +136,11 @@ Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas com
 
 | Método | Ruta | Función |
 |---|---|---|
-| GET | `/api/status` | Estado del usuario (control de edad 16–30) + sus keys |
+| GET | `/api/status` | Estado del usuario (control de edad 16–30), keys y progreso del límite mensual del motor propio |
+| GET | `/api/escaparate` | Juegos con stock confirmado y juegos gratuitos marcados para promoción; lectura pública |
+| GET/POST | `/api/panel` | Panel admin/estudio; roles comprobados en servidor, nunca en el cliente |
+| GET | `/api/opiniones` | Opiniones públicas sin identidad ni códigos de keys |
+| POST | `/api/opiniones` | Publicar opinión de una key propia tras 24 h; 40 Pz pendientes si queda límite mensual |
 | GET | `/api/planes` | Tarifas públicas, sin sesión |
 | GET | `/api/caminos` | Caminos formativos, cursos y estado de convalidaciones |
 | POST | `/api/caminos` | Solicitar convalidación de un curso o actividad externa |
@@ -146,6 +159,18 @@ Las áreas de **Empleo y futuro**, **Rutas** y **Comunidad** están marcadas com
 | POST | `/api/keys` | Marcar una key como canjeada (`{ keyId, accion }`) |
 | POST | `/api/webhook` | Webhook de Lemon Squeezy (verifica la firma `X-Signature`) |
 
+### Catálogo, paneles y economía
+
+- Una ficha de colaboración aparece en el escaparate cuando está activa y hay stock verificable en el keypool.
+- Un juego gratuito requiere `data.gratis=true`, `data.tipoJuego="recomendado"`, `data.promocionada=true` y una URL HTTP(S) oficial.
+- El panel admin se autoriza con `PLACETAJOVEN_ADMIN_DIPS`; los estudios se vinculan mediante `PLACETAJOVEN_STUDIOS_JSON` (`DIP` → `studioId`). Estas variables contienen identificadores personales y solo van en el entorno privado del servidor, nunca en el repositorio.
+- El panel de estudio solo devuelve fichas con su `studioId`; permite cargar claves y muestra únicamente stock agregado. La administración puede publicar/pausar fichas. Sin Supabase, ambos paneles indican que no están configurados y no simulan datos.
+- El límite predeterminado de 400 Pz se aplica server-side a recompensas nuevas del motor de actividades y cuenta las órdenes generadas durante el mes UTC. Las recompensas que PlacetaEDU gestione fuera de este motor aún no entran en ese acumulado.
+- El saldo y el cashback son responsabilidad de Banco de La Placeta. El canje está bloqueado en servidor mientras la API bancaria no confirme el cargo; ninguna variable de entorno puede activarlo por sí sola.
+- Los textos legales vigentes siguen sirviéndose desde el BOLP; las páginas de información no sustituyen esos documentos oficiales.
+- Las opiniones se guardan en `placeta_joven_opiniones`; aplica el esquema de `sql/placeta_joven.sql`. RLS bloquea lectura directa de DIP/keyId; solo la API publica texto, juego, valoración y fecha.
+- La misión diaria destaca una actividad formativa pendiente; completarla otorga la recompensa propia de esa actividad, no un bonus arbitrario adicional.
+
 Lógica pura testeada: `npm test` (`tests/core.test.js`).
 
 ## Acceso interior de pruebas
@@ -158,7 +183,10 @@ PLACETAJOVEN_TEST_MODE=1
 PLACETAJOVEN_TEST_KEY=<clave-larga-y-aleatoria>
 PLACETAJOVEN_TEST_DIP=TEST-PLACETA-JOVEN
 PLACETAJOVEN_TEST_EDAD=25
+PLACETAJOVEN_TEST_PANEL=admin
 ```
+
+`PLACETAJOVEN_TEST_PANEL` acepta `admin` o `studio` solo con el modo de pruebas local/Preview activo; nunca concede permisos en producción.
 
 Después abre `/test-login.html` y usa la clave configurada. El acceso crea una
 sesión sintética activa y no escribe suscripciones, pagos ni datos de usuarios.
@@ -199,7 +227,7 @@ y un flujo de firma integrado con PlacetaID.
 
 ## Despliegue (Vercel)
 
-- Framework `Other` / `Static`; `vercel.json` enruta `/` → `public/index.html`,
+- Framework `Other` / `Static`; `vercel.json` enruta `/` → `public/plataforma.html`,
   `/entrar` → `public/espacio/inicio.html`, `/mi`, `/espacio/*`, `/terminos`,
   `/privacidad` y las funciones de `/api`.
 - Tablas Supabase: ejecutar `sql/placeta_joven.sql`.

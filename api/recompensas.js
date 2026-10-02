@@ -4,9 +4,8 @@
 //   POST /api/recompensas { recompensaId } → canjea la recompensa y entrega la
 //                                            key al socio (la guarda en su doc).
 //
-// El canje está DESACTIVADO por defecto: hay que poner RECOMPENSAS_CANJEO=1
-// cuando existan colaboraciones reales (y códigos reales en el pool). Mientras
-// tanto devuelve 403 { error: 'canjeo_desactivado' }.
+// El canje permanece cerrado hasta integrar un cargo confirmado por el Banco.
+// Tener una ficha activa y claves en el pool no autoriza a entregarlas gratis.
 // Requiere usuario identificado con PlacetaID y suscripción activa/vigente.
 'use strict';
 
@@ -16,7 +15,7 @@ const { edadOk, docVigente } = require('../lib/placetajoven');
 const store = require('../lib/store');
 const { setCors, json, handleOptions, requiereUsuario, readBody } = require('./_util');
 
-const CANJEO_ACTIVO = String(process.env.RECOMPENSAS_CANJEO || '0') === '1';
+const CANJEO_ACTIVO = false;
 
 module.exports = async (req, res) => {
   setCors(req, res);
@@ -33,7 +32,7 @@ async function listarCatalogo(req, res) {
   if (!u) return; // ya respondió con el error adecuado
   try {
     const { demo, recompensas } = await listar();
-    return json(res, 200, { ok: true, demo, recompensas });
+    return json(res, 200, { ok: true, demo, canjeoActivo: CANJEO_ACTIVO, recompensas });
   } catch (e) {
     const code = e && (e.code === 'catalog_not_configured' || e.code === 'catalog_unavailable')
       ? e.code : 'internal';

@@ -9,6 +9,8 @@ const PUBLIC = path.join(ROOT, 'public');
 const PORT = Number(process.env.PORT || 3000);
 const API = new Map([
   ['/api/status', require('../api/status')],
+  ['/api/escaparate', require('../api/escaparate')],
+  ['/api/panel', require('../api/panel')],
   ['/api/planes', require('../api/planes')],
   ['/api/test-login', require('../api/test-login')],
   ['/api/recompensas', require('../api/recompensas')],
@@ -22,6 +24,7 @@ const API = new Map([
   ,['/api/protecciones', require('../api/protecciones')]
   ,['/api/becas', require('../api/becas')]
   ,['/api/actividades', require('../api/actividades')]
+  ,['/api/opiniones', require('../api/opiniones')]
 ]);
 
 const MIME = {
@@ -39,7 +42,7 @@ const MIME = {
 
 function serveStatic(req, res) {
   const requested = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
-  const relative = requested === '/' ? '/index.html' : requested;
+  const relative = requested === '/' || requested === '/index.html' ? '/plataforma.html' : requested;
   const file = path.resolve(PUBLIC, '.' + relative);
   if (!file.startsWith(PUBLIC + path.sep)) return respond(res, 403, 'Forbidden');
   fs.stat(file, (statError, info) => {
