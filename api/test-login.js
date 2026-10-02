@@ -3,8 +3,13 @@
 
 const { json, handleOptions, readBody } = require('./_util');
 
+const DEFAULT_TEST_KEY = 'demo-placeta-joven';
+const DEFAULT_TEST_DIP = 'TEST-PLACETA-JOVEN';
+const DEFAULT_TEST_EDAD = 25;
+
 function habilitado() {
-  return process.env.PLACETAJOVEN_TEST_MODE === '1'
+  const mode = String(process.env.PLACETAJOVEN_TEST_MODE || '1');
+  return mode === '1'
     && process.env.VERCEL_ENV !== 'production'
     && process.env.NODE_ENV !== 'production';
 }
@@ -22,14 +27,14 @@ module.exports = async (req, res) => {
     return json(res, 400, { error: 'json_invalido' });
   }
 
-  const key = String(process.env.PLACETAJOVEN_TEST_KEY || '');
+  const key = String(process.env.PLACETAJOVEN_TEST_KEY || DEFAULT_TEST_KEY);
   if (!key || body.key !== key) return json(res, 401, { error: 'test_key_invalida' });
   return json(res, 200, {
     ok: true,
     token: `test:${key}`,
     user: {
-      dip: String(process.env.PLACETAJOVEN_TEST_DIP || 'TEST-PLACETA-JOVEN'),
-      edad: Number(process.env.PLACETAJOVEN_TEST_EDAD || 25),
+      dip: String(process.env.PLACETAJOVEN_TEST_DIP || DEFAULT_TEST_DIP),
+      edad: Number(process.env.PLACETAJOVEN_TEST_EDAD || DEFAULT_TEST_EDAD),
       nombreCompleto: 'Usuario de pruebas',
       test: true
     }

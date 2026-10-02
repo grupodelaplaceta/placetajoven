@@ -6,6 +6,54 @@ const {
   edadOk, calcExpira, verifyWebhook, estadoDesdeLs, variantToPlan, aplicarEvento, docVigente, planValido
 } = require('../lib/placetajoven');
 
+test('test-login: en local acepta la clave demo por defecto', async () => {
+  const prevMode = process.env.PLACETAJOVEN_TEST_MODE;
+  const prevKey = process.env.PLACETAJOVEN_TEST_KEY;
+  const prevDip = process.env.PLACETAJOVEN_TEST_DIP;
+  const prevEdad = process.env.PLACETAJOVEN_TEST_EDAD;
+  const prevPanel = process.env.PLACETAJOVEN_TEST_PANEL;
+  delete process.env.PLACETAJOVEN_TEST_MODE;
+  delete process.env.PLACETAJOVEN_TEST_KEY;
+  delete process.env.PLACETAJOVEN_TEST_DIP;
+  delete process.env.PLACETAJOVEN_TEST_EDAD;
+  delete process.env.PLACETAJOVEN_TEST_PANEL;
+  process.env.NODE_ENV = 'development';
+  process.env.VERCEL_ENV = 'development';
+
+  const handler = require('../api/test-login');
+  const req = {
+    method: 'POST',
+    headers: {},
+    on(event, cb) {
+      if (event === 'data') cb(JSON.stringify({ key: 'demo-placeta-joven' }));
+      if (event === 'end') cb();
+    }
+  };
+  const res = {
+    statusCode: 0,
+    headers: {},
+    setHeader(name, value) { this.headers[name] = value; },
+    end(body) { this.body = body; }
+  };
+
+  await handler(req, res);
+  assert.strictEqual(res.statusCode, 200);
+  const payload = JSON.parse(res.body);
+  assert.strictEqual(payload.ok, true);
+  assert.strictEqual(payload.user.dip, 'TEST-PLACETA-JOVEN');
+
+  if (prevMode === undefined) delete process.env.PLACETAJOVEN_TEST_MODE;
+  else process.env.PLACETAJOVEN_TEST_MODE = prevMode;
+  if (prevKey === undefined) delete process.env.PLACETAJOVEN_TEST_KEY;
+  else process.env.PLACETAJOVEN_TEST_KEY = prevKey;
+  if (prevDip === undefined) delete process.env.PLACETAJOVEN_TEST_DIP;
+  else process.env.PLACETAJOVEN_TEST_DIP = prevDip;
+  if (prevEdad === undefined) delete process.env.PLACETAJOVEN_TEST_EDAD;
+  else process.env.PLACETAJOVEN_TEST_EDAD = prevEdad;
+  if (prevPanel === undefined) delete process.env.PLACETAJOVEN_TEST_PANEL;
+  else process.env.PLACETAJOVEN_TEST_PANEL = prevPanel;
+});
+
 test('edadOk: 16 y 30 incluidos; fuera se bloquea', () => {
   assert.strictEqual(edadOk(16), true);
   assert.strictEqual(edadOk(30), true);
