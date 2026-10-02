@@ -7,25 +7,7 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
 const PORT = Number(process.env.PORT || 3000);
-const API = new Map([
-  ['/api/status', require('../api/status')],
-  ['/api/escaparate', require('../api/escaparate')],
-  ['/api/panel', require('../api/panel')],
-  ['/api/planes', require('../api/planes')],
-  ['/api/test-login', require('../api/test-login')],
-  ['/api/recompensas', require('../api/recompensas')],
-  ['/api/alta', require('../api/alta')],
-  ['/api/renovar', require('../api/renovar')],
-  ['/api/cancelar', require('../api/cancelar')],
-  ['/api/verificar', require('../api/verificar')],
-  ['/api/keys', require('../api/keys')]
-  ,['/api/caminos', require('../api/caminos')]
-  ,['/api/cuenta-joven', require('../api/cuenta-joven')]
-  ,['/api/protecciones', require('../api/protecciones')]
-  ,['/api/becas', require('../api/becas')]
-  ,['/api/actividades', require('../api/actividades')]
-  ,['/api/opiniones', require('../api/opiniones')]
-]);
+const apiRouter = require('../api');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -61,8 +43,7 @@ function respond(res, status, body) {
 
 const server = http.createServer((req, res) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;
-  const handler = API.get(pathname);
-  if (handler) return handler(req, res);
+  if (pathname.startsWith('/api/')) return apiRouter(req, res);
   return serveStatic(req, res);
 });
 

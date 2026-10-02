@@ -175,7 +175,7 @@ main.app-body{
 .app-foot a{color:var(--txt-2);text-decoration:none}
 .app-foot a:hover{color:var(--violeta)}
 
-.monthly-cap-total,.cashback-mark b{font-family:"Super Bouncer","Baruta",var(--display)}
+.monthly-cap-total,.cashback-mark b{font-family:var(--display)}
 .monthly-cap-total{font-size:.83rem;color:var(--ambar);white-space:nowrap}
 .monthly-cap .pbar{margin:.6rem 0 .35rem}
 .monthly-cap .fine{margin:.7rem 0 0}
@@ -185,7 +185,7 @@ main.app-body{
 .cashback-mark{font-size:2.2rem;font-weight:700;color:var(--verde);line-height:1}
 .cashback-mark span{font-size:1.2rem}
 .cashback-display{display:flex;align-items:center;gap:.85rem;padding:.8rem 1rem;margin:.6rem 0 1rem;background:var(--fondo-2);border:1px solid var(--linea);border-radius:var(--r)}
-.cashback-display b{font:700 1.8rem/.9 "Super Bouncer","Baruta",var(--display);color:var(--verde);white-space:nowrap}
+.cashback-display b{font:700 1.8rem/.9 var(--display);color:var(--verde);white-space:nowrap}
 .cashback-display b span{font-size:1rem}
 .cashback-display>span{font-size:.78rem;color:var(--txt-2)}
 
