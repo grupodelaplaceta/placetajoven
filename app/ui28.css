@@ -1,0 +1,123 @@
+/* ui28 · capa de diseño final. Se carga la última. Respeta html.hc (alto contraste), html.simple, html.rm y las fuentes de accesibilidad. */
+
+/* ---------- Tokens: más profundidad, bordes suaves, jerarquía de radios ---------- */
+html:not(.hc){
+  --bg:#08060F; --sf:#110D1C; --sf2:#181226; --sf3:#251C3A;
+  --bd:#251D3B; --bd2:#3A2F5E; --mt:#CFC9E2; --mt2:#A39CC0;
+  --r:20px; --r-ctl:12px; --ring:0 0 0 3px rgba(123,63,242,.32);
+  --lift:0 1px 0 rgba(255,255,255,.05) inset,0 14px 34px -16px rgba(0,0,0,.75);
+  --fh:Sora,Poppins,system-ui,sans-serif;
+}
+html:not(.hc):not(.simple) body{
+  background:
+    radial-gradient(900px 520px at 88% -8%,rgba(123,63,242,.17),transparent 62%),
+    radial-gradient(700px 420px at -6% 8%,rgba(43,214,123,.06),transparent 58%),
+    var(--bg);
+  background-attachment:fixed;
+}
+::selection{background:rgba(123,63,242,.55);color:#fff}
+*{scrollbar-width:thin;scrollbar-color:var(--sf3) transparent}
+:focus-visible{outline:2px solid var(--p2)!important;outline-offset:2px}
+
+/* ---------- Tipografía: títulos con carácter, cuerpo intacto (no pisa las fuentes de accesibilidad) ---------- */
+html:not(.f-atk):not(.f-lex) :is(h1,h2,.hd h1,.hm-t,.sec h2,.price,.vst){font-family:var(--fh);letter-spacing:-.025em}
+.hd h1{font-weight:700;line-height:1.1}
+.sec h2{font-size:20px;font-weight:700}
+.small,small{color:var(--mt2)}
+
+/* ---------- Barra superior: cristal ---------- */
+html:not(.hc):not(.simple) body:not(.out) #side{
+  background:rgba(10,7,18,.74);backdrop-filter:saturate(1.5) blur(18px);-webkit-backdrop-filter:saturate(1.5) blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.06);border-right:0;
+}
+body #side .nv{font-weight:600;color:var(--mt2);transition:color .2s,background .2s}
+body #side .nv:hover{color:#fff;background:rgba(255,255,255,.06)!important}
+body #side .nv.on{color:#fff!important;background:rgba(123,63,242,.2)!important;box-shadow:inset 0 -2px 0 var(--p2)!important;border-radius:10px!important}
+body #side .pzchip{background:linear-gradient(180deg,rgba(43,214,123,.14),rgba(43,214,123,.05))!important;border:1px solid rgba(43,214,123,.35)!important;border-radius:99px!important;padding:6px 14px}
+body #side .pzchip b{font-family:var(--fh);font-size:16px}
+body #side .pzchip:hover{border-color:var(--g)!important;box-shadow:0 0 0 4px rgba(43,214,123,.12)}
+body #side .me{border-radius:99px!important}.av{border-radius:50%!important;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+
+/* ---------- Superficies ---------- */
+.card,.tile,.kpi{
+  background:linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,0)) ,var(--sf);
+  border:1px solid rgba(255,255,255,.07);box-shadow:var(--lift);
+}
+.empty{background:transparent!important;border:1px dashed rgba(255,255,255,.14)!important;box-shadow:none!important;border-radius:var(--r)}
+.hero{border-radius:28px;border-color:rgba(255,255,255,.08);box-shadow:0 36px 90px -40px rgba(123,63,242,.65)}
+
+/* ---------- Tarjetas de juego ---------- */
+.gc{border-radius:22px!important;border:1px solid rgba(255,255,255,.07)!important;box-shadow:var(--lift)}
+.gc:hover{transform:translateY(-5px)!important;border-color:rgba(185,155,255,.55)!important;box-shadow:0 24px 50px -22px rgba(123,63,242,.7)!important}
+.gc .gb{padding:14px 16px 8px}
+.gc .pr b{background:rgba(255,255,255,.07)!important;font-family:var(--fh);font-weight:700}
+.gc .pr .disc{background:var(--g)!important;color:#04130B!important}
+
+/* ---------- Botones ---------- */
+.btn{border-radius:var(--r-ctl);font-weight:600;letter-spacing:.005em;box-shadow:0 1px 0 rgba(255,255,255,.18) inset}
+.btn:not(.g):not(.ghost):not(.danger){background:linear-gradient(180deg,#8B53FA,#6F34E6)}
+.btn:not(.g):not(.ghost):not(.danger):hover{background:linear-gradient(180deg,#9A67FF,#7B3FF2)}
+.btn.g{background:linear-gradient(180deg,#3BE08A,#25C973)}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);box-shadow:none}
+.btn.ghost:hover{background:rgba(255,255,255,.09);border-color:var(--p2)}
+.btn.blk{width:100%}
+.btn:focus-visible{box-shadow:var(--ring)}
+
+/* ---------- Formularios ---------- */
+input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),textarea,select{
+  background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--r-ctl);min-height:44px;padding:10px 14px;color:var(--tx);
+  transition:border-color .15s,box-shadow .15s;font:inherit;
+}
+textarea{min-height:96px;line-height:1.5}
+input::placeholder,textarea::placeholder{color:#7F77A0}
+input:focus,textarea:focus,select:focus{border-color:var(--p2)!important;box-shadow:var(--ring);outline:none!important}
+input[readonly]{opacity:.7;cursor:not-allowed}
+input[type=checkbox],input[type=radio]{accent-color:var(--p)}
+
+/* ---------- Chips y píldoras ---------- */
+.chips{padding:2px 2px 6px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 28px),transparent)}
+.chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--mt);padding:8px 16px}
+.chip:hover{background:rgba(255,255,255,.08);border-color:var(--p2);color:#fff}
+.chip.on{background:linear-gradient(180deg,#8B53FA,#6F34E6);border-color:transparent;color:#fff;box-shadow:0 6px 18px -6px rgba(123,63,242,.7)}
+.chip.st{border-style:dashed}.chip.st.on{border-style:solid}
+.pill{border:1px solid rgba(255,255,255,.06)}
+
+/* ---------- Banners promocionales ---------- */
+.pbn-i{border-radius:20px;padding:18px 24px;border:1px solid rgba(255,255,255,.16);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.pbn-i::after{content:"";position:absolute;right:-40px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.1);pointer-events:none}
+.pbn-i:hover{transform:translateY(-2px);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
+.pbn-i b{font-family:var(--fh);font-size:19px;letter-spacing:-.02em}
+.pbn-i em{position:relative;z-index:1}
+
+/* ---------- Tablas ---------- */
+.tw table{border-collapse:separate;border-spacing:0;width:100%}
+.tw th{font-size:12.5px;font-weight:600;color:var(--mt2);text-align:left;padding:12px 14px;border-bottom:1px solid var(--bd)}
+.tw td{padding:13px 14px;border-bottom:1px solid rgba(255,255,255,.05)}
+.tw tr:last-child td{border-bottom:0}.tw tbody tr:hover td{background:rgba(255,255,255,.025)}
+
+/* ---------- Avisos ---------- */
+.toasts{left:50%;right:auto;transform:translateX(-50%);bottom:24px;align-items:center}
+.toast{background:rgba(24,18,38,.9);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);border-left-width:1px;border-radius:14px;padding:12px 18px;box-shadow:0 18px 40px -10px rgba(0,0,0,.7);display:flex;gap:10px;align-items:center}
+.toast::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--p2);flex:none}
+.toast.ok::before{background:var(--g)}.toast.dg::before{background:var(--dg)}.toast.wn::before{background:var(--wn)}
+.toast.ok,.toast.dg,.toast.wn{border-left-color:rgba(255,255,255,.1)}
+
+/* ---------- Carga ---------- */
+.pj-load{display:grid;place-items:center;gap:14px;padding:80px 20px;color:var(--mt2)}
+.pj-load i{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.1);border-top-color:var(--p2);animation:pjspin .8s linear infinite}
+@keyframes pjspin{to{transform:rotate(360deg)}}
+
+/* ---------- Móvil: barra de pestañas flotante ---------- */
+@media(max-width:900px){
+  body .tabs{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));padding:6px;border:1px solid rgba(255,255,255,.1);border-radius:24px;
+    background:rgba(17,13,28,.84);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 20px 50px -10px rgba(0,0,0,.8)}
+  body .tabs .tab{border-radius:18px!important}
+  body .tabs .tab.on{background:rgba(123,63,242,.26)!important}
+  body .tabs .tab.on::after{display:none}
+  .toasts{bottom:100px}
+  .hero{border-radius:22px}
+}
+
+/* ---------- Movimiento: respeta preferencias ---------- */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+html.rm *,html.rm *::before,html.rm *::after{animation:none!important;transition:none!important}

@@ -1,0 +1,9 @@
+{
+  "name": "placeta-joven-desktop",
+  "version": "1.0.0",
+  "description": "Placeta Joven - modo escritorio con Arcade Shield",
+  "main": "main.js",
+  "scripts": { "start": "electron .", "build": "electron-builder --win portable" },
+  "devDependencies": { "electron": "^33.0.0", "electron-builder": "^25.0.0" },
+  "build": { "appId": "es.placetajoven.desktop", "files": ["main.js","preload.js","overlay.html","app/**"], "win": { "target": "portable" } }
+}

@@ -1,0 +1,12 @@
+[functions.placetaid-exchange]
+verify_jwt = false      # se llama antes de tener sesión
+[functions.studio-keys]
+verify_jwt = true
+[functions.reveal-key]
+verify_jwt = true
+[functions.check-embed]
+verify_jwt = true
+[functions.joven-api]
+verify_jwt = true
+[functions.joven-pay]
+verify_jwt = true
