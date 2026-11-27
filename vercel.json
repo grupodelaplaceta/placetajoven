@@ -1,9 +1,31 @@
 {
   "outputDirectory": "app",
-  "rewrites": [{ "source": "/placetaid", "destination": "/index.html" }],
-  "headers": [{ "source": "/(.*)", "headers": [
-    { "key": "Referrer-Policy", "value": "same-origin" },
-    { "key": "X-Content-Type-Options", "value": "nosniff" },
-    { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
-  ] }]
+  "rewrites": [
+    {
+      "source": "/placetaid",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "same-origin"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
+  "buildCommand": "echo Web estatica",
+  "installCommand": "echo Sin dependencias",
+  "framework": null
 }
